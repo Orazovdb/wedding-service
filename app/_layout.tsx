@@ -1,39 +1,210 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { useFonts } from 'expo-font';
-import { Stack } from 'expo-router';
-import * as SplashScreen from 'expo-splash-screen';
-import { StatusBar } from 'expo-status-bar';
-import { useEffect } from 'react';
-import 'react-native-reanimated';
+import CategoryIcon from "@/assets/images/navigations/category.svg";
+import HomeIcon from "@/assets/images/navigations/home.svg";
+import SettingsIcon from "@/assets/images/navigations/settings.svg";
+import SubscribersIcon from "@/assets/images/navigations/subscribers.svg";
+import { Colors } from "@/constants/Colors";
+import { useFonts } from "expo-font";
+import { Stack, usePathname, useRouter } from "expo-router";
+import {
+	ActivityIndicator,
+	Platform,
+	StyleSheet,
+	Text,
+	TouchableOpacity,
+	View
+} from "react-native";
+import "react-native-gesture-handler";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { AuthProvider, useAuth } from "../store/AuthContext";
 
-import { useColorScheme } from '@/hooks/useColorScheme';
-
-// Prevent the splash screen from auto-hiding before asset loading is complete.
-SplashScreen.preventAutoHideAsync();
-
-export default function RootLayout() {
-  const colorScheme = useColorScheme();
-  const [loaded] = useFonts({
-    SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
-  });
-
-  useEffect(() => {
-    if (loaded) {
-      SplashScreen.hideAsync();
-    }
-  }, [loaded]);
-
-  if (!loaded) {
-    return null;
-  }
-
-  return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="+not-found" />
-      </Stack>
-      <StatusBar style="auto" />
-    </ThemeProvider>
-  );
+export default function Layout() {
+	return (
+		<AuthProvider>
+			<GestureHandlerRootView style={{ flex: 1 }}>
+				<ProtectedRoutes />
+			</GestureHandlerRootView>
+		</AuthProvider>
+	);
 }
+function ProtectedRoutes() {
+	const { isLoggedIn } = useAuth();
+	const pathname = usePathname();
+	const router = useRouter();
+
+	const [fontsLoaded] = useFonts({
+		"Lexend-Bold": require("@/shared/fonts/Lexend-Bold.ttf"),
+		"Lexend-ExtraBold": require("@/shared/fonts/Lexend-ExtraBold.ttf"),
+		"Lexend-SemiBold": require("@/shared/fonts/Lexend-SemiBold.ttf"),
+		"Lexend-Regular": require("@/shared/fonts/Lexend-Regular.ttf"),
+		"Lexend-ExtraLight": require("@/shared/fonts/Lexend-ExtraLight.ttf"),
+		"Lexend-Thin": require("@/shared/fonts/Lexend-Thin.ttf"),
+		"Lexend-Light": require("@/shared/fonts/Lexend-Light.ttf"),
+		"Lexend-Medium": require("@/shared/fonts/Lexend-Medium.ttf"),
+		"Lexend-Black": require("@/shared/fonts/Lexend-Black.ttf")
+	});
+
+	if (!fontsLoaded) {
+		return (
+			<View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+				<ActivityIndicator size="large" />
+			</View>
+		);
+	}
+
+	return (
+		<SafeAreaView style={styles.safeArea}>
+			<Stack screenOptions={{ headerShown: false }}>
+				{!isLoggedIn ? (
+					<>
+						<Stack.Screen name="home" options={{ headerShown: false }} />
+						<Stack.Screen name="home/[id]" options={{ headerShown: false }} />
+						<Stack.Screen name="categories" options={{ headerShown: false }} />
+						<Stack.Screen
+							name="categories/[id]"
+							options={{ headerShown: false }}
+						/>
+						<Stack.Screen
+							name="categories/[categories-detail]/[id]"
+							options={{ headerShown: false }}
+						/>
+						<Stack.Screen name="subscribers" options={{ headerShown: false }} />
+						<Stack.Screen name="settings" options={{ headerShown: false }} />
+					</>
+				) : (
+					<Stack.Screen name="index" options={{ headerShown: false }} />
+				)}
+			</Stack>
+			{isLoggedIn && (
+				<View style={styles.bottomNavigation}>
+					<TouchableOpacity onPress={() => router.push("/home")}>
+						<View
+							style={[
+								styles.navContainer,
+								(pathname === "/home" || pathname.startsWith("/home/")) &&
+									styles.activeNavContainer
+							]}
+						>
+							<HomeIcon />
+						</View>
+						<Text
+							style={[
+								styles.navItem,
+								pathname === "/home" && styles.activeNavItem
+							]}
+						>
+							Baş sahypa
+						</Text>
+					</TouchableOpacity>
+					<TouchableOpacity onPress={() => router.push("/categories")}>
+						<View
+							style={[
+								styles.navContainer,
+								(pathname === "/categories" ||
+									pathname.startsWith("/categories/")) &&
+									styles.activeNavContainer
+							]}
+						>
+							<CategoryIcon />
+						</View>
+						<Text
+							style={[
+								styles.navItem,
+								pathname === "/categories" && styles.activeNavItem
+							]}
+						>
+							Kategoriýalar
+						</Text>
+					</TouchableOpacity>
+					<TouchableOpacity onPress={() => router.push("/subscribers")}>
+						<View
+							style={[
+								styles.navContainer,
+								pathname === "/subscribers" && styles.activeNavContainer
+							]}
+						>
+							<SubscribersIcon />
+						</View>
+						<Text
+							style={[
+								styles.navItem,
+								pathname === "/subscribers" && styles.activeNavItem
+							]}
+						>
+							Agzalyklarym
+						</Text>
+					</TouchableOpacity>
+					<TouchableOpacity onPress={() => router.push("/settings")}>
+						<View
+							style={[
+								styles.navContainer,
+								pathname === "/settings" && styles.activeNavContainer
+							]}
+						>
+							<SettingsIcon />
+						</View>
+						<Text
+							style={[
+								styles.navItem,
+								pathname === "/settings" && styles.activeNavItem
+							]}
+						>
+							Sazlamalar
+						</Text>
+					</TouchableOpacity>
+				</View>
+			)}
+		</SafeAreaView>
+	);
+}
+
+const styles = StyleSheet.create({
+	safeArea: { flex: 1 },
+	bottomNavigation: {
+		position: "absolute",
+		bottom: 0,
+		width: "100%",
+		height: Platform.OS === "android" ? 65 : 75,
+		backgroundColor: "#fff",
+		flexDirection: "row",
+		justifyContent: "space-around",
+		alignItems: Platform.OS === "android" ? "center" : "flex-start",
+		borderTopWidth: 1,
+		borderTopColor: "#ddd",
+		zIndex: 10,
+		borderTopLeftRadius: 14,
+		borderTopRightRadius: 14,
+		shadowColor: "#000",
+		shadowOffset: { width: 4, height: 0 },
+		shadowOpacity: 0.25,
+		shadowRadius: 4,
+		elevation: 5,
+		paddingHorizontal: 14,
+		paddingTop: Platform.OS === "ios" ? 6 : 0
+	},
+	navItem: {
+		fontSize: 12,
+		fontFamily: "Lexend-ExtraLight",
+		color: Colors.dark.secondary
+	},
+
+	activeNavItem: {
+		fontSize: 12,
+		fontFamily: "Lexend-Medium"
+	},
+
+	navContainer: {
+		justifyContent: "center",
+		alignItems: "center",
+		borderRadius: 6,
+		width: 42,
+		height: 33,
+		marginHorizontal: "auto"
+	},
+
+	activeNavContainer: {
+		backgroundColor: Colors.dark.primary,
+		borderRadius: 8,
+		padding: 4
+	}
+});

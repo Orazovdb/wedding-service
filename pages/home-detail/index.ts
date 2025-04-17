@@ -1,0 +1,1 @@
+export { HomeDynamicScreen } from "./page";
