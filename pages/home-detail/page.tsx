@@ -2,6 +2,7 @@ import { Colors } from "@/constants/Colors";
 import { useLocalSearchParams } from "expo-router";
 import { Dimensions, ScrollView, StyleSheet } from "react-native";
 import { HomeDetailBanner } from "./ui/home-detail-banner";
+import { HomeDetailProfile } from "./ui/home-detail-profile";
 
 const { width } = Dimensions.get("window");
 
@@ -11,6 +12,7 @@ export const HomeDynamicScreen = () => {
 	return (
 		<ScrollView style={styles.container}>
 			<HomeDetailBanner />
+			<HomeDetailProfile />
 		</ScrollView>
 	);
 };

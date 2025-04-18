@@ -5,6 +5,7 @@ import SubscribersIcon from "@/assets/images/navigations/subscribers.svg";
 import { Colors } from "@/constants/Colors";
 import { useFonts } from "expo-font";
 import { Stack, usePathname, useRouter } from "expo-router";
+import { StatusBar } from "expo-status-bar";
 import {
 	ActivityIndicator,
 	Platform,
@@ -15,16 +16,18 @@ import {
 } from "react-native";
 import "react-native-gesture-handler";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { AuthProvider, useAuth } from "../store/AuthContext";
 
 export default function Layout() {
 	return (
-		<AuthProvider>
-			<GestureHandlerRootView style={{ flex: 1 }}>
-				<ProtectedRoutes />
-			</GestureHandlerRootView>
-		</AuthProvider>
+		<SafeAreaProvider>
+			<AuthProvider>
+				<GestureHandlerRootView style={{ flex: 1 }}>
+					<ProtectedRoutes />
+				</GestureHandlerRootView>
+			</AuthProvider>
+		</SafeAreaProvider>
 	);
 }
 function ProtectedRoutes() {
@@ -54,27 +57,47 @@ function ProtectedRoutes() {
 
 	return (
 		<SafeAreaView style={styles.safeArea}>
-			<Stack screenOptions={{ headerShown: false }}>
+			<StatusBar style="dark" backgroundColor="#fff" />
+			<Stack
+				screenOptions={{
+					headerShown: false,
+					animation: "fade",
+					gestureEnabled: false
+				}}
+			>
 				{!isLoggedIn ? (
 					<>
-						<Stack.Screen name="home" options={{ headerShown: false }} />
-						<Stack.Screen name="home/[id]" options={{ headerShown: false }} />
-						<Stack.Screen name="categories" options={{ headerShown: false }} />
+						<Stack.Screen name="home" />
+						<Stack.Screen
+							name="home/[id]"
+							options={{
+								animation: "slide_from_bottom",
+								presentation: "modal"
+							}}
+						/>
+						<Stack.Screen name="categories" />
 						<Stack.Screen
 							name="categories/[id]"
-							options={{ headerShown: false }}
+							options={{
+								animation: "slide_from_bottom",
+								presentation: "modal"
+							}}
 						/>
 						<Stack.Screen
 							name="categories/[categories-detail]/[id]"
-							options={{ headerShown: false }}
+							options={{
+								animation: "slide_from_bottom",
+								presentation: "modal"
+							}}
 						/>
-						<Stack.Screen name="subscribers" options={{ headerShown: false }} />
-						<Stack.Screen name="settings" options={{ headerShown: false }} />
+						<Stack.Screen name="subscribers" />
+						<Stack.Screen name="settings" />
 					</>
 				) : (
-					<Stack.Screen name="index" options={{ headerShown: false }} />
+					<Stack.Screen name="index" />
 				)}
 			</Stack>
+
 			{isLoggedIn && (
 				<View style={styles.bottomNavigation}>
 					<TouchableOpacity onPress={() => router.push("/home")}>
@@ -164,7 +187,7 @@ const styles = StyleSheet.create({
 		position: "absolute",
 		bottom: 0,
 		width: "100%",
-		height: Platform.OS === "android" ? 65 : 75,
+		height: Platform.OS === "android" ? 65 : 80,
 		backgroundColor: "#fff",
 		flexDirection: "row",
 		justifyContent: "space-around",

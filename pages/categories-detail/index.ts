@@ -1,0 +1,1 @@
+export {CategoriesDetailScreen} from './page'

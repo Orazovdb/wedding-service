@@ -70,6 +70,10 @@ export const HomeDetailBanner = () => {
 		}
 	}, [isBuffering, player]);
 
+	const handleChangeVideo = (value: boolean) => {
+		setIsVideoSlide(value);
+	};
+
 	return (
 		<View style={styles.sliderContainer}>
 			<View style={styles.backIcon}>
@@ -85,7 +89,7 @@ export const HomeDetailBanner = () => {
 					<View style={styles.tabsBackground} />
 
 					<TouchableOpacity
-						onPress={() => setIsVideoSlide(true)}
+						onPress={() => handleChangeVideo(true)}
 						style={[styles.tab, isVideoSlide && styles.tabActive]}
 					>
 						<Text
@@ -95,7 +99,7 @@ export const HomeDetailBanner = () => {
 						</Text>
 					</TouchableOpacity>
 					<TouchableOpacity
-						onPress={() => setIsVideoSlide(false)}
+						onPress={() => handleChangeVideo(false)}
 						style={[styles.tab, !isVideoSlide && styles.tabActive]}
 					>
 						<Text
@@ -142,9 +146,17 @@ export const HomeDetailBanner = () => {
 							))}
 						</View>
 					</View>
+					<View style={styles.paginationFractionWrapper}>
+						<View style={styles.paginationFraction}>
+							<Text style={styles.paginationFractionText}>
+								{currentIndex + 1}/{FakeSlides.length}
+							</Text>
+						</View>
+					</View>
 				</>
-			) : null}
-			)
+			) : (
+				<Text>Privet</Text>
+			)}
 		</View>
 	);
 };
@@ -153,13 +165,18 @@ export const styles = StyleSheet.create({
 	sliderContainer: {
 		position: "relative",
 		flexGrow: 1,
-		width: width
+		width: width,
 	},
 
 	backIcon: {
 		position: "absolute",
 		top: 12,
-		left: 18
+		left: 18,
+		zIndex: 10,
+		paddingVertical: 2,
+		paddingHorizontal: 6,
+		backgroundColor: "#00000099",
+		borderRadius: 4
 	},
 
 	tabsWrapper: {
@@ -212,7 +229,8 @@ export const styles = StyleSheet.create({
 	paginationContainer: {
 		position: "absolute",
 		bottom: 14,
-		alignSelf: "center"
+		alignSelf: "center",
+		zIndex: 10
 	},
 	pagination: {
 		flexDirection: "row",
@@ -223,5 +241,27 @@ export const styles = StyleSheet.create({
 		borderRadius: 3,
 		minWidth: 100
 	},
-	dot: { width: 7, height: 7, borderRadius: 7 / 2, marginHorizontal: 3 }
+	dot: { width: 7, height: 7, borderRadius: 7 / 2, marginHorizontal: 2 },
+
+	paginationFractionWrapper: {
+		position: "absolute",
+		right: 30,
+		bottom: 12,
+		alignSelf: "center",
+		zIndex: 10
+	},
+	paginationFraction: {
+		flexDirection: "row",
+		justifyContent: "center",
+		backgroundColor: "#00000099",
+		paddingVertical: 2,
+		paddingHorizontal: 10,
+		borderRadius: 4,
+		minWidth: 54
+	},
+	paginationFractionText: {
+		fontFamily: "Lexend-Regular",
+		fontSize: 12,
+		color: Colors.dark.white
+	}
 });
