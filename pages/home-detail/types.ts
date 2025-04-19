@@ -9,3 +9,9 @@ export type ImageSlide = {
 	id: string;
 	image: ImageSourcePropType;
 };
+
+export type CategoryItem = {
+	id: string;
+	image: ImageSourcePropType;
+	status: string;
+};

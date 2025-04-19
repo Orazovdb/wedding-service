@@ -1,3 +1,4 @@
+import { Colors } from "@/constants/Colors";
 import React from "react";
 import { Image, StyleSheet, Text, View } from "react-native";
 
@@ -11,14 +12,11 @@ export const HomeDetailAbout = () => {
 					style={styles.image}
 				/>
 				<View style={styles.info}>
-					<Text style={styles.name}>Mark Manson</Text>
 					<Text style={styles.description}>
-						Salam, ipsum dolor sit amet, consectetur adipiscing elit. Sed do
-						eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim
-						ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
-						aliquip ex ea commodo consequat. Duis aute irure dolor in
-						reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
-						pariatur.
+						<Text style={{ fontFamily: "Lexend-Regular" }}>Salam</Text>, ipsum
+						dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor
+						incididunt ut labore et dolore magna aliqua. Ut enim ad minim
+						veniam.
 					</Text>
 					<Text style={styles.meeting}>Hormatlamak bilen, Mark</Text>
 				</View>
@@ -28,12 +26,41 @@ export const HomeDetailAbout = () => {
 };
 
 export const styles = StyleSheet.create({
-	about: {},
-	title: {},
-	row: {},
-	image: {},
-	info: {},
-	name: {},
-	description: {},
-	meeting: {},
+	about: {
+		marginTop: 14,
+		marginBottom: 20,
+		paddingHorizontal: 24
+	},
+	title: {
+		color: "#000",
+		fontSize: 14,
+		fontFamily: "Lexend-Regular",
+		marginBottom: 6
+	},
+	row: {
+		flexDirection: "row"
+	},
+	image: {
+		width: "50%",
+		height: 144,
+		resizeMode: "cover",
+		borderRadius: 6,
+		marginRight: 16,
+		marginTop: 10
+	},
+	info: {
+		width: "50%",
+		justifyContent: "space-between"
+	},
+	description: {
+		fontFamily: "Lexend-ExtraLight",
+		fontSize: 14,
+		color: Colors.dark.secondary,
+		flex: 1
+	},
+	meeting: {
+		fontFamily: "Lexend-Regular",
+		fontSize: 14,
+		color: Colors.dark.secondary
+	}
 });

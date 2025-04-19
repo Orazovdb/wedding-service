@@ -155,7 +155,49 @@ export const HomeDetailBanner = () => {
 					</View>
 				</>
 			) : (
-				<Text>Privet</Text>
+				<>
+					{isBuffering && <ActivityIndicator size="large" color="#0000ff" />}
+					<FlatList
+						data={FakeSlides}
+						keyExtractor={item => item.id}
+						horizontal
+						pagingEnabled
+						showsHorizontalScrollIndicator={false}
+						onScroll={handleScroll}
+						onMomentumScrollEnd={handleMomentumScrollEnd}
+						style={styles.flatList}
+						renderItem={({ item }) => (
+							<View style={styles.slide}>
+								<Image source={item.image} style={styles.image} />
+							</View>
+						)}
+					/>
+					<View style={styles.paginationContainer}>
+						<View style={styles.pagination}>
+							{FakeSlides.map((_, i) => (
+								<View
+									key={i}
+									style={[
+										styles.dot,
+										{
+											backgroundColor:
+												i === currentIndex
+													? Colors[colorScheme ?? "light"].primary
+													: Colors[colorScheme ?? "light"].white
+										}
+									]}
+								/>
+							))}
+						</View>
+					</View>
+					<View style={styles.paginationFractionWrapper}>
+						<View style={styles.paginationFraction}>
+							<Text style={styles.paginationFractionText}>
+								{currentIndex + 1}/{FakeSlides.length}
+							</Text>
+						</View>
+					</View>
+				</>
 			)}
 		</View>
 	);
@@ -165,7 +207,7 @@ export const styles = StyleSheet.create({
 	sliderContainer: {
 		position: "relative",
 		flexGrow: 1,
-		width: width,
+		width: width
 	},
 
 	backIcon: {
