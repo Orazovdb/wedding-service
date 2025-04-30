@@ -1,6 +1,7 @@
 import { Colors } from "@/constants/Colors";
 import CheckedIcon from "@/shared/icons/checked.svg";
 import CloseIcon from "@/shared/icons/close-icon.svg";
+import IconFilter from "@/shared/icons/filter-subscribers-icon.svg";
 import UncheckedIcon from "@/shared/icons/unchecked.svg";
 import React, { useState } from "react";
 import {
@@ -13,27 +14,28 @@ import {
 	TouchableOpacity,
 	View
 } from "react-native";
-import { HomeFilterModalData } from "../data";
+import { HomeFilterModalData } from "../../home/data";
 
-type HomeFilterModalProps = {
+type SubscribersFilterProps = {
 	isModalVisible: boolean;
-	setIsModalVisible: (isModalVisible: boolean) => void;
+	setIsModalVisible: () => void;
 };
 
 const { width, height } = Dimensions.get("window");
 
-const HomeFilterModalButton = (props: HomeFilterModalProps) => {
+const SubscribersFilterButton = (props: SubscribersFilterProps) => {
 	return (
 		<TouchableOpacity
 			style={styles.filterButton}
-			onPress={() => props.setIsModalVisible(true)}
+			onPress={ props.setIsModalVisible}
 		>
 			<Text style={styles.filterText}>Фильтр</Text>
+			<IconFilter />
 		</TouchableOpacity>
 	);
 };
 
-const HomeFilterModal = (props: HomeFilterModalProps) => {
+const SubscribersDetailFilter = (props: SubscribersFilterProps) => {
 	const [selectedItems, setSelectedItems] = useState<string[]>([]);
 
 	const toggleCheckbox = (categoryId: string, itemId: string) => {
@@ -49,13 +51,13 @@ const HomeFilterModal = (props: HomeFilterModalProps) => {
 			animationType="slide"
 			transparent={true}
 			visible={props.isModalVisible}
-			onRequestClose={() => props.setIsModalVisible(false)}
+			onRequestClose={props.setIsModalVisible}
 		>
 			<View style={styles.modalContainer}>
 				<ScrollView contentContainerStyle={styles.modalContent}>
 					<TouchableOpacity
 						style={styles.closeButton}
-						onPress={() => props.setIsModalVisible(false)}
+						onPress={props.setIsModalVisible}
 					>
 						<CloseIcon />
 						<Text style={styles.closeButtonText}>Filter</Text>
@@ -98,24 +100,24 @@ const HomeFilterModal = (props: HomeFilterModalProps) => {
 	);
 };
 
-export const FilterModal = {
-	Modal: HomeFilterModal,
-	Button: HomeFilterModalButton
+export const SubscribersFilterModal = {
+	Modal: SubscribersDetailFilter,
+	Button: SubscribersFilterButton
 };
 
 export const styles = StyleSheet.create({
 	filterButton: {
-		paddingVertical: 3,
-		paddingHorizontal: 12,
-		marginLeft: 4,
-		borderLeftWidth: 1,
-		borderColor: Colors.light.secondary
+		paddingVertical: 4,
+		paddingHorizontal: 6,
+		flexDirection: "row",
+		gap: 4,
+		backgroundColor: "#0000004D",
+		borderRadius: 6
 	},
 	filterText: {
-		color: Colors.light.secondary,
-		fontSize: 14,
-		fontWeight: "400",
-		textDecorationLine: "underline"
+		color: Colors.light.white,
+		fontSize: 16,
+		fontFamily: "Lexend-Regular"
 	},
 	modalContainer: {
 		flex: 1,
@@ -172,8 +174,8 @@ export const styles = StyleSheet.create({
 		marginRight: 10
 	},
 	categoryItemModalDivider: {
-		width: '70%',
-		marginHorizontal: "auto", 
+		width: "70%",
+		marginHorizontal: "auto",
 		height: 1,
 		backgroundColor: "#E3E3E3",
 		marginTop: 24

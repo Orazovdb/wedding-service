@@ -9,8 +9,8 @@ import {
 	TextInput,
 	View
 } from "react-native";
+import { FilterModal } from "../categories-detail/ui/categories-filter";
 import { HomeCategoriesSlider } from "./ui/HomeCategoriesSlider";
-import { FilterModal } from "./ui/HomeFilterModal";
 import { HomeMainBanner } from "./ui/HomeMainBanner";
 import { HomeServices } from "./ui/HomeServices";
 
