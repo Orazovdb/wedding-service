@@ -15,7 +15,8 @@
       "adaptiveIcon": {
         "foregroundImage": "./shared/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.dovran_orazov.weddingservice"
     },
     "web": {
       "bundler": "metro",
@@ -37,6 +38,14 @@
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "80ba94ef-cc2b-4442-8591-0533656636e4"
+      }
     }
   }
 }
