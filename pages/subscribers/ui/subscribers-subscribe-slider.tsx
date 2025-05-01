@@ -44,13 +44,10 @@ export const SubscribersSubscribeSlider = (props: Props) => {
 				animated: true,
 				viewPosition: 0
 			});
+			setCurrentIndex(index);
 			props.onSelectSubCategory(SubscribersData[index].id);
 		}
 	};
-
-	useEffect(() => {
-		props.onSelectSubCategory(SubscribersData[currentIndex]?.id);
-	}, [currentIndex]);
 
 	return (
 		<View style={styles.wrapper}>
@@ -66,21 +63,14 @@ export const SubscribersSubscribeSlider = (props: Props) => {
 					data={SubscribersData}
 					keyExtractor={item => item.id}
 					horizontal
-					pagingEnabled
-					scrollEnabled
+					pagingEnabled={false}
+					scrollEnabled={true}
 					showsHorizontalScrollIndicator={false}
-					onViewableItemsChanged={({ viewableItems }) => {
-						if (viewableItems.length > 0) {
-							const index = viewableItems[0].index ?? 0;
-							setCurrentIndex(index);
-						}
-					}}
-					viewabilityConfig={{ itemVisiblePercentThreshold: 50 }}
-					renderItem={({ item }) => (
+					renderItem={({ item, index }) => (
 						<SubscriberItem
 							item={item}
-							isActive={props.subscribe_id === item.id}
-							onSelectSubCategory={props.onSelectSubCategory}
+							isActive={SubscribersData[currentIndex].id === item.id}
+							onPress={() => scrollToIndex(index)}
 						/>
 					)}
 					getItemLayout={(_, index) => ({
@@ -88,7 +78,7 @@ export const SubscribersSubscribeSlider = (props: Props) => {
 						offset: ITEM_WIDTH * index,
 						index
 					})}
-					initialNumToRender={3}
+					initialNumToRender={5}
 					snapToInterval={ITEM_WIDTH}
 					decelerationRate="fast"
 					contentContainerStyle={styles.flatListContent}
@@ -107,10 +97,10 @@ export const SubscribersSubscribeSlider = (props: Props) => {
 type ItemProps = {
 	item: any;
 	isActive: boolean;
-	onSelectSubCategory: (id: string) => void;
+	onPress: () => void;
 };
 
-const SubscriberItem = ({ item, isActive, onSelectSubCategory }: ItemProps) => {
+const SubscriberItem = ({ item, isActive, onPress }: ItemProps) => {
 	const animatedSize = useRef(new Animated.Value(isActive ? 120 : 60)).current;
 
 	useEffect(() => {
@@ -128,7 +118,7 @@ const SubscriberItem = ({ item, isActive, onSelectSubCategory }: ItemProps) => {
 				isActive ? styles.categoryItemActive : null,
 				{ width: ITEM_WIDTH }
 			]}
-			onPress={() => onSelectSubCategory(item.id)}
+			onPress={onPress}
 		>
 			<Animated.Image
 				source={item.image}
