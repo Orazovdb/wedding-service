@@ -110,6 +110,7 @@ export const styles = StyleSheet.create({
 		paddingVertical: 4,
 		paddingHorizontal: 6,
 		flexDirection: "row",
+		alignItems: 'center',
 		gap: 4,
 		backgroundColor: "#0000004D",
 		borderRadius: 6

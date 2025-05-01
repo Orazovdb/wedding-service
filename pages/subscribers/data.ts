@@ -105,5 +105,23 @@ export const SubscribersData = [
 		name: "Myrat",
 		surname: "Myradow",
 		image: require("@/shared/images/login/slider-3.png")
+	},
+	{
+		id: "8",
+		name: "Myrat",
+		surname: "Myradow",
+		image: require("@/shared/images/login/slider-3.png")
+	},
+	{
+		id: "9",
+		name: "Myrat",
+		surname: "Myradow",
+		image: require("@/shared/images/login/slider-3.png")
+	},
+	{
+		id: "10",
+		name: "Myrat",
+		surname: "Myradow",
+		image: require("@/shared/images/login/slider-3.png")
 	}
 ];

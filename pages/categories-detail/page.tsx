@@ -4,9 +4,7 @@ import { StyleSheet, View } from "react-native";
 import { CategoriesDetailHeader } from "./ui/categories-detail-header";
 import { CategoryServices } from "./ui/category-services";
 
-
-
-export const CategoriesDetailScreen = () =>{
+export const CategoriesDetailScreen = () => {
 	const { categories_detail, id } = useLocalSearchParams();
 	const [selectedSubCategoryId, setSelectedSubCategoryId] = useState<string>(
 		id as string
@@ -24,7 +22,7 @@ export const CategoriesDetailScreen = () =>{
 			</View>
 		</View>
 	);
-}
+};
 
 export const styles = StyleSheet.create({
 	safeArea: {
@@ -33,6 +31,7 @@ export const styles = StyleSheet.create({
 	},
 	page: {
 		flex: 1,
-		height: "100%"
+		height: "100%",
+		paddingTop: 10
 	}
 });

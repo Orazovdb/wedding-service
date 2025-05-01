@@ -1,5 +1,4 @@
-// file: components/SubscribersSubscribeSlider.tsx
-
+import IconArrowLeft from "@/shared/icons/arrow-left-big.svg";
 import React, { useEffect, useRef, useState } from "react";
 import {
 	Animated,
@@ -13,7 +12,7 @@ import {
 import { SubscribersData } from "../data";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
-const ITEM_WIDTH = SCREEN_WIDTH / 5.4;
+const ITEM_WIDTH = SCREEN_WIDTH / 6.3;
 
 type Props = {
 	subscribe_id: string | string[];
@@ -49,22 +48,34 @@ export const SubscribersSubscribeSlider = (props: Props) => {
 		}
 	};
 
+	useEffect(() => {
+		props.onSelectSubCategory(SubscribersData[currentIndex]?.id);
+	}, [currentIndex]);
+
 	return (
 		<View style={styles.wrapper}>
 			<TouchableOpacity
 				style={styles.navButtonLeft}
 				onPress={() => scrollToIndex(currentIndex - 1)}
 			>
-				<Text style={styles.navButtonText}>{"<"}</Text>
+				<IconArrowLeft />
 			</TouchableOpacity>
 			<View style={styles.container}>
 				<FlatList
 					ref={flatListRef}
 					data={SubscribersData}
 					keyExtractor={item => item.id}
-					horizontal={true}
-					scrollEnabled={false}
+					horizontal
+					pagingEnabled
+					scrollEnabled
 					showsHorizontalScrollIndicator={false}
+					onViewableItemsChanged={({ viewableItems }) => {
+						if (viewableItems.length > 0) {
+							const index = viewableItems[0].index ?? 0;
+							setCurrentIndex(index);
+						}
+					}}
+					viewabilityConfig={{ itemVisiblePercentThreshold: 50 }}
 					renderItem={({ item }) => (
 						<SubscriberItem
 							item={item}
@@ -72,19 +83,22 @@ export const SubscribersSubscribeSlider = (props: Props) => {
 							onSelectSubCategory={props.onSelectSubCategory}
 						/>
 					)}
-					getItemLayout={(data, index) => ({
+					getItemLayout={(_, index) => ({
 						length: ITEM_WIDTH,
 						offset: ITEM_WIDTH * index,
 						index
 					})}
-					initialNumToRender={10}
+					initialNumToRender={3}
+					snapToInterval={ITEM_WIDTH}
+					decelerationRate="fast"
+					contentContainerStyle={styles.flatListContent}
 				/>
 			</View>
 			<TouchableOpacity
 				style={styles.navButtonRight}
 				onPress={() => scrollToIndex(currentIndex + 1)}
 			>
-				<Text style={styles.navButtonText}>{">"}</Text>
+				<IconArrowLeft />
 			</TouchableOpacity>
 		</View>
 	);
@@ -153,7 +167,6 @@ const SubscriberItem = ({ item, isActive, onSelectSubCategory }: ItemProps) => {
 
 export const styles = StyleSheet.create({
 	wrapper: {
-		position: "relative",
 		justifyContent: "center",
 		alignItems: "center",
 		paddingTop: 16
@@ -164,41 +177,42 @@ export const styles = StyleSheet.create({
 	},
 	navButtonLeft: {
 		position: "absolute",
+		top: Dimensions.get("window").height / 2 - 80,
 		left: 0,
 		zIndex: 10,
-		width: 40,
-		height: 40,
-		backgroundColor: "#ddd",
-		borderRadius: 20,
+		width: 30,
+		height: 28,
+		backgroundColor: "#000000",
+		borderRadius: 4,
 		justifyContent: "center",
 		alignItems: "center"
 	},
 	navButtonRight: {
 		position: "absolute",
+		top: Dimensions.get("window").height / 2 - 80,
 		right: 0,
 		zIndex: 10,
-		width: 40,
-		height: 40,
-		backgroundColor: "#ddd",
-		borderRadius: 20,
+		width: 30,
+		height: 28,
+		backgroundColor: "#000000",
+		borderRadius: 4,
 		justifyContent: "center",
-		alignItems: "center"
+		alignItems: "center",
+		transform: [{ rotate: "-180deg" }]
 	},
 	navButtonText: {
 		fontSize: 20,
 		fontWeight: "bold"
 	},
 	categoryItem: {
-		flexDirection: "column",
-		marginRight: 8,
-		position: "relative",
-		paddingBottom: 50,
+		width: SCREEN_WIDTH,
 		alignItems: "center",
-		justifyContent: "flex-start"
+		justifyContent: "center",
+		paddingBottom: 70
 	},
 	categoryItemActive: {
-		marginLeft: 30,
-		marginRight: 20
+		marginLeft: 40,
+		marginRight: 30
 	},
 	image: {
 		marginBottom: 2
@@ -219,5 +233,9 @@ export const styles = StyleSheet.create({
 	categoryItemTextActive: {
 		fontFamily: "Lexend-Medium",
 		fontSize: 16
+	},
+	flatListContent: {
+		justifyContent: "center",
+		alignItems: "center"
 	}
 });

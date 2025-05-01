@@ -24,7 +24,7 @@ const { height, width } = Dimensions.get("window");
 export const CategoryServices = () => {
 	const insets = useSafeAreaInsets();
 	const PAGE_HEIGHT =
-		Dimensions.get("window").height - insets.top - insets.bottom - 180;
+		Dimensions.get("window").height - insets.top - insets.bottom - 200;
 	const ITEMS_PER_PAGE = 6;
 	const router = useRouter();
 	const flatListRef = useRef<FlatList<any>>(null);
