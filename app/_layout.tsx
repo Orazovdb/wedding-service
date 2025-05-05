@@ -92,6 +92,7 @@ function ProtectedRoutes() {
 						/>
 						<Stack.Screen name="subscribers" />
 						<Stack.Screen name="settings" />
+						<Stack.Screen name="settings/[id]" />
 					</>
 				) : (
 					<Stack.Screen name="index" />

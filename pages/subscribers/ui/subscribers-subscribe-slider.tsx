@@ -1,4 +1,5 @@
 import IconArrowLeft from "@/shared/icons/arrow-left-big.svg";
+import IconSubscribed from "@/shared/icons/subscribed-icon.svg";
 import React, { useEffect, useRef, useState } from "react";
 import {
 	Animated,
@@ -12,7 +13,7 @@ import {
 import { SubscribersData } from "../data";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
-const ITEM_WIDTH = SCREEN_WIDTH / 6.3;
+const ITEM_WIDTH = SCREEN_WIDTH / 5.6;
 
 type Props = {
 	subscribe_id: string | string[];
@@ -119,6 +120,7 @@ const SubscriberItem = ({ item, isActive, onPress }: ItemProps) => {
 				{ width: ITEM_WIDTH }
 			]}
 			onPress={onPress}
+			activeOpacity={0.8}
 		>
 			<Animated.Image
 				source={item.image}
@@ -142,14 +144,25 @@ const SubscriberItem = ({ item, isActive, onPress }: ItemProps) => {
 				>
 					{item.name}
 				</Text>
-				<Text
-					style={[
-						styles.categoryItemText,
-						isActive ? styles.categoryItemTextActive : null
-					]}
-				>
-					{item.surname}
-				</Text>
+				{item.isPremium && isActive && (
+					<View
+						style={[
+							styles.categoryItemIcon,
+							isActive ? styles.categoryItemIconActive : null
+						]}
+					>
+						<IconSubscribed />
+					</View>
+				)}
+				{isActive ? (
+					<Text
+						style={[styles.categoryItemText, styles.categoryItemTextActive]}
+					>
+						{item.surname}
+					</Text>
+				) : (
+					<Text style={styles.categoryItemText}>{item.surname}</Text>
+				)}
 			</View>
 		</TouchableOpacity>
 	);
@@ -157,9 +170,9 @@ const SubscriberItem = ({ item, isActive, onPress }: ItemProps) => {
 
 export const styles = StyleSheet.create({
 	wrapper: {
-		justifyContent: "center",
-		alignItems: "center",
-		paddingTop: 16
+		marginTop: 16,
+		height: 200,
+		zIndex: 10
 	},
 	container: {
 		flexDirection: "row",
@@ -167,7 +180,7 @@ export const styles = StyleSheet.create({
 	},
 	navButtonLeft: {
 		position: "absolute",
-		top: Dimensions.get("window").height / 2 - 80,
+		top: Dimensions.get("window").height / 2 - 60,
 		left: 0,
 		zIndex: 10,
 		width: 30,
@@ -179,7 +192,7 @@ export const styles = StyleSheet.create({
 	},
 	navButtonRight: {
 		position: "absolute",
-		top: Dimensions.get("window").height / 2 - 80,
+		top: Dimensions.get("window").height / 2 - 60,
 		right: 0,
 		zIndex: 10,
 		width: 30,
@@ -198,27 +211,45 @@ export const styles = StyleSheet.create({
 		width: SCREEN_WIDTH,
 		alignItems: "center",
 		justifyContent: "center",
-		paddingBottom: 70
+		marginBottom: 70
 	},
 	categoryItemActive: {
 		marginLeft: 40,
-		marginRight: 30
+		marginRight: 30,
+		paddingBottom: 70,
+		marginBottom: 0
 	},
 	image: {
 		marginBottom: 2
 	},
-	titleBlock: {},
+	titleBlock: {
+	},
 	titleBlockActive: {
 		position: "absolute",
 		top: "100%",
-		marginTop: 6
+		width: "140%",
+		backgroundColor: "#fff",
+		paddingTop: 6
 	},
 	categoryItemText: {
 		color: "#000",
 		fontFamily: "Lexend-Light",
 		fontSize: 13,
 		marginHorizontal: "auto",
-		textAlign: "center"
+		textAlign: "center",
+		flexDirection: "row",
+		alignItems: "center",
+		position: "relative"
+	},
+	categoryItemIcon: {
+		position: "absolute",
+		right: -6,
+		top: 0
+	},
+	categoryItemIconActive: {
+		position: "absolute",
+		right: 4,
+		top: 8
 	},
 	categoryItemTextActive: {
 		fontFamily: "Lexend-Medium",

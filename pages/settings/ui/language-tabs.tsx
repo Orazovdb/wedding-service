@@ -1,0 +1,96 @@
+import IconLanguage from "@/shared/icons/settings/language-icon.svg";
+import IconTranslate from "@/shared/icons/settings/translate-icon.svg";
+import React from "react";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+
+type props = {
+	selectedTab: number;
+	onChangeTab: (value: number) => void;
+};
+
+const data = [
+	{
+		id: "1",
+		icon: <IconTranslate />,
+		title: "TKM"
+	},
+	{
+		id: "2",
+		icon: <IconTranslate />,
+		title: "RUS"
+	},
+	{
+		id: "3",
+		icon: <IconTranslate />,
+		title: "ENG"
+	}
+];
+
+export const LanguageTabs = ({ selectedTab = 1, onChangeTab }: props) => {
+	return (
+		<View style={styles.languageTabs}>
+			<View style={styles.titleRow}>
+				<IconLanguage />
+				<Text style={styles.title}>Dil</Text>
+			</View>
+			<View style={styles.tabs}>
+				{data.map(tab => (
+					<TouchableOpacity
+						key={tab.id}
+						onPress={() => onChangeTab(Number(tab.id))}
+						style={[
+							styles.tab,
+							selectedTab === Number(tab.id) ? styles.tabActive : null
+						]}
+					>
+						{tab.icon}
+						<Text style={styles.tabText}>{tab.title}</Text>
+					</TouchableOpacity>
+				))}
+			</View>
+		</View>
+	);
+};
+
+export const styles = StyleSheet.create({
+	languageTabs: {},
+	titleRow: {
+		flexDirection: "row",
+		alignItems: "center",
+		gap: 5,
+		marginBottom: 10
+	},
+	title: {
+		fontSize: 16,
+		color: "#000000",
+		fontFamily: "Lexend-Regular"
+	},
+	tabs: {
+		flexDirection: "row",
+		alignItems: "center",
+		gap: 10,
+		paddingVertical: 8,
+		paddingHorizontal: 24,
+		borderRadius: 10,
+		backgroundColor: "#0000000D"
+	},
+	tab: {
+		backgroundColor: "#FFFFFF",
+		borderColor: "#000000",
+		borderRadius: 10,
+		flexDirection: "row",
+		alignItems: "center",
+		justifyContent: 'center',
+		height: 24,
+		gap: 6,
+		paddingHorizontal: 8
+	},
+	tabActive: {
+		backgroundColor: "#C0FFB9"
+	},
+	tabText: {
+		fontFamily: "Lexend-Light",
+		fontSize: 14,
+		color: "#000000"
+	}
+});
