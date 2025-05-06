@@ -48,12 +48,16 @@ export const LanguageTabs = ({ selectedTab = 1, onChangeTab }: props) => {
 					</TouchableOpacity>
 				))}
 			</View>
+			<View style={styles.divider} />
 		</View>
 	);
 };
 
 export const styles = StyleSheet.create({
-	languageTabs: {},
+	languageTabs: {
+		marginBottom: 14,
+		width: "100%"
+	},
 	titleRow: {
 		flexDirection: "row",
 		alignItems: "center",
@@ -72,7 +76,10 @@ export const styles = StyleSheet.create({
 		paddingVertical: 8,
 		paddingHorizontal: 24,
 		borderRadius: 10,
-		backgroundColor: "#0000000D"
+		backgroundColor: "#0000000D",
+		marginBottom: 22,
+		width: "90%",
+		justifyContent: "center"
 	},
 	tab: {
 		backgroundColor: "#FFFFFF",
@@ -80,7 +87,7 @@ export const styles = StyleSheet.create({
 		borderRadius: 10,
 		flexDirection: "row",
 		alignItems: "center",
-		justifyContent: 'center',
+		justifyContent: "center",
 		height: 24,
 		gap: 6,
 		paddingHorizontal: 8
@@ -92,5 +99,10 @@ export const styles = StyleSheet.create({
 		fontFamily: "Lexend-Light",
 		fontSize: 14,
 		color: "#000000"
+	},
+	divider: {
+		width: "100%",
+		height: 1,
+		backgroundColor: "#0000004D"
 	}
 });

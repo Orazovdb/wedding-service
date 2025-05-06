@@ -79,7 +79,7 @@ export const styles = StyleSheet.create({
 		paddingHorizontal: 6
 	},
 	categoryItemActive: {
-		backgroundColor: "#000000"
+		
 	},
 	categoryItemText: {
 		color: "#000000",
@@ -87,6 +87,5 @@ export const styles = StyleSheet.create({
 		fontSize: 14
 	},
 	categoryItemTextActive: {
-		color: "#FFF"
 	}
 });
