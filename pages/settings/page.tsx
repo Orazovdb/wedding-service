@@ -2,6 +2,7 @@ import { Colors } from "@/constants/Colors";
 import IconAd from "@/shared/icons/settings/ad-icon.svg";
 import IconLogout from "@/shared/icons/settings/logout-icon.svg";
 import IconRocket from "@/shared/icons/settings/rocket-icon.svg";
+import { useAuth } from "@/store/AuthContext";
 import React, { useState } from "react";
 import {
 	Image,
@@ -18,6 +19,10 @@ import { ThemeTabs } from "./ui/theme-tabs";
 export const SettingsScreen = () => {
 	const [selectedLang, setSelectedLang] = useState(1);
 	const [selectedTheme, setSelectedTheme] = useState(1);
+
+	const { logout } = useAuth();
+	
+
 	return (
 		<ScrollView style={styles.scrollView}>
 			<View style={styles.page}>
@@ -43,7 +48,7 @@ export const SettingsScreen = () => {
 						<View style={styles.routeDivider} />
 					</View>
 				</View>
-				<TouchableOpacity style={styles.logoutButton}>
+				<TouchableOpacity onPress={logout} style={styles.logoutButton}>
 					<Text style={styles.logoutButtonText}>Ulgamda cyk</Text>
 					<IconLogout />
 				</TouchableOpacity>

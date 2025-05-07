@@ -1,18 +1,52 @@
-import React, { createContext, useContext, useState } from "react";
+import {
+	getAccessToken,
+	removeFromStorage,
+	saveTokenStorage
+} from "@/shared/api/services/auth-token.service";
+import { authService } from "@/shared/api/services/auth.service";
+import { Verify } from "@/shared/api/types";
+import { useRouter } from "expo-router";
+import React, { createContext, useContext, useEffect, useState } from "react";
 
 type AuthContextType = {
 	isLoggedIn: boolean;
-	login: () => void;
+	login: (data: Verify) => void;
 	logout: () => void;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-	const [isLoggedIn, setIsLoggedIn] = useState(true);
+	const [isLoggedIn, setIsLoggedIn] = useState(false);
+	const router = useRouter();
 
-	const login = () => setIsLoggedIn(true);
-	const logout = () => setIsLoggedIn(false);
+	useEffect(() => {
+		const checkAuth = async () => {
+			const token = await getAccessToken();
+			if (token) {
+				setIsLoggedIn(true);
+				router.push("/home");
+			} else {
+				router.push("/");
+			}
+		};
+		checkAuth();
+	}, []);
+
+	const login = async (data: Verify) => {
+		const response = await authService.accountVerify(data);
+		if (response.data.access_token) {
+			saveTokenStorage(response.data.access_token);
+			setIsLoggedIn(true);
+			router.push("/home");
+		}
+	};
+
+	const logout = () => {
+		setIsLoggedIn(false);
+		removeFromStorage();
+		router.push("/");
+	};
 
 	return (
 		<AuthContext.Provider value={{ isLoggedIn, login, logout }}>
