@@ -15,13 +15,14 @@ export const VerifyForm = (props: props) => {
 	return (
 		<View>
 			<Text style={styles.loginFormTitle}>
-				Telefon nomeriňize iberilen tassyklaýyş kodyny giriziň
+				({props.phone}) Telefon belginize iberilen tassyklaýyş kodyny giriziň
 			</Text>
+			<Text></Text>
 			<View style={styles.loginInputs}>
 				<OTPGridInput otp={props.otp} setOtp={props.setOtp} />
 			</View>
 			<CustomButton
-				title="Login"
+				title="Ugratmak"
 				onPress={() =>
 					props.handleClick({ otp: props.otp.join(""), phone: props.phone })
 				}

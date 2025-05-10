@@ -13,9 +13,7 @@ import { saveTokenStorage } from "./auth-token.service";
 			`/verify`,
 			data
 		);
-		if (response.data.data.access_token)
-			saveTokenStorage(response.data.data.access_token);
-		return response.data;
+		return response.data
 	}
 
 	async login(data: Login) {

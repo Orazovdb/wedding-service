@@ -1,7 +1,3 @@
-import Slider1 from "@/assets/images/main/slider-1.svg";
-import Slider2 from "@/assets/images/main/slider-2.svg";
-import Slider3 from "@/assets/images/main/slider-3.svg";
-
 import { Colors } from "@/constants/Colors";
 import { getAccessToken } from "@/shared/api/services/auth-token.service";
 import { authService } from "@/shared/api/services/auth.service";
@@ -15,7 +11,6 @@ import {
 	Dimensions,
 	FlatList,
 	Image,
-	ImageSourcePropType,
 	Keyboard,
 	Platform,
 	SafeAreaView,
@@ -25,18 +20,12 @@ import {
 	useColorScheme,
 	View
 } from "react-native";
+import { slides } from "./data";
+import { LoginForm } from "./ui/login-form";
 import { RegisterForm } from "./ui/register-form";
 import { VerifyForm } from "./ui/verify-form";
 
 const { width, height } = Dimensions.get("window");
-
-type SlidesType = {
-	id: string;
-	text?: string | undefined;
-	image?: ImageSourcePropType | undefined;
-	contentTitle?: string | undefined;
-	contentImage?: React.ReactNode | undefined;
-};
 
 export const AuthScreen = () => {
 	const router = useRouter();
@@ -45,6 +34,9 @@ export const AuthScreen = () => {
 	const [currentIndex, setCurrentIndex] = useState(0);
 	const [isOtp, setIsOtp] = useState(false);
 	const { login, isLoggedIn } = useAuth();
+	const [isLogin, setIsLogin] = useState(false);
+	const [otp, setOtp] = useState<string[]>(["", "", "", "", ""]);
+	const [name, setName] = useState<string>("");
 	const { setValue, watch } = useForm<Login>({
 		defaultValues: {
 			phone: ""
@@ -52,10 +44,15 @@ export const AuthScreen = () => {
 	});
 
 	const {
-		setValue: setValueRegister,
 		register: registerRegister,
-		watch: watchRegister
-	} = useForm<Register>();
+		setValue: setValueRegister,
+		watch: watchRegister,
+		handleSubmit: handleSubmitRegister,
+		formState: { errors },
+		control: controlRegister
+	} = useForm<Register>({
+		defaultValues: { name: "", phone: "" }
+	});
 
 	useEffect(() => {
 		const checkToken = async () => {
@@ -67,38 +64,8 @@ export const AuthScreen = () => {
 		checkToken();
 	}, [isLoggedIn]);
 
-	const phone = watch("phone");
-	const [otp, setOtp] = useState<string[]>(["", "", "", "", ""]);
-	const [name, setName] = useState<string>("");
-
-	const slides: SlidesType[] = [
-		{
-			id: "1",
-			text: "Toy hyzmatlary",
-			image: require("@/shared/images/login/slider-1.png"),
-			contentTitle: "Ähli hyzmatlar bir jubigiňizde",
-			contentImage: <Slider1 style={styles.contentImage} />
-		},
-		{
-			id: "2",
-			text: "Toy hyzmatlary",
-			image: require("@/shared/images/login/slider-2.png"),
-			contentTitle: "Ýigitler we Gyz Gelinler üçin ýörite kategoriýalar",
-			contentImage: <Slider2 style={styles.contentImage2} />
-		},
-		{
-			id: "3",
-			text: "Toy hyzmatlary",
-			image: require("@/shared/images/login/slider-3.png"),
-			contentTitle: "Täze çatynjalar üçin umumy amatlyklar",
-			contentImage: <Slider3 style={styles.contentImage3} />
-		},
-		{
-			id: "4",
-			text: "",
-			contentTitle: ""
-		}
-	];
+	const phoneLogin = watch("phone");
+	const phoneRegister = watchRegister("phone");
 
 	const handleScroll = Animated.event(
 		[{ nativeEvent: { contentOffset: { x: scrollX } } }],
@@ -134,10 +101,21 @@ export const AuthScreen = () => {
 
 	const handleVerify = async () => {
 		try {
-			login({ otp: otp.join(""), phone: phone });
+			login({
+				otp: otp.join(""),
+				phone: phoneLogin.length ? phoneLogin : phoneRegister
+			});
 		} catch (error) {
 			console.error("Verify failed:", error);
 		}
+	};
+
+	const handleChangeToLogin = () => {
+		setIsLogin(true);
+	};
+
+	const handleChangeToRegister = () => {
+		setIsLogin(false);
 	};
 
 	return (
@@ -173,21 +151,31 @@ export const AuthScreen = () => {
 									</View>
 									<View style={styles.loginDivider} />
 									{!isOtp ? (
-										<RegisterForm
-											phone={watchRegister("phone") || ""}
-											name={watchRegister("name") || ""}
-											setValue={setValueRegister}
-											handleClick={handleRegister}
-										/>
+										!isLogin ? (
+											<RegisterForm
+												phone={watchRegister("phone") || ""}
+												name={watchRegister("name") || ""}
+												setValue={setValueRegister}
+												handleClick={() =>
+													handleSubmitRegister(handleRegister)()
+												}
+												changeForm={handleChangeToLogin}
+												errors={errors}
+												register={registerRegister}
+												control={controlRegister}
+											/>
+										) : (
+											<LoginForm
+												phone={watch("phone") || ""}
+												setValue={setValue}
+												handleClick={handleLogin}
+												changeForm={handleChangeToRegister}
+											/>
+										)
 									) : (
-										// <LoginForm
-										// 	handleClick={handleLogin}
-										// 	phone={phone}
-										// 	setValue={setValue}
-										// />
 										<VerifyForm
 											handleClick={handleVerify}
-											phone={phone}
+											phone={phoneLogin.length ? phoneLogin : phoneRegister}
 											otp={otp}
 											setOtp={setOtp}
 										/>
@@ -262,23 +250,6 @@ const styles = StyleSheet.create({
 		margin: "auto",
 		textAlign: "center",
 		marginTop: 30
-	},
-	contentImage: {
-		margin: "auto",
-		marginTop: -10,
-		objectFit: "contain"
-	},
-
-	contentImage2: {
-		margin: "auto",
-		marginTop: -30,
-		objectFit: "contain"
-	},
-
-	contentImage3: {
-		margin: "auto",
-		marginTop: -6,
-		objectFit: "contain"
 	},
 
 	loginContainer: {

@@ -14,6 +14,15 @@ type Props = {
 export const SubscribersInfo = (props: Props) => {
 	return (
 		<View style={styles.box}>
+			<View style={styles.header}>
+				<Text style={styles.userName}>Myrat Myradow</Text>
+				<SubscribersUnsubscribe.Button
+					handleConfirm={props.handleConfirm}
+					isModalVisible={props.isModalVisible}
+					handleOpenModal={props.handleOpenModal}
+					handleCloseModal={props.handleCloseModal}
+				/>
+			</View>
 			<View style={styles.categories}>
 				<View style={styles.categoryItem}>
 					<Text style={styles.categoryType}>Kategoriýa</Text>
@@ -37,14 +46,6 @@ export const SubscribersInfo = (props: Props) => {
 					</View>
 				</View>
 			</View>
-			<View style={styles.header}>
-				<SubscribersUnsubscribe.Button
-					handleConfirm={props.handleConfirm}
-					isModalVisible={props.isModalVisible}
-					handleOpenModal={props.handleOpenModal}
-					handleCloseModal={props.handleCloseModal}
-				/>
-			</View>
 			<SubscribersInfoBanner />
 			<TouchableOpacity style={styles.goProfileButton}>
 				<IconAvatarCircle />
@@ -67,14 +68,19 @@ export const styles = StyleSheet.create({
 		borderRadius: 6,
 		paddingBottom: 20,
 		marginHorizontal: 16,
-		marginTop: -65
 	},
 
 	header: {
 		flexDirection: "row",
-		justifyContent: "flex-end",
+		justifyContent: "space-between",
 		marginBottom: 18,
-		paddingTop: 12
+		paddingTop: 12,
+		paddingLeft: 10
+	},
+
+	userName: {
+		fontSize: 14,
+		fontFamily: "Lexend-Regular"
 	},
 
 	categories: {

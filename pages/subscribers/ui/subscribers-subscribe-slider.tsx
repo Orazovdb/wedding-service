@@ -133,7 +133,7 @@ const SubscriberItem = ({ item, isActive, onPress }: ItemProps) => {
 					}
 				]}
 			/>
-			<View
+			{/* <View
 				style={[styles.titleBlock, isActive ? styles.titleBlockActive : null]}
 			>
 				<Text
@@ -163,15 +163,15 @@ const SubscriberItem = ({ item, isActive, onPress }: ItemProps) => {
 				) : (
 					<Text style={styles.categoryItemText}>{item.surname}</Text>
 				)}
-			</View>
+			</View> */}
 		</TouchableOpacity>
 	);
 };
 
 export const styles = StyleSheet.create({
 	wrapper: {
-		marginTop: 16,
-		height: 200,
+		marginTop: 30,
+		height: 140,
 		zIndex: 10
 	},
 	container: {
@@ -211,12 +211,10 @@ export const styles = StyleSheet.create({
 		width: SCREEN_WIDTH,
 		alignItems: "center",
 		justifyContent: "center",
-		marginBottom: 70
 	},
 	categoryItemActive: {
 		marginLeft: 40,
 		marginRight: 30,
-		paddingBottom: 70,
 		marginBottom: 0
 	},
 	image: {

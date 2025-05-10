@@ -135,13 +135,16 @@ export const HomeServices = () => {
 export const styles = StyleSheet.create({
 	services: {
 		width: "100%",
-		marginBottom: 20
+		marginBottom: 20,
+		paddingLeft: 20
 	},
 	servicesTitleBlock: {
 		flexDirection: "row",
 		alignItems: "center",
 		justifyContent: "space-between",
-		marginBottom: 16
+		marginBottom: 16,
+		paddingRight: 20
+
 	},
 	servicesTitle: {
 		fontSize: 16,

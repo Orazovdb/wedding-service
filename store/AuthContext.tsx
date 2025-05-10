@@ -34,11 +34,17 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 	}, []);
 
 	const login = async (data: Verify) => {
-		const response = await authService.accountVerify(data);
-		if (response.data.access_token) {
-			saveTokenStorage(response.data.access_token);
-			setIsLoggedIn(true);
-			router.push("/home");
+		try {
+			const response = await authService.accountVerify(data);
+			if (response.data.access_token) {
+				await saveTokenStorage(response.data.access_token);
+
+				setIsLoggedIn(true);
+				router.push("/home");
+			} else {
+			}
+		} catch (e) {
+			console.error("Login error:", e);
 		}
 	};
 

@@ -24,24 +24,26 @@ export const HomeScreen = () => {
 		<SafeAreaView style={styles.safeArea}>
 			<ScrollView contentContainerStyle={styles.scrollContainer}>
 				<View style={styles.home}>
-					<View
-						style={[
-							styles.inputContainer,
-							{ borderColor: Colors.light.secondary }
-						]}
-					>
-						<SearchIcon width={20} height={20} color="#000000" />
-						<TextInput
-							placeholder="Search"
-							value={search}
-							onChangeText={setSearch}
-							style={styles.input}
-							placeholderTextColor={Colors.light.secondary20}
-						/>
-						<FilterModal.Button
-							isModalVisible={isModalVisible}
-							setIsModalVisible={setIsModalVisible}
-						/>
+					<View style={styles.searchBox}>
+						<View
+							style={[
+								styles.inputContainer,
+								{ borderColor: Colors.light.secondary }
+							]}
+						>
+							<SearchIcon width={20} height={20} color="#000000" />
+							<TextInput
+								placeholder="Search"
+								value={search}
+								onChangeText={setSearch}
+								style={styles.input}
+								placeholderTextColor={Colors.light.secondary20}
+							/>
+							<FilterModal.Button
+								isModalVisible={isModalVisible}
+								setIsModalVisible={setIsModalVisible}
+							/>
+						</View>
 					</View>
 
 					<HomeMainBanner />
@@ -64,8 +66,10 @@ const styles = StyleSheet.create({
 	scrollContainer: { flexGrow: 1 },
 	home: {
 		width: width,
-		paddingHorizontal: 30,
 		paddingBottom: 50
+	},
+	searchBox: {
+		paddingHorizontal: 20
 	},
 	inputContainer: {
 		flexDirection: "row",

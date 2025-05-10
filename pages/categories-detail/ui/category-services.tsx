@@ -25,6 +25,7 @@ export const CategoryServices = () => {
 	const insets = useSafeAreaInsets();
 	const PAGE_HEIGHT =
 		Dimensions.get("window").height - insets.top - insets.bottom - 200;
+
 	const ITEMS_PER_PAGE = 6;
 	const router = useRouter();
 	const flatListRef = useRef<FlatList<any>>(null);
@@ -160,12 +161,8 @@ export const CategoryServices = () => {
 				data={pagedData}
 				keyExtractor={(_, index) => index.toString()}
 				renderItem={renderPage}
-				pagingEnabled
+				scrollEnabled
 				showsVerticalScrollIndicator={false}
-				snapToInterval={PAGE_HEIGHT}
-				decelerationRate="fast"
-				onViewableItemsChanged={onViewableItemsChanged}
-				viewabilityConfig={{ viewAreaCoveragePercentThreshold: 50 }}
 			/>
 		</View>
 	);

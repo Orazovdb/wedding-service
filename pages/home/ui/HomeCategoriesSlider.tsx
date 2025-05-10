@@ -25,7 +25,7 @@ export const HomeCategoriesSlider = () => {
 	const scrollToIndex = (index: any) => {
 		previewFlatListRef.current?.scrollToIndex({ index, animated: true });
 	};
-	
+
 	return (
 		<View style={styles.previewSliderContainer}>
 			<TouchableOpacity
@@ -81,7 +81,8 @@ export const styles = StyleSheet.create({
 		alignItems: "center",
 		marginTop: 18,
 		marginBottom: 22,
-		position: "relative"
+		position: "relative",
+		paddingHorizontal: 20
 	},
 	previewSlide: {
 		borderRadius: width / 12.2 / 2,
@@ -92,8 +93,8 @@ export const styles = StyleSheet.create({
 	previewImage: {
 		borderRadius: width / 12.2 / 2,
 		backgroundColor: Colors.light.primary,
-		width: width / 12.2,
-		height: width / 12.2,
+		width: width / 11.2,
+		height: width / 11.2,
 		justifyContent: "center",
 		alignItems: "center",
 		marginBottom: 4
@@ -101,12 +102,12 @@ export const styles = StyleSheet.create({
 	arrow: { fontSize: 24, fontWeight: "bold", paddingHorizontal: 10 },
 	arrowLeft: {
 		position: "absolute",
-		left: -24,
+		left: 0,
 		zIndex: 1
 	},
 	arrowRight: {
 		position: "absolute",
-		right: -24,
+		right: 0,
 		zIndex: 1,
 		transform: [{ rotate: "180deg" }]
 	}

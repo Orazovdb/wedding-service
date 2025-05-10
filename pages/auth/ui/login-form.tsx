@@ -2,13 +2,20 @@ import CustomButton from "@/components/CustomButton";
 import { Colors } from "@/constants/Colors";
 import { Login } from "@/shared/api/types";
 import React from "react";
-import { UseFormSetValue } from 'react-hook-form'
-import { StyleSheet, Text, TextInput, View } from "react-native";
+import { UseFormSetValue } from "react-hook-form";
+import {
+	StyleSheet,
+	Text,
+	TextInput,
+	TouchableOpacity,
+	View
+} from "react-native";
 
 type props = {
 	phone: string;
-	setValue: UseFormSetValue<Login>
+	setValue: UseFormSetValue<Login>;
 	handleClick: (data: Login) => void;
+	changeForm: () => void;
 };
 
 export const LoginForm = (props: props) => {
@@ -18,13 +25,19 @@ export const LoginForm = (props: props) => {
 			<View style={styles.loginInputs}>
 				<TextInput
 					value={props.phone}
-					onChangeText={value => props.setValue('phone', value)}
-					placeholder="Adyňyz"
+					onChangeText={value => props.setValue("phone", value)}
+					placeholder="Telefon nomerniniz"
 					style={styles.input}
 				/>
+				<TouchableOpacity
+					onPress={props.changeForm}
+					style={{ marginLeft: "auto" }}
+				>
+					<Text style={styles.accText}>Do i you have not any account?</Text>
+				</TouchableOpacity>
 			</View>
 			<CustomButton
-				title="Ugratmak"
+				title="Login"
 				onPress={() => props.handleClick({ phone: props.phone })}
 			/>
 		</View>
@@ -54,5 +67,11 @@ export const styles = StyleSheet.create({
 		paddingRight: 6,
 		marginBottom: 12,
 		width: "100%"
+	},
+	accText: {
+		fontSize: 12,
+		color: "#000",
+		fontFamily: "Lexend-Regular",
+		textDecorationLine: "underline"
 	}
 });
