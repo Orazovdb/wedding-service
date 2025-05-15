@@ -1,6 +1,6 @@
 import SearchIcon from "@/components/ui/SearchIcon";
 import { Colors } from "@/constants/Colors";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
 	Dimensions,
 	SafeAreaView,
@@ -9,8 +9,13 @@ import {
 	TextInput,
 	View
 } from "react-native";
-import { FilterModal } from "../categories-detail/ui/categories-filter";
+
+import { categoriesService } from "@/shared/api/services/categories.service";
+import { CategoriesWithChildren } from "@/shared/api/types";
+import { homeService } from "./home.service";
+import { Home } from "./types";
 import { HomeCategoriesSlider } from "./ui/HomeCategoriesSlider";
+import { FilterModal } from "./ui/HomeFilter";
 import { HomeMainBanner } from "./ui/HomeMainBanner";
 import { HomeServices } from "./ui/HomeServices";
 
@@ -19,6 +24,28 @@ const { width } = Dimensions.get("window");
 export const HomeScreen = () => {
 	const [search, setSearch] = useState("");
 	const [isModalVisible, setIsModalVisible] = useState(false);
+	const [data, setData] = useState<Home>();
+
+	const [dataCategories, setDataCategories] =
+		useState<CategoriesWithChildren[]>();
+
+	useEffect(() => {
+		const fetchData = async () => {
+			const result = await categoriesService.getCategories({ parent: 1 });
+			setDataCategories(result);
+		};
+
+		fetchData();
+	}, []);
+
+	useEffect(() => {
+		const fetchData = async () => {
+			const result = await homeService.getHome();
+			setData(result);
+		};
+
+		fetchData();
+	}, []);
 
 	return (
 		<SafeAreaView style={styles.safeArea}>
@@ -42,20 +69,22 @@ export const HomeScreen = () => {
 							<FilterModal.Button
 								isModalVisible={isModalVisible}
 								setIsModalVisible={setIsModalVisible}
+								categories={dataCategories}
 							/>
 						</View>
 					</View>
 
-					<HomeMainBanner />
+					<HomeMainBanner data={data} />
 
 					<HomeCategoriesSlider />
 
-					<HomeServices />
+					<HomeServices data={data} />
 				</View>
 			</ScrollView>
 			<FilterModal.Modal
 				isModalVisible={isModalVisible}
 				setIsModalVisible={setIsModalVisible}
+				categories={dataCategories}
 			/>
 		</SafeAreaView>
 	);

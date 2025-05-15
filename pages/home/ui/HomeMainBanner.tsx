@@ -12,11 +12,13 @@ import {
 	useColorScheme,
 	View
 } from "react-native";
-import { FakeSlides } from "../data";
+import { Home } from "../types";
 
 const { width, height } = Dimensions.get("window");
 
-export const HomeMainBanner = () => {
+interface props extends Home {}
+
+export const HomeMainBanner = ({ data }: { data: Home | undefined }) => {
 	const colorScheme: "light" | "dark" = useColorScheme() ?? "light";
 	const scrollX = useRef(new Animated.Value(0)).current;
 	const [currentIndex, setCurrentIndex] = useState(0);
@@ -36,8 +38,8 @@ export const HomeMainBanner = () => {
 	return (
 		<>
 			<FlatList
-				data={FakeSlides}
-				keyExtractor={item => item.id}
+				data={data?.homeFeeds}
+				keyExtractor={item => String(item.id)}
 				horizontal
 				pagingEnabled
 				showsHorizontalScrollIndicator={false}
@@ -46,13 +48,13 @@ export const HomeMainBanner = () => {
 				style={styles.flatList}
 				renderItem={({ item }) => (
 					<View style={styles.slide}>
-						<Image source={item.image} style={styles.image} />
+						<Image source={{ uri: item.image }} style={styles.image} />
 					</View>
 				)}
 			/>
 			<View style={styles.paginationContainer}>
 				<View style={styles.pagination}>
-					{FakeSlides.map((_, i) => (
+					{data?.homeFeeds.map((_, i) => (
 						<View
 							key={i}
 							style={[
@@ -74,9 +76,9 @@ export const HomeMainBanner = () => {
 
 export const styles = StyleSheet.create({
 	flatList: { flex: 1 },
-	slide: { width: width * 0.85 },
+	slide: { width: width * 1 },
 	image: {
-		width: width * 0.9,
+		width: width * 1,
 		height: height * 0.24,
 		resizeMode: "cover"
 	},

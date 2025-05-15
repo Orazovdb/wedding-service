@@ -1,4 +1,5 @@
 import { Colors } from "@/constants/Colors";
+import { Services } from "@/shared/api/types";
 import CategoryIcon from "@/shared/icons/category-icon.svg";
 import LocationIcon from "@/shared/icons/location-icon.svg";
 import GoldenIcon from "@/shared/icons/status-golden.svg";
@@ -15,50 +16,71 @@ import {
 	TouchableOpacity,
 	View
 } from "react-native";
-import { FakeSlides } from "../data";
-import { CategoryItem } from "../types";
+import { Home } from "../types";
+
+interface props extends Home {}
 
 const { width } = Dimensions.get("window");
 
-export const HomeServices = () => {
+export const HomeServices = ({ data }: { data?: props }) => {
 	const router = useRouter();
 
-	const categoryFlatListRef = useRef<FlatList<any>>(null);
-	return Array.from({ length: 5 }).map((_, index) => (
-		<View style={styles.services} key={index}>
+	const categoryFlatListRef = useRef<FlatList<Services>>(null);
+	return data?.categories?.map(categoryItem => (
+		<View style={styles.services} key={categoryItem.id}>
 			<View style={styles.servicesTitleBlock}>
-				<Text style={styles.servicesTitle}>Restoranlar</Text>
-				<TouchableOpacity style={styles.servicesCategoryButton}>
+				<Text style={styles.servicesTitle}>{categoryItem.name}</Text>
+				<TouchableOpacity
+					onPress={() =>
+						router.push({
+							pathname: `/categories/[categories_detail]/[id]`,
+							params: {
+								categories_detail: categoryItem.id,
+								id: "all"
+							}
+						})
+					}
+					style={styles.servicesCategoryButton}
+				>
 					<CategoryIcon />
 					<Text style={styles.servicesCategoryButtonText}>Hemmesini gor</Text>
 				</TouchableOpacity>
 			</View>
 			<FlatList
 				ref={categoryFlatListRef}
-				data={FakeSlides}
-				keyExtractor={item => item.id}
+				data={categoryItem.services}
+				keyExtractor={categoryItem => String(categoryItem.id)}
 				horizontal
 				showsHorizontalScrollIndicator={false}
 				contentContainerStyle={{ alignItems: "center" }}
-				renderItem={({ item }: { item: CategoryItem }) => (
+				renderItem={({ item }: { item: Services }) => (
 					<View style={styles.categoryList}>
-						<View
+						<TouchableOpacity
+							onPress={() =>
+								router.push({
+									pathname: `/home/[id]`,
+									params: {
+										id: item.id
+									}
+								})
+							}
+							activeOpacity={0.6}
 							style={[
 								styles.categoryItem,
 								item.status === "premium"
 									? styles.categoryItemPremium
-									: item.status === "gold"
+									: item.status === "golden"
 									? styles.categoryItemGold
 									: ""
 							]}
 						>
-							{item.status !== "static" && (
+							{item.status !== "normal" && (
 								<View
 									style={[
 										styles.categoryItemStatus,
 										item.status === "premium"
 											? styles.categoryItemStatusPremium
-											: item.status === "gold"
+											: item.status === "golden"
 											? styles.categoryItemStatusGold
 											: item.status === "new"
 											? styles.categoryItemStatusNew
@@ -68,7 +90,7 @@ export const HomeServices = () => {
 									<Text style={styles.categoryItemStatusText}>
 										{item.status === "premium"
 											? "premium"
-											: item.status === "gold"
+											: item.status === "golden"
 											? `${"golden"}`
 											: item.status === "new"
 											? "täze"
@@ -76,24 +98,28 @@ export const HomeServices = () => {
 									</Text>
 									{item.status === "premium" ? (
 										<PremiumIcon />
-									) : item.status === "gold" ? (
+									) : item.status === "golden" ? (
 										<GoldenIcon />
 									) : item.status === "new" ? (
 										<NewIcon />
 									) : null}
 								</View>
 							)}
-							<Image source={item.image} style={styles.categoryProfileImg} />
-							<Text style={styles.categoryUsername}>Mark</Text>
-							<Text style={styles.categoryUserSurName}>Manson</Text>
+							<Image
+								source={{ uri: item.logo }}
+								style={styles.categoryProfileImg}
+							/>
+
+							<Text style={styles.categoryUsername}>
+								service-provider_{item.id}
+							</Text>
+							{/* <Text style={styles.categoryUserSurName}>Manson</Text> */}
 							<View style={styles.serviceDivider} />
-							<TouchableOpacity onPress={() => router.push("/home/1")}>
-								<Text style={styles.categoryName}>Mashyn bezegci</Text>
-							</TouchableOpacity>
-							<Text style={styles.serviceName}>BMW</Text>
+							<Text style={styles.categoryName}>{categoryItem.name}</Text>
+							<Text style={styles.serviceName}>{item.name}</Text>
 							<View style={styles.serviceLocationWrapper}>
 								<LocationIcon />
-								<Text style={styles.serviceLocation}>Ahal, Gokdepe</Text>
+								<Text style={styles.serviceLocation}>Example region</Text>
 							</View>
 							<View style={styles.serviceButtons}>
 								<View style={styles.subscriptionsButton}>
@@ -103,13 +129,13 @@ export const HomeServices = () => {
 								<TouchableOpacity
 									style={[
 										styles.subscribeButton,
-										item.status === "gold" && styles.subscribeButtonGold
+										item.status === "golden" && styles.subscribeButtonGold
 									]}
 								>
 									<Text
 										style={[
 											styles.subscribeButtonText,
-											item.status === "gold" && styles.subscribeButtonGoldText
+											item.status === "golden" && styles.subscribeButtonGoldText
 										]}
 									>
 										Agza
@@ -117,14 +143,14 @@ export const HomeServices = () => {
 									<Text
 										style={[
 											styles.subscribeButtonText,
-											item.status === "gold" && styles.subscribeButtonGoldText
+											item.status === "golden" && styles.subscribeButtonGoldText
 										]}
 									>
 										bol
 									</Text>
 								</TouchableOpacity>
 							</View>
-						</View>
+						</TouchableOpacity>
 					</View>
 				)}
 			/>
@@ -144,7 +170,6 @@ export const styles = StyleSheet.create({
 		justifyContent: "space-between",
 		marginBottom: 16,
 		paddingRight: 20
-
 	},
 	servicesTitle: {
 		fontSize: 16,

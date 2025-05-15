@@ -1,7 +1,6 @@
 import { Colors } from "@/constants/Colors";
-import { getAccessToken } from "@/shared/api/services/auth-token.service";
 import { authService } from "@/shared/api/services/auth.service";
-import type { Login, Register } from "@/shared/api/types";
+import type { Auth } from "@/shared/api/types";
 import { useAuth } from "@/store/AuthContext";
 import { useRouter } from "expo-router";
 import React, { useEffect, useRef, useState } from "react";
@@ -21,8 +20,7 @@ import {
 	View
 } from "react-native";
 import { slides } from "./data";
-import { LoginForm } from "./ui/login-form";
-import { RegisterForm } from "./ui/register-form";
+import { AuthForm } from "./ui/auth-form";
 import { VerifyForm } from "./ui/verify-form";
 
 const { width, height } = Dimensions.get("window");
@@ -34,38 +32,29 @@ export const AuthScreen = () => {
 	const [currentIndex, setCurrentIndex] = useState(0);
 	const [isOtp, setIsOtp] = useState(false);
 	const { login, isLoggedIn } = useAuth();
-	const [isLogin, setIsLogin] = useState(false);
 	const [otp, setOtp] = useState<string[]>(["", "", "", "", ""]);
-	const [name, setName] = useState<string>("");
-	const { setValue, watch } = useForm<Login>({
-		defaultValues: {
-			phone: ""
-		}
-	});
 
 	const {
-		register: registerRegister,
-		setValue: setValueRegister,
-		watch: watchRegister,
-		handleSubmit: handleSubmitRegister,
+		register,
+		setValue,
+		watch,
+		handleSubmit,
 		formState: { errors },
-		control: controlRegister
-	} = useForm<Register>({
-		defaultValues: { name: "", phone: "" }
+		control
+	} = useForm<Auth>({
+		defaultValues: { phone: "" }
 	});
 
 	useEffect(() => {
 		const checkToken = async () => {
-			const token = await getAccessToken();
-			if (isLoggedIn) {
+			if (!isLoggedIn) {
 				router.push("/home");
 			}
 		};
 		checkToken();
 	}, [isLoggedIn]);
 
-	const phoneLogin = watch("phone");
-	const phoneRegister = watchRegister("phone");
+	const phone = watch("phone");
 
 	const handleScroll = Animated.event(
 		[{ nativeEvent: { contentOffset: { x: scrollX } } }],
@@ -77,18 +66,7 @@ export const AuthScreen = () => {
 		setCurrentIndex(index);
 	};
 
-	const handleLogin = async (data: Login) => {
-		try {
-			const response = await authService.login(data);
-			if (response.success) {
-				setIsOtp(true);
-			}
-		} catch (error) {
-			console.error("Login failed:", error);
-		}
-	};
-
-	const handleRegister = async (data: Register) => {
+	const handleAuth = async (data: Auth) => {
 		try {
 			const response = await authService.login(data);
 			if (response.success) {
@@ -103,19 +81,11 @@ export const AuthScreen = () => {
 		try {
 			login({
 				otp: otp.join(""),
-				phone: phoneLogin.length ? phoneLogin : phoneRegister
+				phone: phone
 			});
 		} catch (error) {
 			console.error("Verify failed:", error);
 		}
-	};
-
-	const handleChangeToLogin = () => {
-		setIsLogin(true);
-	};
-
-	const handleChangeToRegister = () => {
-		setIsLogin(false);
 	};
 
 	return (
@@ -151,31 +121,18 @@ export const AuthScreen = () => {
 									</View>
 									<View style={styles.loginDivider} />
 									{!isOtp ? (
-										!isLogin ? (
-											<RegisterForm
-												phone={watchRegister("phone") || ""}
-												name={watchRegister("name") || ""}
-												setValue={setValueRegister}
-												handleClick={() =>
-													handleSubmitRegister(handleRegister)()
-												}
-												changeForm={handleChangeToLogin}
-												errors={errors}
-												register={registerRegister}
-												control={controlRegister}
-											/>
-										) : (
-											<LoginForm
-												phone={watch("phone") || ""}
-												setValue={setValue}
-												handleClick={handleLogin}
-												changeForm={handleChangeToRegister}
-											/>
-										)
+										<AuthForm
+											phone={watch("phone") || ""}
+											setValue={setValue}
+											handleClick={() => handleSubmit(handleAuth)()}
+											errors={errors}
+											register={register}
+											control={control}
+										/>
 									) : (
 										<VerifyForm
 											handleClick={handleVerify}
-											phone={phoneLogin.length ? phoneLogin : phoneRegister}
+											phone={phone}
 											otp={otp}
 											setOtp={setOtp}
 										/>

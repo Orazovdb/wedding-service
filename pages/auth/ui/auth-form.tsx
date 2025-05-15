@@ -1,6 +1,6 @@
 import CustomButton from "@/components/CustomButton";
 import { Colors } from "@/constants/Colors";
-import { Register } from "@/shared/api/types";
+import { Auth } from "@/shared/api/types";
 import React, { useEffect } from "react";
 import {
 	Control,
@@ -9,36 +9,25 @@ import {
 	UseFormRegister,
 	UseFormSetValue
 } from "react-hook-form";
-import {
-	StyleSheet,
-	Text,
-	TextInput,
-	TouchableOpacity,
-	View
-} from "react-native";
+import { StyleSheet, Text, TextInput, View } from "react-native";
 
 type Props = {
 	phone: string;
-	name: string;
-	setValue: UseFormSetValue<Register>;
-	register: UseFormRegister<Register>;
-	errors: FieldErrors<Register>;
-	control: Control<Register>;
-	handleClick: (data: Register) => void;
-	changeForm: () => void;
+	setValue: UseFormSetValue<Auth>;
+	register: UseFormRegister<Auth>;
+	errors: FieldErrors<Auth>;
+	control: Control<Auth>;
+	handleClick: (data: Auth) => void;
 };
 
-export const RegisterForm = ({
+export const AuthForm = ({
 	phone,
-	name,
 	register,
 	errors,
 	handleClick,
-	changeForm,
 	control
 }: Props) => {
 	useEffect(() => {
-		register("name", { required: "Adyňyz boş bolmaly däl" });
 		register("phone", {
 			required: "Telefon belgiňiz boş bolmaly däl",
 			pattern: {
@@ -52,24 +41,6 @@ export const RegisterForm = ({
 		<View>
 			<Text style={styles.loginFormTitle}>Ulgam doredin</Text>
 			<View style={styles.loginInputs}>
-				<View style={{ marginBottom: 10 }}>
-					<Controller
-						control={control}
-						name="name"
-						rules={{ required: "Adyňyz boş bolmaly däl" }}
-						render={({ field: { onChange, value } }) => (
-							<TextInput
-								placeholder="Adyňyz"
-								value={value}
-								onChangeText={onChange}
-								style={styles.input}
-							/>
-						)}
-					/>
-					{errors.name && (
-						<Text style={styles.errorText}>{errors.name.message}</Text>
-					)}
-				</View>
 				<View style={{ marginBottom: 10 }}>
 					<Controller
 						control={control}
@@ -95,15 +66,8 @@ export const RegisterForm = ({
 						<Text style={styles.errorText}>{errors.phone.message}</Text>
 					)}
 				</View>
-
-				<TouchableOpacity onPress={changeForm} style={{ marginLeft: "auto" }}>
-					<Text style={styles.accText}>Do i you have any account?</Text>
-				</TouchableOpacity>
 			</View>
-			<CustomButton
-				title="Register"
-				onPress={() => handleClick({ name, phone })}
-			/>
+			<CustomButton title="Ulgama gir" onPress={() => handleClick({ phone })} />
 		</View>
 	);
 };

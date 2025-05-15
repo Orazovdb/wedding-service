@@ -1,17 +1,18 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
 	Dimensions,
 	FlatList,
+	Image,
 	StyleSheet,
 	Text,
 	TouchableOpacity,
 	View
 } from "react-native";
-import { FakeSlides } from "../data";
 
 import { Colors } from "@/constants/Colors";
+import { categoriesService } from "@/shared/api/services/categories.service";
+import type { CategoriesWithChildren } from "@/shared/api/types";
 import ArrowLeft from "@/shared/icons/arrow-left.svg";
-import SliderCategoryIcon from "@/shared/icons/slider-category-icon.svg";
 import { useRouter } from "expo-router";
 
 const { width } = Dimensions.get("window");
@@ -26,6 +27,17 @@ export const HomeCategoriesSlider = () => {
 		previewFlatListRef.current?.scrollToIndex({ index, animated: true });
 	};
 
+	const [data, setData] = useState<CategoriesWithChildren[]>();
+
+	useEffect(() => {
+		const fetchData = async () => {
+			const result = await categoriesService.getCategories({ parent: 1 });
+			setData(result);
+		};
+
+		fetchData();
+	}, []);
+
 	return (
 		<View style={styles.previewSliderContainer}>
 			<TouchableOpacity
@@ -37,18 +49,26 @@ export const HomeCategoriesSlider = () => {
 
 			<FlatList
 				ref={previewFlatListRef}
-				data={FakeSlides}
-				keyExtractor={item => item.id}
+				data={data}
+				keyExtractor={(item: CategoriesWithChildren) => String(item.id)}
 				horizontal
 				showsHorizontalScrollIndicator={false}
 				contentContainerStyle={{ alignItems: "center" }}
 				renderItem={({ item }) => (
 					<TouchableOpacity
 						style={styles.previewSlide}
-						onPress={() => router.push("/")}
+						onPress={() =>
+							router.push({
+								pathname: "/categories/[categories_detail]/[id]",
+								params: {
+									categories_detail: item.id,
+									id: "all"
+								}
+							})
+						}
 					>
-						<View style={styles.previewImage}>
-							<SliderCategoryIcon />
+						<View style={styles.previewImageWrapper}>
+							<Image source={{ uri: item.icon }} style={styles.previewImage} />
 						</View>
 						<Text
 							style={{
@@ -57,7 +77,7 @@ export const HomeCategoriesSlider = () => {
 								fontWeight: "400"
 							}}
 						>
-							Fatalar
+							{item.name}
 						</Text>
 					</TouchableOpacity>
 				)}
@@ -66,7 +86,7 @@ export const HomeCategoriesSlider = () => {
 			<TouchableOpacity
 				style={styles.arrowRight}
 				onPress={() =>
-					scrollToIndex(Math.min(currentIndex + 1, FakeSlides.length - 1))
+					scrollToIndex(Math.min(currentIndex + 1, data?.length || 0 - 1))
 				}
 			>
 				<ArrowLeft />
@@ -90,14 +110,19 @@ export const styles = StyleSheet.create({
 		alignItems: "center",
 		marginHorizontal: 5
 	},
-	previewImage: {
-		borderRadius: width / 12.2 / 2,
+	previewImageWrapper: {
+		borderRadius: width / 11.2 / 2,
 		backgroundColor: Colors.light.primary,
 		width: width / 11.2,
 		height: width / 11.2,
 		justifyContent: "center",
 		alignItems: "center",
 		marginBottom: 4
+	},
+	previewImage: {
+		borderRadius: width / 14.2 / 2,
+		width: width / 14.2,
+		height: width / 14.2
 	},
 	arrow: { fontSize: 24, fontWeight: "bold", paddingHorizontal: 10 },
 	arrowLeft: {
