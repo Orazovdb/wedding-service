@@ -65,27 +65,27 @@ export const HomeFilterModalData = [
 
 export const regions = [
 	{
-		id: "1",
+		id: "ashgabat",
 		name: "Aşgabat"
 	},
 	{
-		id: "2",
+		id: "balkan",
 		name: "Balkan welaýaty"
 	},
 	{
-		id: "3",
+		id: "mary",
 		name: "Mary welaýaty"
 	},
 	{
-		id: "4",
+		id: "lebap",
 		name: "Lebap welaýaty"
 	},
 	{
-		id: "5",
+		id: "dashoguz",
 		name: "Daşoguz welaýaty"
 	},
 	{
-		id: "6",
+		id: "ahal",
 		name: "Ahal welaýaty"
 	}
 ];

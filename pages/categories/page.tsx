@@ -1,21 +1,22 @@
 import { Colors } from "@/constants/Colors";
+import { categoriesService } from "@/shared/api/services/categories.service";
+import { CategoriesWithChildren } from "@/shared/api/types";
 import ArrowRightIcon from "@/shared/icons/arrow-right.svg";
 import NavBottomIcon from "@/shared/icons/nav-bottom.svg";
-import WeddingRestaurantIcon from "@/shared/icons/wedding-restaurant.svg";
 import { useRouter } from "expo-router";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
 	Animated,
 	Dimensions,
 	Easing,
 	FlatList,
+	Image,
 	SafeAreaView,
 	StyleSheet,
 	Text,
 	TouchableOpacity,
 	View
 } from "react-native";
-import { items } from "./data";
 
 const { width } = Dimensions.get("window");
 
@@ -23,6 +24,17 @@ export const CategoriesScreen = () => {
 	const [openItemId, setOpenItemId] = useState<number | null>(null);
 	const animatedOpacity = useRef(new Animated.Value(0)).current;
 	const router = useRouter();
+	const [dataCategories, setDataCategories] =
+		useState<CategoriesWithChildren[]>();
+
+	useEffect(() => {
+		const fetchData = async () => {
+			const result = await categoriesService.getCategories({ parent: 1 });
+			setDataCategories(result);
+		};
+
+		fetchData();
+	}, []);
 
 	const toggleDropdown = (id: number) => {
 		const isOpen = openItemId === id;
@@ -41,7 +53,7 @@ export const CategoriesScreen = () => {
 			<View style={styles.page}>
 				<Text style={styles.title}>Kategoriýalar</Text>
 				<FlatList
-					data={items}
+					data={dataCategories}
 					keyExtractor={item => item.id.toString()}
 					style={{ height: "100%" }}
 					renderItem={({ item }) => (
@@ -52,10 +64,10 @@ export const CategoriesScreen = () => {
 									style={styles.item}
 								>
 									<View style={styles.itemTitleWrapper}>
-										<View style={styles.icon}>
-											<WeddingRestaurantIcon />
+										<View style={styles.iconWrapper}>
+											<Image source={{ uri: item.icon }} style={styles.icon} />
 										</View>
-										<Text style={styles.itemTitle}>{item.title}</Text>
+										<Text style={styles.itemTitle}>{item.name}</Text>
 									</View>
 									<NavBottomIcon />
 								</TouchableOpacity>
@@ -67,7 +79,7 @@ export const CategoriesScreen = () => {
 											{ opacity: animatedOpacity }
 										]}
 									>
-										{item.subItems.map(subItem => (
+										{item.children.map(subItem => (
 											<TouchableOpacity
 												key={subItem.id}
 												style={styles.subItem}
@@ -75,7 +87,7 @@ export const CategoriesScreen = () => {
 													router.push(`/categories/${item.id}/${subItem.id}`)
 												}
 											>
-												<Text style={styles.subItemText}>{subItem.title}</Text>
+												<Text style={styles.subItemText}>{subItem.name}</Text>
 												<ArrowRightIcon />
 											</TouchableOpacity>
 										))}
@@ -121,13 +133,18 @@ export const styles = StyleSheet.create({
 		justifyContent: "space-between",
 		gap: 4
 	},
-	icon: {
+	iconWrapper: {
 		width: 27,
 		height: 27,
 		borderRadius: 25 / 2,
 		backgroundColor: Colors.light.primary,
 		justifyContent: "center",
 		alignItems: "center"
+	},
+	icon: {
+		width: 20,
+		height: 20,
+		borderRadius: 25 / 2
 	},
 	itemTitle: { fontSize: 14, fontFamily: "Lexend-Regular" },
 	subItemsContainer: {

@@ -17,11 +17,21 @@ import {
 } from "react-native";
 import { regions } from "../data";
 
-type HomeFilterModalProps = {
+interface HomeFilterModalProps {
 	isModalVisible: boolean;
-	setIsModalVisible: (isModalVisible: boolean) => void;
-	categories?: CategoriesWithChildren[];
-};
+	setIsModalVisible: (val: boolean) => void;
+	categories: CategoriesWithChildren[] | undefined;
+	isFiltered: boolean;
+	onFilterApply?: ({
+		selectedStatuses,
+		selectedCategories,
+		selectedRegions
+	}: {
+		selectedStatuses?: string[];
+		selectedCategories?: string[];
+		selectedRegions?: string[];
+	}) => void;
+}
 
 const { width, height } = Dimensions.get("window");
 
@@ -52,29 +62,61 @@ const HomeFilterButton = (props: HomeFilterModalProps) => {
 };
 
 const HomeFilterModal = (props: HomeFilterModalProps) => {
-	const [selectedItems, setSelectedItems] = useState<string[]>([]);
+	const [selectedStatuses, setSelectedStatuses] = useState<string[]>([]);
+	const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+	const [selectedRegions, setSelectedRegions] = useState<string[]>([]);
 
-	const toggleCheckbox = (categoryId: string, itemId: string) => {
-		const identifier = `${categoryId}_${itemId}`;
-		setSelectedItems((prevItems: string[]) =>
+	const toggleCheckboxStatus = (id: string) => {
+		const identifier = `${id}`;
+		setSelectedStatuses((prevItems: string[]) =>
 			prevItems.includes(identifier)
 				? prevItems.filter(id => id !== identifier)
 				: [...prevItems, identifier]
 		);
 	};
+
+	const toggleCheckboxCategories = (categoryId: string) => {
+		const identifier = `${categoryId}`;
+		setSelectedCategories((prevItems: string[]) =>
+			prevItems.includes(identifier)
+				? prevItems.filter(id => id !== identifier)
+				: [...prevItems, identifier]
+		);
+	};
+
+	const toggleCheckboxRegions = (region: string) => {
+		setSelectedRegions((prevItems: string[]) =>
+			prevItems.includes(region)
+				? prevItems.filter(id => id !== region)
+				: [...prevItems, region]
+		);
+	};
+
+	const closeFilter = () => {
+		props.setIsModalVisible(false);
+		if (
+			selectedCategories.length ||
+			selectedCategories.length ||
+			selectedRegions.length
+		) {
+			props.onFilterApply?.({
+				selectedStatuses,
+				selectedCategories,
+				selectedRegions
+			});
+		}
+	};
+
 	return (
 		<Modal
 			animationType="slide"
 			transparent={true}
 			visible={props.isModalVisible}
-			onRequestClose={() => props.setIsModalVisible(false)}
+			onRequestClose={closeFilter}
 		>
 			<View style={styles.modalContainer}>
 				<ScrollView contentContainerStyle={styles.modalContent}>
-					<TouchableOpacity
-						style={styles.closeButton}
-						onPress={() => props.setIsModalVisible(false)}
-					>
+					<TouchableOpacity style={styles.closeButton} onPress={closeFilter}>
 						<CloseIcon />
 						<Text style={styles.closeButtonText}>Filter</Text>
 					</TouchableOpacity>
@@ -91,16 +133,9 @@ const HomeFilterModal = (props: HomeFilterModalProps) => {
 											marginBottom: 4
 										}
 									]}
-									onPress={() =>
-										toggleCheckbox(
-											String(category.status),
-											String(category.status)
-										)
-									}
+									onPress={() => toggleCheckboxStatus(String(category.status))}
 								>
-									{selectedItems.includes(
-										`${category.status}_${category.status}`
-									) ? (
+									{selectedStatuses.includes(`${category.status}`) ? (
 										<CheckedIcon />
 									) : (
 										<UncheckedIcon />
@@ -123,11 +158,9 @@ const HomeFilterModal = (props: HomeFilterModalProps) => {
 											marginBottom: 4
 										}
 									]}
-									onPress={() =>
-										toggleCheckbox(String(category.id), String(category.id))
-									}
+									onPress={() => toggleCheckboxCategories(String(category.id))}
 								>
-									{selectedItems.includes(`${category.id}_${category.id}`) ? (
+									{selectedCategories.includes(`${category.id}`) ? (
 										<CheckedIcon />
 									) : (
 										<UncheckedIcon />
@@ -150,11 +183,9 @@ const HomeFilterModal = (props: HomeFilterModalProps) => {
 											marginBottom: 4
 										}
 									]}
-									onPress={() =>
-										toggleCheckbox(String(region.id), String(region.id))
-									}
+									onPress={() => toggleCheckboxRegions(String(region.id))}
 								>
-									{selectedItems.includes(`${region.id}_${region.id}`) ? (
+									{selectedRegions.includes(`${region.id}`) ? (
 										<CheckedIcon />
 									) : (
 										<UncheckedIcon />

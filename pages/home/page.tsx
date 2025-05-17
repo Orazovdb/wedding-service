@@ -6,12 +6,14 @@ import {
 	SafeAreaView,
 	ScrollView,
 	StyleSheet,
+	Text,
 	TextInput,
 	View
 } from "react-native";
 
 import { categoriesService } from "@/shared/api/services/categories.service";
-import { CategoriesWithChildren } from "@/shared/api/types";
+import { servicesService } from "@/shared/api/services/services.service";
+import { CategoriesWithChildren, HumanServices } from "@/shared/api/types";
 import { homeService } from "./home.service";
 import { Home } from "./types";
 import { HomeCategoriesSlider } from "./ui/HomeCategoriesSlider";
@@ -25,9 +27,9 @@ export const HomeScreen = () => {
 	const [search, setSearch] = useState("");
 	const [isModalVisible, setIsModalVisible] = useState(false);
 	const [data, setData] = useState<Home>();
-
 	const [dataCategories, setDataCategories] =
 		useState<CategoriesWithChildren[]>();
+	const [dataServices, setDataServices] = useState<HumanServices[]>();
 
 	useEffect(() => {
 		const fetchData = async () => {
@@ -47,11 +49,43 @@ export const HomeScreen = () => {
 		fetchData();
 	}, []);
 
+	const [statuses, setStatuses] = useState<string[]>([]);
+	const [categories, setCategories] = useState<string[]>([]);
+	const [regions, setRegions] = useState<string[]>([]);
+
+	const handleFilterApply = ({
+		selectedRegions,
+		selectedStatuses,
+		selectedCategories
+	}: {
+		selectedRegions?: string[];
+		selectedStatuses?: string[];
+		selectedCategories?: string[];
+	}) => {
+		setRegions(selectedRegions || []);
+		setStatuses(selectedStatuses || []);
+		setCategories(selectedCategories || []);
+		fetchData();
+	};
+
+	const fetchData = async () => {
+		const result = await servicesService.getServices({
+			category_id: categories.join(","),
+			status: statuses.join(","),
+			province: regions.join(","),
+			name: search
+		});
+		setDataServices(result);
+	};
+
 	return (
 		<SafeAreaView style={styles.safeArea}>
 			<ScrollView contentContainerStyle={styles.scrollContainer}>
 				<View style={styles.home}>
 					<View style={styles.searchBox}>
+						<Text>
+							{regions} {categories} {statuses} {search}
+						</Text>
 						<View
 							style={[
 								styles.inputContainer,
@@ -70,6 +104,7 @@ export const HomeScreen = () => {
 								isModalVisible={isModalVisible}
 								setIsModalVisible={setIsModalVisible}
 								categories={dataCategories}
+								onFilterApply={handleFilterApply}
 							/>
 						</View>
 					</View>
@@ -85,6 +120,7 @@ export const HomeScreen = () => {
 				isModalVisible={isModalVisible}
 				setIsModalVisible={setIsModalVisible}
 				categories={dataCategories}
+				onFilterApply={handleFilterApply}
 			/>
 		</SafeAreaView>
 	);
