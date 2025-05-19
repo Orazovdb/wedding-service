@@ -2,9 +2,8 @@ import { Colors } from "@/constants/Colors";
 import { CategoriesWithChildren, statusServices } from "@/shared/api/types";
 import CheckedIcon from "@/shared/icons/checked.svg";
 import CloseIcon from "@/shared/icons/close-icon.svg";
-import IconFilter from "@/shared/icons/filter-icon.svg";
 import UncheckedIcon from "@/shared/icons/unchecked.svg";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
 	Dimensions,
 	Modal,
@@ -22,20 +21,22 @@ interface HomeFilterModalProps {
 	setIsModalVisible: (val: boolean) => void;
 	categories: CategoriesWithChildren[] | undefined;
 	isFiltered: boolean;
-	onFilterApply?: ({
-		selectedStatuses,
-		selectedCategories,
-		selectedRegions
-	}: {
+	setIsFiltered: (val: boolean) => void;
+	onFilterApply?: (args: {
 		selectedStatuses?: string[];
 		selectedCategories?: string[];
 		selectedRegions?: string[];
 	}) => void;
+	clearTrigger: boolean;
 }
 
 const { width, height } = Dimensions.get("window");
 
 const statusFilter = [
+	{
+		status: statusServices.NORMAL,
+		title: "Normal"
+	},
 	{
 		status: statusServices.NEW,
 		title: "Täze"
@@ -56,7 +57,8 @@ const HomeFilterButton = (props: HomeFilterModalProps) => {
 			style={styles.filterButton}
 			onPress={() => props.setIsModalVisible(true)}
 		>
-			<IconFilter />
+			<View style={styles.divider} />
+			<Text style={styles.filterText}>Filter</Text>
 		</TouchableOpacity>
 	);
 };
@@ -65,6 +67,12 @@ const HomeFilterModal = (props: HomeFilterModalProps) => {
 	const [selectedStatuses, setSelectedStatuses] = useState<string[]>([]);
 	const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
 	const [selectedRegions, setSelectedRegions] = useState<string[]>([]);
+
+	useEffect(() => {
+		setSelectedStatuses([]);
+		setSelectedCategories([]);
+		setSelectedRegions([]);
+	}, [props.clearTrigger]);
 
 	const toggleCheckboxStatus = (id: string) => {
 		const identifier = `${id}`;
@@ -94,16 +102,18 @@ const HomeFilterModal = (props: HomeFilterModalProps) => {
 
 	const closeFilter = () => {
 		props.setIsModalVisible(false);
+		props.setIsFiltered(true);
+		props.onFilterApply?.({
+			selectedStatuses,
+			selectedCategories,
+			selectedRegions
+		});
 		if (
-			selectedCategories.length ||
-			selectedCategories.length ||
-			selectedRegions.length
+			selectedStatuses.length === 0 &&
+			selectedCategories.length === 0 &&
+			selectedRegions.length === 0
 		) {
-			props.onFilterApply?.({
-				selectedStatuses,
-				selectedCategories,
-				selectedRegions
-			});
+			props.setIsFiltered(false);
 		}
 	};
 
@@ -133,9 +143,9 @@ const HomeFilterModal = (props: HomeFilterModalProps) => {
 											marginBottom: 4
 										}
 									]}
-									onPress={() => toggleCheckboxStatus(String(category.status))}
+									onPress={() => toggleCheckboxStatus(category.status)}
 								>
-									{selectedStatuses.includes(`${category.status}`) ? (
+									{selectedStatuses.includes(category.status) ? (
 										<CheckedIcon />
 									) : (
 										<UncheckedIcon />
@@ -212,7 +222,14 @@ export const FilterModal = {
 export const styles = StyleSheet.create({
 	filterButton: {
 		paddingVertical: 3,
-		borderColor: Colors.light.secondary
+		borderColor: Colors.light.secondary,
+		flexDirection: "row",
+		gap: 10,
+	},
+	divider: {
+		width: 1,
+		height: 20,
+		backgroundColor: "#000"
 	},
 	filterText: {
 		color: Colors.light.secondary,

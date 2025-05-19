@@ -84,7 +84,7 @@ export const styles = StyleSheet.create({
 	},
 	paginationContainer: {
 		position: "absolute",
-		top: height * 0.31,
+		top: height * 0.24 - 20,
 		alignSelf: "center"
 	},
 	pagination: {

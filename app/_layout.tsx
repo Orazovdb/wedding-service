@@ -99,7 +99,7 @@ function ProtectedRoutes() {
 				)}
 			</Stack>
 
-			{isLoggedIn && (
+			{!isLoggedIn && (
 				<View style={styles.bottomNavigation}>
 					<TouchableOpacity onPress={() => router.push("/home")}>
 						<View

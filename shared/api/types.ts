@@ -32,6 +32,16 @@ export type Services = {
 	name: string;
 	status: statusServices;
 	logo: string;
+	followers_count: number;
+	region: {
+		id: number;
+		name: string;
+		province: string;
+	};
+	service_provider: {
+		id: number;
+		name: string;
+	};
 };
 
 export type Categories = {
@@ -61,10 +71,11 @@ export type CategoriesWithChildrenData = {
 };
 
 export type HumanServicesArgs = {
-	category_id: string | undefined;
+	category_ids: string | undefined;
 	name: string | undefined;
-	province: string | undefined;
-	status: statusServices | string | undefined;
+	provinces: string | undefined;
+	statuses: statusServices | string | undefined;
+	page: number | undefined;
 };
 
 export type HumanServices = {
@@ -90,4 +101,10 @@ export type HumanServices = {
 
 export type HumanServicesData = {
 	data: HumanServices[];
+	meta: {
+		current_page: number;
+		last_page: number;
+		per_page: number;
+		total: number;
+	};
 };

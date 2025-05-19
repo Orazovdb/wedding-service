@@ -109,21 +109,47 @@ export const HomeServices = ({ data }: { data?: props }) => {
 								source={{ uri: item.logo }}
 								style={styles.categoryProfileImg}
 							/>
+							{item.name ? (
+								(() => {
+									const [firstWord = "", secondWord = ""] =
+										item.name.split(" ");
+									return (
+										<>
+											<Text style={styles.categoryUsername}>{firstWord}</Text>
+											<Text style={styles.categoryUserSurName}>
+												{secondWord}
+											</Text>
+										</>
+									);
+								})()
+							) : (
+								<Text style={styles.categoryUsername}>
+									service-provider_{item.id}
+								</Text>
+							)}
 
-							<Text style={styles.categoryUsername}>
-								service-provider_{item.id}
-							</Text>
-							{/* <Text style={styles.categoryUserSurName}>Manson</Text> */}
 							<View style={styles.serviceDivider} />
 							<Text style={styles.categoryName}>{categoryItem.name}</Text>
 							<Text style={styles.serviceName}>{item.name}</Text>
 							<View style={styles.serviceLocationWrapper}>
 								<LocationIcon />
-								<Text style={styles.serviceLocation}>Example region</Text>
+								{(() => {
+									const [firstWord = "", secondWord = ""] =
+										item.region.name.split(" ");
+									return (
+										<>
+											<Text style={styles.serviceLocation}>
+												{firstWord} {secondWord}, {item.region.province}
+											</Text>
+										</>
+									);
+								})()}
 							</View>
 							<View style={styles.serviceButtons}>
 								<View style={styles.subscriptionsButton}>
-									<Text style={styles.subscriptionsButtonText}>100K</Text>
+									<Text style={styles.subscriptionsButtonText}>
+										{item.followers_count}
+									</Text>
 									<Text style={styles.subscriptionsButtonText}>agza</Text>
 								</View>
 								<TouchableOpacity
