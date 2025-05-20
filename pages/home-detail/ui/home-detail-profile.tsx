@@ -1,36 +1,54 @@
 import { Colors } from "@/constants/Colors";
+import { HumanServicesByIdData } from "@/shared/api/types";
 import IconAvatar from "@/shared/icons/avatar-icon.svg";
 import IconFlag from "@/shared/icons/flag-icon.svg";
-import IconMusician from "@/shared/icons/musician-icon.svg";
+import { useRouter } from "expo-router";
 import React from "react";
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
-export const HomeDetailProfile = () => {
+export const HomeDetailProfile = ({
+	data
+}: {
+	data: HumanServicesByIdData | undefined;
+}) => {
+	const router = useRouter();
 	return (
 		<View style={styles.profile}>
 			<View style={styles.avatarBlock}>
-				<Image
-					source={require("@/shared/images/login/slider-1.png")}
-					style={styles.avatar}
-				/>
+				<Image source={{ uri: data?.service?.logo }} style={styles.avatar} />
 				<View style={styles.profileNameWrapper}>
-					<Text style={styles.profileName}>Aman Amanow</Text>
-					<TouchableOpacity style={styles.profileCategory}>
-						<IconMusician />
-						<Text style={styles.profileCategoryText}>Musician</Text>
+					<Text style={styles.profileName}>{data?.service?.name}</Text>
+					<TouchableOpacity
+						onPress={() =>
+							router.push(`/categories/${data?.service?.categories[0].id}/all`)
+						}
+						style={styles.profileCategory}
+					>
+						<Image
+							source={{ uri: data?.service.categories[0]?.icon }}
+							style={styles.profileCategoryIcon}
+						/>
+
+						<Text style={styles.profileCategoryText}>
+							{data?.service?.categories[0]?.name}
+						</Text>
 					</TouchableOpacity>
 				</View>
-				<Text style={styles.profileExperience}>3+ year experience</Text>
+				{/* <Text style={styles.profileExperience}>3+ year experience</Text> */}
 			</View>
 			<View style={styles.subscribersBlock}>
 				<View style={styles.location}>
 					<IconFlag />
-					<Text style={styles.locationText}>Turkmenabat, Lebap</Text>
+					<Text style={styles.locationText}>
+						{data?.service?.region.name}, {data?.service?.region.province}
+					</Text>
 				</View>
 				<View style={styles.subscribeButtons}>
 					<View style={styles.subscribeCount}>
 						<IconAvatar />
-						<Text style={styles.subscribeCountText}>1k agza</Text>
+						<Text style={styles.subscribeCountText}>
+							{data?.service?.followers_count} agza
+						</Text>
 					</View>
 					<TouchableOpacity style={styles.subscribeButton}>
 						<Text style={styles.subscribeButtonText}>Agza bol</Text>
@@ -64,14 +82,20 @@ export const styles = StyleSheet.create({
 	},
 	profileCategory: {
 		flexDirection: "row",
-		gap: 8,
+		gap: 6,
 		alignItems: "center"
+	},
+	profileCategoryIcon: {
+		width: 24,
+		height: 24,
+		borderRadius: 2
 	},
 	profileCategoryText: {
 		fontFamily: "Lexend-Light",
 		fontSize: 14,
 		color: Colors.dark.secondary,
-		textDecorationLine: "underline"
+		textDecorationLine: "underline",
+		flexWrap: "wrap"
 	},
 	profileExperience: {
 		backgroundColor: Colors.dark.primary,
@@ -106,8 +130,7 @@ export const styles = StyleSheet.create({
 	},
 	subscribeButtons: {
 		flexDirection: "row",
-		alignItems: "center",
-		
+		alignItems: "center"
 	},
 	subscribeCount: {
 		flexDirection: "row",

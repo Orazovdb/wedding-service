@@ -1,7 +1,8 @@
 import { Colors } from "@/constants/Colors";
 import { useColorScheme } from "@/hooks/useColorScheme.web";
-import ArrowLeftBigIcon from "@/shared/icons/arrow-left-big.svg";
-// import { BlurView } from "expo-blur";
+import { BASE_URL } from "@/shared/api/interceptors";
+import { HumanServicesByIdData } from "@/shared/api/types";
+import { Video } from "expo-av";
 import { BlurView } from "expo-blur";
 import { useVideoPlayer } from "expo-video";
 import React, { useEffect, useRef, useState } from "react";
@@ -12,6 +13,7 @@ import {
 	FlatList,
 	Image,
 	Keyboard,
+	Modal,
 	NativeScrollEvent,
 	NativeSyntheticEvent,
 	StyleSheet,
@@ -19,13 +21,18 @@ import {
 	TouchableOpacity,
 	View
 } from "react-native";
-import { FakeSlides } from "../data";
 
 const { width, height } = Dimensions.get("window");
 
-export const HomeDetailBanner = () => {
+export const HomeDetailBanner = ({
+	data
+}: {
+	data: HumanServicesByIdData | undefined;
+}) => {
 	const [isBuffering, setIsBuffering] = useState(true);
 	const [isVideoSlide, setIsVideoSlide] = useState(true);
+	const [isImageViewerVisible, setImageViewerVisible] = useState(false);
+	const [selectedImageIndex, setSelectedImageIndex] = useState(0);
 
 	const colorScheme: "light" | "dark" = useColorScheme() ?? "light";
 	const scrollX = useRef(new Animated.Value(0)).current;
@@ -43,22 +50,21 @@ export const HomeDetailBanner = () => {
 		setCurrentIndex(index);
 	};
 
-	const videoUrl =
-		"https://ybady.com.tm:8090/api/v1/videos/stream/RZDKzGghTdHfGZoXM8pFG7ztcYICAw5dX595naWC.mp4";
-
-	const player = useVideoPlayer({ uri: videoUrl }, player => {
-		player.muted = false;
-		player.loop = false;
-		if (!isBuffering) {
-			player.play();
+	const player = useVideoPlayer(
+		{ uri: data?.service?.videos[0]?.filename },
+		player => {
+			player.muted = false;
+			player.loop = false;
+			if (!isBuffering) {
+				player.play();
+			}
 		}
-	});
+	);
 
 	useEffect(() => {
 		const timeout = setTimeout(() => {
 			setIsBuffering(false);
 		}, 500);
-
 		return () => clearTimeout(timeout);
 	}, []);
 
@@ -70,15 +76,27 @@ export const HomeDetailBanner = () => {
 		}
 	}, [isBuffering, player]);
 
+	useEffect(() => {
+		if (!data?.service.videos.length) {
+			setIsVideoSlide(false);
+		}
+	}, []);
+
 	const handleChangeVideo = (value: boolean) => {
 		setIsVideoSlide(value);
 	};
 
+	useEffect(() => {
+		if (!data?.service?.videos?.length) return;
+
+		const currentVideo = data?.service?.videos[currentIndex];
+		if (!currentVideo?.id) return;
+	}, [data, currentIndex]);
+
+	const videoRef = useRef<Video>(null);
+
 	return (
 		<View style={styles.sliderContainer}>
-			<View style={styles.backIcon}>
-				<ArrowLeftBigIcon />
-			</View>
 			<View style={styles.tabsWrapper}>
 				<View style={styles.tabs}>
 					<BlurView
@@ -95,27 +113,29 @@ export const HomeDetailBanner = () => {
 						<Text
 							style={[styles.tabText, isVideoSlide && styles.tabActiveText]}
 						>
-							Videolar ({FakeSlides.length.toString()})
+							Videolar ({data?.service.videos.length})
 						</Text>
 					</TouchableOpacity>
-					<TouchableOpacity
-						onPress={() => handleChangeVideo(false)}
-						style={[styles.tab, !isVideoSlide && styles.tabActive]}
-					>
-						<Text
-							style={[styles.tabText, !isVideoSlide && styles.tabActiveText]}
+					{data && data?.service.images?.length > 0 && (
+						<TouchableOpacity
+							onPress={() => handleChangeVideo(false)}
+							style={[styles.tab, !isVideoSlide && styles.tabActive]}
 						>
-							Suratlar ({FakeSlides.length.toString()})
-						</Text>
-					</TouchableOpacity>
+							<Text
+								style={[styles.tabText, !isVideoSlide && styles.tabActiveText]}
+							>
+								Suratlar ({data?.service.images.length})
+							</Text>
+						</TouchableOpacity>
+					)}
 				</View>
 			</View>
 			{isVideoSlide ? (
 				<>
 					{isBuffering && <ActivityIndicator size="large" color="#0000ff" />}
 					<FlatList
-						data={FakeSlides}
-						keyExtractor={item => item.id}
+						data={data?.service?.videos}
+						keyExtractor={item => item.id.toString()}
 						horizontal
 						pagingEnabled
 						showsHorizontalScrollIndicator={false}
@@ -123,81 +143,150 @@ export const HomeDetailBanner = () => {
 						onMomentumScrollEnd={handleMomentumScrollEnd}
 						style={styles.flatList}
 						renderItem={({ item }) => (
-							<View style={styles.slide}>
-								<Image source={item.image} style={styles.image} />
+							<View key={item.id} style={styles.slide}>
+								<TouchableOpacity
+									activeOpacity={0.8}
+									onPress={async () => {
+										try {
+											await videoRef.current?.presentFullscreenPlayer();
+											await videoRef.current?.playAsync();
+										} catch (e) {
+											console.error("Fullscreen play error:", e);
+										}
+									}}
+									style={styles.image}
+								>
+									<Video
+										ref={videoRef}
+										source={{
+											uri: `${BASE_URL}/videos/stream/${item?.filename}`
+										}}
+										style={styles.image}
+										useNativeControls
+										shouldPlay={false}
+										isLooping={false}
+									/>
+
+									<View style={styles.overlayPlayButton}>
+										<Text style={styles.playIcon}>▶</Text>
+									</View>
+								</TouchableOpacity>
 							</View>
 						)}
 					/>
-					<View style={styles.paginationContainer}>
-						<View style={styles.pagination}>
-							{FakeSlides.map((_, i) => (
-								<View
-									key={i}
-									style={[
-										styles.dot,
-										{
-											backgroundColor:
-												i === currentIndex
-													? Colors[colorScheme ?? "light"].primary
-													: Colors[colorScheme ?? "light"].white
-										}
-									]}
-								/>
-							))}
-						</View>
-					</View>
-					<View style={styles.paginationFractionWrapper}>
-						<View style={styles.paginationFraction}>
-							<Text style={styles.paginationFractionText}>
-								{currentIndex + 1}/{FakeSlides.length}
-							</Text>
-						</View>
-					</View>
+					{data && data?.service?.videos?.length > 1 && (
+						<>
+							<View style={styles.paginationContainer}>
+								<View style={styles.pagination}>
+									{data?.service?.videos.map((_, i) => (
+										<View
+											key={i}
+											style={[
+												styles.dot,
+												{
+													backgroundColor:
+														i === currentIndex
+															? Colors[colorScheme ?? "light"].primary
+															: Colors[colorScheme ?? "light"].white
+												}
+											]}
+										/>
+									))}
+								</View>
+							</View>
+							<View style={styles.paginationFractionWrapper}>
+								<View style={styles.paginationFraction}>
+									<Text style={styles.paginationFractionText}>
+										{currentIndex + 1}/{data?.service?.videos.length}
+									</Text>
+								</View>
+							</View>
+						</>
+					)}
 				</>
 			) : (
 				<>
-					{isBuffering && <ActivityIndicator size="large" color="#0000ff" />}
+					{isBuffering && <ActivityIndicator size="large" color="#000" />}
 					<FlatList
-						data={FakeSlides}
-						keyExtractor={item => item.id}
+						data={data?.service?.images}
+						keyExtractor={item => item.id.toString()}
 						horizontal
 						pagingEnabled
 						showsHorizontalScrollIndicator={false}
 						onScroll={handleScroll}
 						onMomentumScrollEnd={handleMomentumScrollEnd}
 						style={styles.flatList}
+						renderItem={({ item, index }) => (
+							<TouchableOpacity
+								onPress={() => {
+									setSelectedImageIndex(index);
+									setImageViewerVisible(true);
+								}}
+							>
+								<Image source={{ uri: item.url }} style={styles.image} />
+							</TouchableOpacity>
+						)}
+					/>
+					{data && data?.service?.images?.length > 1 && (
+						<>
+							<View style={styles.paginationContainer}>
+								<View style={styles.pagination}>
+									{data?.service?.images.map((_, i) => (
+										<View
+											key={i}
+											style={[
+												styles.dot,
+												{
+													backgroundColor:
+														i === currentIndex
+															? Colors[colorScheme ?? "light"].primary
+															: Colors[colorScheme ?? "light"].white
+												}
+											]}
+										/>
+									))}
+								</View>
+							</View>
+							<View style={styles.paginationFractionWrapper}>
+								<View style={styles.paginationFraction}>
+									<Text style={styles.paginationFractionText}>
+										{currentIndex + 1}/{data?.service?.images.length}
+									</Text>
+								</View>
+							</View>
+						</>
+					)}
+				</>
+			)}
+			{isImageViewerVisible && (
+				<Modal
+					visible
+					transparent
+					onRequestClose={() => setImageViewerVisible(false)}
+				>
+					<FlatList
+						data={data?.service?.images}
+						keyExtractor={item => item?.id?.toString()}
+						horizontal
+						pagingEnabled
+						initialScrollIndex={selectedImageIndex}
+						style={styles.fullscreenGallery}
 						renderItem={({ item }) => (
-							<View style={styles.slide}>
-								<Image source={item.image} style={styles.image} />
+							<View style={styles.fullscreenImageWrapper}>
+								<Image
+									source={{ uri: item?.url }}
+									style={styles.fullscreenImage}
+								/>
 							</View>
 						)}
 					/>
-					<View style={styles.paginationContainer}>
-						<View style={styles.pagination}>
-							{FakeSlides.map((_, i) => (
-								<View
-									key={i}
-									style={[
-										styles.dot,
-										{
-											backgroundColor:
-												i === currentIndex
-													? Colors[colorScheme ?? "light"].primary
-													: Colors[colorScheme ?? "light"].white
-										}
-									]}
-								/>
-							))}
-						</View>
-					</View>
-					<View style={styles.paginationFractionWrapper}>
-						<View style={styles.paginationFraction}>
-							<Text style={styles.paginationFractionText}>
-								{currentIndex + 1}/{FakeSlides.length}
-							</Text>
-						</View>
-					</View>
-				</>
+					<TouchableOpacity
+						style={styles.closeButton}
+						onPress={() => setImageViewerVisible(false)}
+					>
+						<Text style={styles.closeText}>✕</Text>
+					</TouchableOpacity>
+				</Modal>
 			)}
 		</View>
 	);
@@ -208,17 +297,6 @@ export const styles = StyleSheet.create({
 		position: "relative",
 		flexGrow: 1,
 		width: width
-	},
-
-	backIcon: {
-		position: "absolute",
-		top: 12,
-		left: 18,
-		zIndex: 10,
-		paddingVertical: 2,
-		paddingHorizontal: 6,
-		backgroundColor: "#00000099",
-		borderRadius: 4
 	},
 
 	tabsWrapper: {
@@ -285,6 +363,22 @@ export const styles = StyleSheet.create({
 	},
 	dot: { width: 7, height: 7, borderRadius: 7 / 2, marginHorizontal: 2 },
 
+	overlayPlayButton: {
+		position: "absolute",
+		top: "45%",
+		left: "45%",
+		backgroundColor: "rgba(0,0,0,0.6)",
+		borderRadius: 30,
+		width: 60,
+		height: 60,
+		justifyContent: "center",
+		alignItems: "center"
+	},
+	playIcon: {
+		fontSize: 28,
+		color: "#fff"
+	},
+
 	paginationFractionWrapper: {
 		position: "absolute",
 		right: 30,
@@ -305,5 +399,29 @@ export const styles = StyleSheet.create({
 		fontFamily: "Lexend-Regular",
 		fontSize: 12,
 		color: Colors.dark.white
+	},
+	fullscreenGallery: {
+		backgroundColor: "black"
+	},
+	fullscreenImageWrapper: {
+		width,
+		height,
+		justifyContent: "center",
+		alignItems: "center"
+	},
+	fullscreenImage: {
+		width,
+		height,
+		resizeMode: "contain"
+	},
+	closeButton: {
+		position: "absolute",
+		top: 40,
+		right: 20,
+		zIndex: 10
+	},
+	closeText: {
+		fontSize: 28,
+		color: "#fff"
 	}
 });

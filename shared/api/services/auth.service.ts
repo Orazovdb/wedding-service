@@ -1,25 +1,24 @@
 import { axiosWithFile } from "../../api/interceptors";
-import type { AuthResponse, Login, Register, Verify, VerifyUserResponse } from "../types";
-import { saveTokenStorage } from "./auth-token.service";
+import type {
+	Auth,
+	AuthResponse,
+	Verify,
+	VerifyUserResponse
+} from "../types";
 
- class AuthService  {
-	async register(data: Register) {
-		const response = await axiosWithFile.post(`/register`, data);
-		return response.data;
-	}
-
+class AuthService {
 	async accountVerify(data: Verify) {
 		const response = await axiosWithFile.post<VerifyUserResponse>(
 			`/verify`,
 			data
 		);
-		return response.data
+		return response.data;
 	}
 
-	async login(data: Login) {
+	async login(data: Auth) {
 		const response = await axiosWithFile.post<AuthResponse>(`/login`, data);
 		return response.data;
 	}
-};
+}
 
-export const authService = new AuthService()
+export const authService = new AuthService();

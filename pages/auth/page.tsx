@@ -47,7 +47,7 @@ export const AuthScreen = () => {
 
 	useEffect(() => {
 		const checkToken = async () => {
-			if (!isLoggedIn) {
+			if (isLoggedIn) {
 				router.push("/home");
 			}
 		};

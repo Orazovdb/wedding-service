@@ -27,7 +27,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 				setIsLoggedIn(true);
 				router.push("/home");
 			} else {
-				router.push("/");
+				router.replace("/");
+				setIsLoggedIn(false);
 			}
 		};
 		checkAuth();
@@ -38,10 +39,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 			const response = await authService.accountVerify(data);
 			if (response.data.access_token) {
 				await saveTokenStorage(response.data.access_token);
-
 				setIsLoggedIn(true);
 				router.push("/home");
 			} else {
+				router.replace("/");
 			}
 		} catch (e) {
 			console.error("Login error:", e);
@@ -51,7 +52,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 	const logout = () => {
 		setIsLoggedIn(false);
 		removeFromStorage();
-		router.push("/");
+		setTimeout(() => {
+			router.replace("/");
+		}, 0);
 	};
 
 	return (

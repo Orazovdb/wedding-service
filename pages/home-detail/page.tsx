@@ -1,6 +1,15 @@
 import { Colors } from "@/constants/Colors";
-import { useLocalSearchParams } from "expo-router";
-import { Dimensions, ScrollView, StyleSheet } from "react-native";
+import { servicesService } from "@/shared/api/services/services.service";
+import { HumanServicesByIdData } from "@/shared/api/types";
+import ArrowLeftBigIcon from "@/shared/icons/arrow-left-big.svg";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import { useEffect, useState } from "react";
+import {
+	Dimensions,
+	ScrollView,
+	StyleSheet,
+	TouchableOpacity
+} from "react-native";
 import { HomeDetailAbout } from "./ui/home-detail-about";
 import { HomeDetailBanner } from "./ui/home-detail-banner";
 import { HomeDetailFeedback } from "./ui/home-detail-feedback";
@@ -12,14 +21,33 @@ const { width } = Dimensions.get("window");
 
 export const HomeDynamicScreen = () => {
 	const { id } = useLocalSearchParams();
+	const [data, setData] = useState<HumanServicesByIdData>();
+
+	useEffect(() => {
+		const fetchData = async () => {
+			const result = await servicesService.getServicesById(id as string);
+			if (result) {
+				setData(result);
+			}
+		};
+
+		fetchData();
+	}, []);
+
+	const router = useRouter();
 
 	return (
 		<ScrollView style={styles.container}>
-			<HomeDetailBanner />
-			<HomeDetailProfile />
-			<HomeDetailAbout />
-			<HomeDetailFeedback />
-			<HomeDetailContact />
+			{data?.service.videos.length && data?.service.images.length ? (
+				<HomeDetailBanner data={data} />
+			) : null}
+			<TouchableOpacity onPress={() => router.back()} style={styles.backIcon}>
+				<ArrowLeftBigIcon />
+			</TouchableOpacity>
+			<HomeDetailProfile data={data} />
+			<HomeDetailAbout data={data} />
+			<HomeDetailFeedback data={data} />
+			<HomeDetailContact data={data} />
 			<HomeDetailSameServices />
 		</ScrollView>
 	);
@@ -38,6 +66,11 @@ export const styles = StyleSheet.create({
 	backIcon: {
 		position: "absolute",
 		top: 12,
-		left: 18
+		left: 10,
+		zIndex: 10,
+		paddingVertical: 2,
+		paddingHorizontal: 6,
+		backgroundColor: "#00000099",
+		borderRadius: 4
 	}
 });

@@ -65,7 +65,7 @@ function ProtectedRoutes() {
 					gestureEnabled: false
 				}}
 			>
-				{!isLoggedIn ? (
+				{isLoggedIn ? (
 					<>
 						<Stack.Screen name="home" />
 						<Stack.Screen
@@ -99,7 +99,7 @@ function ProtectedRoutes() {
 				)}
 			</Stack>
 
-			{!isLoggedIn && (
+			{isLoggedIn && (
 				<View style={styles.bottomNavigation}>
 					<TouchableOpacity onPress={() => router.push("/home")}>
 						<View

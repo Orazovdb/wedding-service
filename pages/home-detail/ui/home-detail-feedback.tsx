@@ -1,40 +1,86 @@
 import { Colors } from "@/constants/Colors";
+import { HumanServicesByIdData } from "@/shared/api/types";
+import IconAlarm from "@/shared/icons/alarm-icon.svg";
+import IconHeadphones from "@/shared/icons/headphones.svg";
 import React from "react";
-import { FlatList, StyleSheet, Text, View } from "react-native";
-import { FeedbackData } from "../data";
+import { ScrollView, StyleSheet, Text, View } from "react-native";
 import IconFeedBack from "./icons/feedback-icon.svg";
 
-export const HomeDetailFeedback = () => {
+export const HomeDetailFeedback = ({
+	data
+}: {
+	data: HumanServicesByIdData | undefined;
+}) => {
 	return (
 		<View style={styles.feedback}>
-			<FlatList
-				data={FeedbackData}
-				keyExtractor={item => item.id}
-				horizontal={true}
-				showsHorizontalScrollIndicator={false}
-				renderItem={({ item }) => (
-					<View style={styles.feedbackItem}>
-						<View style={styles.titleGroup}>
-							<View style={styles.iconFeedback}>
-								<IconFeedBack />
-							</View>
-							<Text style={styles.title}>{item.title}</Text>
+			<ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
+				<View style={styles.feedbackItem}>
+					<View style={styles.titleGroup}>
+						<View style={styles.iconFeedback}>
+							<IconFeedBack />
 						</View>
-						{item.possibilities.map((possibility, index) => (
-							<View
-								key={index}
-								style={[
-									styles.possibility,
-									index !== item.possibilities.length - 1 && { marginBottom: 6 }
-								]}
-							>
-								<View style={styles.possibilityDot} />
-								<Text style={styles.possibilityText}>{possibility}</Text>
-							</View>
-						))}
+						<Text style={styles.title}>Bahalandyrma</Text>
 					</View>
-				)}
-			/>
+					{data?.service.pricing.map((price, index) => (
+						<View
+							key={index}
+							style={[
+								styles.possibility,
+								index !== data.service.pricing.length - 1 && {
+									marginBottom: 6
+								}
+							]}
+						>
+							<View style={styles.possibilityDot} />
+							<Text style={styles.possibilityText}>{price}</Text>
+						</View>
+					))}
+				</View>
+				<View style={styles.feedbackItem}>
+					<View style={styles.titleGroup}>
+						<View style={styles.iconFeedback}>
+							<IconAlarm />
+						</View>
+						<Text style={styles.title}>Bronlamak üçin </Text>
+					</View>
+					{data?.service.booking.map((alarm, index) => (
+						<View
+							key={index}
+							style={[
+								styles.possibility,
+								index !== data.service.booking.length - 1 && {
+									marginBottom: 6
+								}
+							]}
+						>
+							<View style={styles.possibilityDot} />
+							<Text style={styles.possibilityText}>{alarm}</Text>
+						</View>
+					))}
+				</View>
+				<View style={styles.feedbackItem}>
+					<View style={styles.titleGroup}>
+						<View style={styles.iconFeedback}>
+							<IconHeadphones />
+						</View>
+						<Text style={styles.title}>Habarlaşmak</Text>
+					</View>
+					{data?.service.contacts.map((contact, index) => (
+						<View
+							key={index}
+							style={[
+								styles.possibility,
+								index !== data?.service.contacts.length - 1 && {
+									marginBottom: 6
+								}
+							]}
+						>
+							<View style={styles.possibilityDot} />
+							<Text style={styles.possibilityText}>{contact}</Text>
+						</View>
+					))}
+				</View>
+			</ScrollView>
 		</View>
 	);
 };

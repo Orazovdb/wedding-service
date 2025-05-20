@@ -75,30 +75,4 @@ export const FakeCards: CategoryItem[] = [
 	}
 ];
 
-export const FeedbackData = [
-	{
-		id: "1",
-		title: "Bahalandyrma",
-		possibilities: [
-			"1 sag 10 tmt",
-			"2 sag 20 tmt",
-			"3 sag 30 tmt",
-			"4 sag 40 tmt",
-			"5 sag 50 tmt"
-		]
-	},
-	{
-		id: "2",
-		title: "Bronlamak ucin",
-		possibilities: ["1 hepde onunden bronlamaly"]
-	},
-	{
-		id: "3",
-		title: "Habarlashmak",
-		possibilities: [
-			"+993 61 993333",
-			"+993 61 9933 33",
-			"kerimkerimow@gmail.com"
-		]
-	}
-];
+export const FeedbackData = [];

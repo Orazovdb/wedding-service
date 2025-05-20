@@ -101,10 +101,58 @@ export type HumanServices = {
 
 export type HumanServicesData = {
 	data: HumanServices[];
-	meta: {
-		current_page: number;
-		last_page: number;
-		per_page: number;
-		total: number;
+};
+
+export type HumanServicesById = {
+	id: number;
+	name: string;
+	description: string;
+	phone: string;
+	status: string;
+	pricing: string[];
+	booking: string[];
+	contacts: string[];
+	followers_count: number;
+	categories: {
+		id: number;
+		name: string;
+		icon: string;
+	}[];
+	region: {
+		id: number;
+		name: string;
+		province: string;
+	};
+	logo: string;
+	catalog: string;
+	images: {
+		id: number;
+		url: string;
+	}[];
+	videos: {
+		id: number;
+		filename: string;
+	}[];
+};
+
+export type HumanServicesByIdData = {
+	service: HumanServicesById;
+	similar: {
+		id: number;
+		name: string;
+		status: statusServices;
+		logo: string;
+		categories: [
+			{
+				id: number;
+				name: string;
+			}
+		];
+		region: {
+			id: number;
+			name: string;
+			province: string;
+		};
+		service_provider:  null | boolean;
 	};
 };
