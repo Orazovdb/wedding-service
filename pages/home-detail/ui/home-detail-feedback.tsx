@@ -14,72 +14,78 @@ export const HomeDetailFeedback = ({
 	return (
 		<View style={styles.feedback}>
 			<ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
-				<View style={styles.feedbackItem}>
-					<View style={styles.titleGroup}>
-						<View style={styles.iconFeedback}>
-							<IconFeedBack />
+				{data?.service.pricing[0] !== "" ? (
+					<View style={styles.feedbackItem}>
+						<View style={styles.titleGroup}>
+							<View style={styles.iconFeedback}>
+								<IconFeedBack />
+							</View>
+							<Text style={styles.title}>Bahalandyrma</Text>
 						</View>
-						<Text style={styles.title}>Bahalandyrma</Text>
+						{data?.service.pricing.map((price, index) => (
+							<View
+								key={index}
+								style={[
+									styles.possibility,
+									index !== data.service.pricing.length - 1 && {
+										marginBottom: 6
+									}
+								]}
+							>
+								<View style={styles.possibilityDot} />
+								<Text style={styles.possibilityText}>{price}</Text>
+							</View>
+						))}
 					</View>
-					{data?.service.pricing.map((price, index) => (
-						<View
-							key={index}
-							style={[
-								styles.possibility,
-								index !== data.service.pricing.length - 1 && {
-									marginBottom: 6
-								}
-							]}
-						>
-							<View style={styles.possibilityDot} />
-							<Text style={styles.possibilityText}>{price}</Text>
+				) : null}
+				{data?.service.booking[0] !== "" ? (
+					<View style={styles.feedbackItem}>
+						<View style={styles.titleGroup}>
+							<View style={styles.iconFeedback}>
+								<IconAlarm />
+							</View>
+							<Text style={styles.title}>Bronlamak üçin </Text>
 						</View>
-					))}
-				</View>
-				<View style={styles.feedbackItem}>
-					<View style={styles.titleGroup}>
-						<View style={styles.iconFeedback}>
-							<IconAlarm />
-						</View>
-						<Text style={styles.title}>Bronlamak üçin </Text>
+						{data?.service.booking.map((alarm, index) => (
+							<View
+								key={index}
+								style={[
+									styles.possibility,
+									index !== data.service.booking.length - 1 && {
+										marginBottom: 6
+									}
+								]}
+							>
+								<View style={styles.possibilityDot} />
+								<Text style={styles.possibilityText}>{alarm}</Text>
+							</View>
+						))}
 					</View>
-					{data?.service.booking.map((alarm, index) => (
-						<View
-							key={index}
-							style={[
-								styles.possibility,
-								index !== data.service.booking.length - 1 && {
-									marginBottom: 6
-								}
-							]}
-						>
-							<View style={styles.possibilityDot} />
-							<Text style={styles.possibilityText}>{alarm}</Text>
+				) : null}
+				{data?.service.contacts[0] !== "" ? (
+					<View style={styles.feedbackItem}>
+						<View style={styles.titleGroup}>
+							<View style={styles.iconFeedback}>
+								<IconHeadphones />
+							</View>
+							<Text style={styles.title}>Habarlaşmak</Text>
 						</View>
-					))}
-				</View>
-				<View style={styles.feedbackItem}>
-					<View style={styles.titleGroup}>
-						<View style={styles.iconFeedback}>
-							<IconHeadphones />
-						</View>
-						<Text style={styles.title}>Habarlaşmak</Text>
+						{data?.service.contacts.map((contact, index) => (
+							<View
+								key={index}
+								style={[
+									styles.possibility,
+									index !== data?.service.contacts.length - 1 && {
+										marginBottom: 6
+									}
+								]}
+							>
+								<View style={styles.possibilityDot} />
+								<Text style={styles.possibilityText}>{contact}</Text>
+							</View>
+						))}
 					</View>
-					{data?.service.contacts.map((contact, index) => (
-						<View
-							key={index}
-							style={[
-								styles.possibility,
-								index !== data?.service.contacts.length - 1 && {
-									marginBottom: 6
-								}
-							]}
-						>
-							<View style={styles.possibilityDot} />
-							<Text style={styles.possibilityText}>{contact}</Text>
-						</View>
-					))}
-				</View>
+				) : null}
 			</ScrollView>
 		</View>
 	);

@@ -1,7 +1,9 @@
 import SearchIcon from "@/components/ui/SearchIcon";
+import { categoriesService } from "@/shared/api/services/categories.service";
+import { CategoriesWithChildren, HumanServices } from "@/shared/api/types";
 import ArrowLeft from "@/shared/icons/arrow-left.svg";
 import { useRouter } from "expo-router";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
 	FlatList,
 	StyleSheet,
@@ -11,13 +13,14 @@ import {
 	View
 } from "react-native";
 import { Colors } from "react-native/Libraries/NewAppScreen";
-import { CategoryData } from "../data";
 import { FilterModal } from "./categories-filter";
 
 interface Props {
-	sub_category_id: string | string[];
 	category_id: string | string[];
+	sub_category_id: string | string[];
 	onSelectSubCategory: (id: string) => void;
+	data: HumanServices | undefined;
+	totalCount: number | undefined;
 }
 
 export const CategoriesDetailHeader = (props: Props) => {
@@ -25,16 +28,38 @@ export const CategoriesDetailHeader = (props: Props) => {
 	const [search, setSearch] = useState("");
 	const [isModalVisible, setIsModalVisible] = useState(false);
 
+	const [dataCategories, setDataCategories] =
+		useState<CategoriesWithChildren[]>();
+
+	useEffect(() => {
+		const fetchData = async () => {
+			const result = await categoriesService.getCategories({
+				category_id: Number(props.sub_category_id),
+				parent: 0
+			});
+			setDataCategories(result);
+		};
+
+		fetchData();
+	}, []);
+
 	return (
 		<View style={styles.header}>
 			<View style={styles.categoryBlock}>
 				<TouchableOpacity onPress={() => router.back()}>
 					<ArrowLeft />
 				</TouchableOpacity>
-				<Text style={styles.categoryName}>Maşyn Arenda / BMW</Text>
+				<Text style={styles.categoryName}>
+					{props.data?.categories[0].name} /{" "}
+					{
+						props.data?.categories.find(
+							item => String(item.id) === String(props.sub_category_id)
+						)?.name
+					}
+				</Text>
 				<View style={styles.categoryService}>
 					<View style={styles.categoryServiceDot} />
-					<Text style={styles.categoryServiceName}>14 Hyzmatcy</Text>
+					<Text style={styles.categoryServiceName}>{props.totalCount}</Text>
 				</View>
 			</View>
 			<View style={styles.searchBlock}>
@@ -46,7 +71,7 @@ export const CategoriesDetailHeader = (props: Props) => {
 				>
 					<SearchIcon width={20} height={20} color="#000000" />
 					<TextInput
-						placeholder="Maşyn prokadçylary gözle"
+						placeholder="search"
 						value={search}
 						onChangeText={setSearch}
 						style={styles.input}
@@ -60,29 +85,29 @@ export const CategoriesDetailHeader = (props: Props) => {
 			</View>
 			<View style={styles.categoryList}>
 				<FlatList
-					data={CategoryData}
-					keyExtractor={item => item.id}
+					data={dataCategories}
+					keyExtractor={item => item.id.toString()}
 					horizontal={true}
 					showsHorizontalScrollIndicator={false}
 					renderItem={({ item }) => (
 						<TouchableOpacity
 							style={[
 								styles.categoryItem,
-								props.sub_category_id === item.id
+								props.sub_category_id === String(item.id)
 									? styles.categoryItemActive
 									: null
 							]}
-							onPress={() => props.onSelectSubCategory(item.id)}
+							onPress={() => props.onSelectSubCategory(String(item.id))}
 						>
 							<Text
 								style={[
 									styles.categoryItemText,
-									props.sub_category_id === item.id
+									props.sub_category_id === String(item.id)
 										? styles.categoryItemTextActive
 										: null
 								]}
 							>
-								{item.title}
+								{item.name}
 							</Text>
 						</TouchableOpacity>
 					)}
@@ -97,8 +122,7 @@ export const CategoriesDetailHeader = (props: Props) => {
 };
 
 export const styles = StyleSheet.create({
-	header: {
-	},
+	header: {},
 	categoryBlock: {
 		flexDirection: "row",
 		alignItems: "center",

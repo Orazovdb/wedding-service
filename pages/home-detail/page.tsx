@@ -1,21 +1,21 @@
-import { Colors } from "@/constants/Colors";
-import { servicesService } from "@/shared/api/services/services.service";
-import { HumanServicesByIdData } from "@/shared/api/types";
-import ArrowLeftBigIcon from "@/shared/icons/arrow-left-big.svg";
-import { useLocalSearchParams, useRouter } from "expo-router";
-import { useEffect, useState } from "react";
+import { Colors } from "@/constants/Colors"
+import { servicesService } from "@/shared/api/services/services.service"
+import { HumanServicesByIdData } from "@/shared/api/types"
+import ArrowLeftBigIcon from "@/shared/icons/arrow-left-big.svg"
+import { useLocalSearchParams, useRouter } from "expo-router"
+import { useEffect, useState } from "react"
 import {
 	Dimensions,
 	ScrollView,
 	StyleSheet,
 	TouchableOpacity
-} from "react-native";
-import { HomeDetailAbout } from "./ui/home-detail-about";
-import { HomeDetailBanner } from "./ui/home-detail-banner";
-import { HomeDetailFeedback } from "./ui/home-detail-feedback";
-import { HomeDetailProfile } from "./ui/home-detail-profile";
-import HomeDetailSameServices from "./ui/home-detail-same-services";
-import { HomeDetailContact } from "./ui/home-detail.contact";
+} from "react-native"
+import { HomeDetailAbout } from "./ui/home-detail-about"
+import { HomeDetailBanner } from "./ui/home-detail-banner"
+import { HomeDetailFeedback } from "./ui/home-detail-feedback"
+import { HomeDetailProfile } from "./ui/home-detail-profile"
+import HomeDetailSameServices from "./ui/home-detail-same-services"
+import { HomeDetailContact } from "./ui/home-detail.contact"
 
 const { width } = Dimensions.get("window");
 
@@ -38,7 +38,7 @@ export const HomeDynamicScreen = () => {
 
 	return (
 		<ScrollView style={styles.container}>
-			{data?.service.videos.length && data?.service.images.length ? (
+			{data?.service.videos.length || data?.service.images.length ? (
 				<HomeDetailBanner data={data} />
 			) : null}
 			<TouchableOpacity onPress={() => router.back()} style={styles.backIcon}>
@@ -46,9 +46,13 @@ export const HomeDynamicScreen = () => {
 			</TouchableOpacity>
 			<HomeDetailProfile data={data} />
 			<HomeDetailAbout data={data} />
-			<HomeDetailFeedback data={data} />
+			{data?.service.pricing[0] !== "" ||
+			data?.service.booking[0] !== "" ||
+			data?.service.contacts[0] !== "" ? (
+				<HomeDetailFeedback data={data} />
+			) : null}
 			<HomeDetailContact data={data} />
-			<HomeDetailSameServices />
+			{data?.similar.length ? <HomeDetailSameServices data={data} /> : null}
 		</ScrollView>
 	);
 };

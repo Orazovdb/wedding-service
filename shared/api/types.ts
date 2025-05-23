@@ -56,7 +56,8 @@ export enum parentCategories {
 }
 
 export type CategoriesWithChildrenArgs = {
-	parent: parentCategories;
+	parent?: parentCategories;
+	category_id?: number
 };
 
 export type CategoriesWithChildren = {
@@ -72,6 +73,7 @@ export type CategoriesWithChildrenData = {
 
 export type HumanServicesArgs = {
 	category_ids: string | undefined;
+	subcategory_ids?: string | undefined;
 	name: string | undefined;
 	provinces: string | undefined;
 	statuses: statusServices | string | undefined;
@@ -101,6 +103,11 @@ export type HumanServices = {
 
 export type HumanServicesData = {
 	data: HumanServices[];
+	meta: {
+		current_page: number;
+		per_page: number;
+		total: number;
+	};
 };
 
 export type HumanServicesById = {
@@ -135,24 +142,26 @@ export type HumanServicesById = {
 	}[];
 };
 
-export type HumanServicesByIdData = {
-	service: HumanServicesById;
-	similar: {
-		id: number;
-		name: string;
-		status: statusServices;
-		logo: string;
-		categories: [
-			{
-				id: number;
-				name: string;
-			}
-		];
-		region: {
+export type SimilarServices = {
+	id: number;
+	name: string;
+	status: statusServices;
+	logo: string;
+	categories: [
+		{
 			id: number;
 			name: string;
-			province: string;
-		};
-		service_provider:  null | boolean;
+		}
+	];
+	region: {
+		id: number;
+		name: string;
+		province: string;
 	};
+};
+
+export type HumanServicesByIdData = {
+	service: HumanServicesById;
+	similar: SimilarServices[];
+	service_provider: null | boolean;
 };

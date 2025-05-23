@@ -4,7 +4,7 @@ import SettingsIcon from "@/assets/images/navigations/settings.svg";
 import SubscribersIcon from "@/assets/images/navigations/subscribers.svg";
 import { Colors } from "@/constants/Colors";
 import { useFonts } from "expo-font";
-import { Stack, usePathname, useRouter } from "expo-router";
+import { Slot, Stack, usePathname, useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import {
 	ActivityIndicator,
@@ -24,7 +24,8 @@ export default function Layout() {
 		<SafeAreaProvider>
 			<AuthProvider>
 				<GestureHandlerRootView style={{ flex: 1 }}>
-					<ProtectedRoutes />
+					<Slot />
+					{/* <ProtectedRoutes /> */}
 				</GestureHandlerRootView>
 			</AuthProvider>
 		</SafeAreaProvider>
@@ -77,14 +78,7 @@ function ProtectedRoutes() {
 						/>
 						<Stack.Screen name="categories" />
 						<Stack.Screen
-							name="categories/[id]"
-							options={{
-								animation: "slide_from_bottom",
-								presentation: "modal"
-							}}
-						/>
-						<Stack.Screen
-							name="categories/[categories-detail]/[id]"
+							name="categories/[categoryDetail]"
 							options={{
 								animation: "slide_from_bottom",
 								presentation: "modal"

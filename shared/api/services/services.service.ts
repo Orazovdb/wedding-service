@@ -10,6 +10,8 @@ class ServicesService {
 		const response = await axiosClassic.get<HumanServicesData>("/services", {
 			params
 		});
+		console.log(response.data.data, "responseeeee:");
+		console.log(params, "paramsss:");
 		return response.data;
 	}
 

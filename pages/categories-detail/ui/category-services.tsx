@@ -1,4 +1,5 @@
 import { Colors } from "@/constants/Colors";
+import { HumanServices, HumanServicesData } from "@/shared/api/types";
 import LocationIcon from "@/shared/icons/location-icon.svg";
 import GoldenIcon from "@/shared/icons/status-golden.svg";
 import NewIcon from "@/shared/icons/status-new.svg";
@@ -16,153 +17,216 @@ import {
 	View
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { FakeSlides } from "../data";
-import { CategoryItem } from "../types";
 
 const { height, width } = Dimensions.get("window");
 
-export const CategoryServices = () => {
+export const CategoryServices = ({
+	data,
+	onPageChange
+}: {
+	data: HumanServicesData | undefined;
+	onPageChange?: (page: number) => void;
+}) => {
 	const insets = useSafeAreaInsets();
 	const PAGE_HEIGHT =
 		Dimensions.get("window").height - insets.top - insets.bottom - 200;
-
 	const ITEMS_PER_PAGE = 6;
-	const router = useRouter();
 	const flatListRef = useRef<FlatList<any>>(null);
-	const [currentPage, setCurrentPage] = useState(0);
-	const totalPages = Math.ceil(FakeSlides.length / ITEMS_PER_PAGE);
+	const [currentPage, setCurrentPage] = useState(1);
+	const router = useRouter();
 
-	const pagedData = Array.from({ length: totalPages }, (_, index) => {
-		const start = index * ITEMS_PER_PAGE;
-		const end = start + ITEMS_PER_PAGE;
-		return FakeSlides.slice(start, end);
-	});
+	const pagedData: HumanServices[][] = data?.data
+		? Array.from(
+				{ length: Math.ceil(data.data.length / ITEMS_PER_PAGE) },
+				(_, index) => {
+					const start = index * ITEMS_PER_PAGE;
+					const end = start + ITEMS_PER_PAGE;
+					const items = data.data.slice(start, end);
+					while (items.length < ITEMS_PER_PAGE) {
+						items.push(null as unknown as HumanServices);
+					}
+					return items;
+				}
+		  )
+		: [];
 
 	const onViewableItemsChanged = useRef(({ viewableItems }: any) => {
 		if (viewableItems.length > 0) {
-			setCurrentPage(viewableItems[0].index);
+			const nextPage = viewableItems[0].index + 1;
+			if (nextPage === currentPage) {
+				setCurrentPage(nextPage);
+				onPageChange?.(nextPage);
+				console.log(currentPage);
+			}
 		}
 	}).current;
 
-	const renderPage = ({ item }: { item: CategoryItem[] }) => (
+	const renderPage = ({ item }: { item: HumanServices[] }) => (
 		<View style={[styles.pageContainer, { height: PAGE_HEIGHT }]}>
-			{item.map(user => (
-				<View key={user.id} style={styles.categoryList}>
-					<View
-						style={[
-							styles.categoryItem,
-							user.status === "premium"
-								? styles.categoryItemPremium
-								: user.status === "gold"
-								? styles.categoryItemGold
-								: null
-						]}
+			{item.map((item, index) => {
+				if (!item)
+					return (
+						<View
+							key={index}
+							style={{ height: PAGE_HEIGHT / 3, width: width / 2 - 40 }}
+						/>
+					);
+				return (
+					<TouchableOpacity
+						onPress={() => router.push(`/home/${item.id}`)}
+						key={item.id}
+						style={[styles.categoryList, { height: PAGE_HEIGHT / 3 }]}
 					>
-						{user.status !== "static" && (
-							<View
-								style={[
-									styles.categoryItemStatus,
-									user.status === "premium"
-										? styles.categoryItemStatusPremium
-										: user.status === "gold"
-										? styles.categoryItemStatusGold
-										: user.status === "new"
-										? styles.categoryItemStatusNew
-										: null
-								]}
-							>
-								<Text style={styles.categoryItemStatusText}>
-									{user.status === "premium"
-										? "premium"
-										: user.status === "gold"
-										? "golden"
-										: user.status === "new"
-										? "täze"
-										: ""}
-								</Text>
-								{user.status === "premium" ? (
-									<PremiumIcon />
-								) : user.status === "gold" ? (
-									<GoldenIcon />
-								) : user.status === "new" ? (
-									<NewIcon />
-								) : null}
-							</View>
-						)}
-						<Image source={user.image} style={styles.categoryProfileImg} />
-						<Text style={styles.categoryUsername}>Mark</Text>
-						<Text style={styles.categoryUserSurName}>Manson</Text>
-						<View style={styles.serviceDivider} />
-						<TouchableOpacity onPress={() => router.push("/home/1")}>
-							<Text style={styles.categoryName}>Mashyn bezegci</Text>
-						</TouchableOpacity>
-						<Text style={styles.serviceName}>BMW</Text>
-						<View style={styles.serviceLocationWrapper}>
-							<LocationIcon />
-							<Text style={styles.serviceLocation}>Ahal, Gokdepe</Text>
-						</View>
-						<View style={styles.serviceButtons}>
-							<View style={styles.subscriptionsButton}>
-								<Text style={styles.subscriptionsButtonText}>100K</Text>
-								<Text style={styles.subscriptionsButtonText}>agza</Text>
-							</View>
-							<TouchableOpacity
-								style={[
-									styles.subscribeButton,
-									user.status === "gold" && styles.subscribeButtonGold
-								]}
-							>
-								<Text
+						<View
+							style={[
+								styles.categoryItem,
+								item.status === "premium"
+									? styles.categoryItemPremium
+									: item.status === "golden"
+									? styles.categoryItemGold
+									: null
+							]}
+						>
+							{item.status !== "normal" && (
+								<View
 									style={[
-										styles.subscribeButtonText,
-										user.status === "gold" && styles.subscribeButtonGoldText
+										styles.categoryItemStatus,
+										item.status === "premium"
+											? styles.categoryItemStatusPremium
+											: item.status === "golden"
+											? styles.categoryItemStatusGold
+											: item.status === "new"
+											? styles.categoryItemStatusNew
+											: null
 									]}
 								>
-									Agza
+									<Text style={styles.categoryItemStatusText}>
+										{item.status === "premium"
+											? "premium"
+											: item.status === "golden"
+											? "golden"
+											: item.status === "new"
+											? "täze"
+											: ""}
+									</Text>
+									{item.status === "premium" ? (
+										<PremiumIcon />
+									) : item.status === "golden" ? (
+										<GoldenIcon />
+									) : item.status === "new" ? (
+										<NewIcon />
+									) : null}
+								</View>
+							)}
+							<Image
+								source={{ uri: item.logo }}
+								style={styles.categoryProfileImg}
+							/>
+							{item.name ? (
+								(() => {
+									const [firstWord = "", secondWord = ""] =
+										item.name.split(" ");
+									return (
+										<>
+											<Text style={styles.categoryUsername}>{firstWord}</Text>
+											<Text style={styles.categoryUserSurName}>
+												{secondWord}
+											</Text>
+										</>
+									);
+								})()
+							) : (
+								<Text style={styles.categoryUsername}>
+									service-provider_{item.id}
 								</Text>
-								<Text
+							)}
+							<View style={styles.serviceDivider} />
+							<Text style={styles.categoryName}>{item.categories[0].name}</Text>
+							<Text style={styles.serviceName}>{item.name}</Text>
+							<View style={styles.serviceLocationWrapper}>
+								<LocationIcon />
+								{(() => {
+									const [firstWord = "", secondWord = ""] =
+										item.region.name.split(" ");
+									return (
+										<>
+											<Text style={styles.serviceLocation}>
+												{firstWord} {secondWord}, {item.region.province}
+											</Text>
+										</>
+									);
+								})()}
+							</View>
+							<View style={styles.serviceButtons}>
+								<View style={styles.subscriptionsButton}>
+									<Text style={styles.subscriptionsButtonText}>
+										{item.followers_count}
+									</Text>
+									<Text style={styles.subscriptionsButtonText}>agza</Text>
+								</View>
+								<TouchableOpacity
 									style={[
-										styles.subscribeButtonText,
-										user.status === "gold" && styles.subscribeButtonGoldText
+										styles.subscribeButton,
+										item.status === "golden" && styles.subscribeButtonGold
 									]}
 								>
-									bol
-								</Text>
-							</TouchableOpacity>
+									<Text
+										style={[
+											styles.subscribeButtonText,
+											item.status === "golden" && styles.subscribeButtonGoldText
+										]}
+									>
+										Agza
+									</Text>
+									<Text
+										style={[
+											styles.subscribeButtonText,
+											item.status === "golden" && styles.subscribeButtonGoldText
+										]}
+									>
+										bol
+									</Text>
+								</TouchableOpacity>
+							</View>
 						</View>
-					</View>
-				</View>
-			))}
+					</TouchableOpacity>
+				);
+			})}
 		</View>
 	);
 
 	return (
-		<View
-			style={{
-				flexDirection: "row",
-				alignItems: "center",
-				flex: 1,
-				paddingBottom: 50
-			}}
-		>
+		<View style={{ flex: 1 }}>
 			<View style={styles.paginationContainer}>
-				{pagedData.map((_, index) => (
-					<View
-						key={index}
-						style={[
-							styles.paginationDot,
-							index === currentPage && styles.paginationDotActive
-						]}
-					/>
-				))}
+				{Array.from({ length: Number(data?.meta?.total) / ITEMS_PER_PAGE }).map(
+					(_, index) => (
+						<View
+							key={index}
+							style={[
+								styles.paginationDot,
+								index + 1 === currentPage && styles.paginationDotActive
+							]}
+						/>
+					)
+				)}
+				<Text>{Number(data?.meta?.total) / ITEMS_PER_PAGE}</Text>
 			</View>
 			<FlatList
 				ref={flatListRef}
 				data={pagedData}
 				keyExtractor={(_, index) => index.toString()}
 				renderItem={renderPage}
-				scrollEnabled
+				pagingEnabled
+				snapToInterval={PAGE_HEIGHT}
+				decelerationRate="fast"
 				showsVerticalScrollIndicator={false}
+				onViewableItemsChanged={onViewableItemsChanged}
+				viewabilityConfig={{ viewAreaCoveragePercentThreshold: 50 }}
+				getItemLayout={(_, index) => ({
+					length: PAGE_HEIGHT,
+					offset: PAGE_HEIGHT * index,
+					index
+				})}
 			/>
 		</View>
 	);

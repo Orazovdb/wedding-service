@@ -1,4 +1,5 @@
 import { Colors } from "@/constants/Colors";
+import { HumanServicesByIdData, SimilarServices } from "@/shared/api/types";
 import LocationIcon from "@/shared/icons/location-icon.svg";
 import GoldenIcon from "@/shared/icons/status-golden.svg";
 import NewIcon from "@/shared/icons/status-new.svg";
@@ -14,12 +15,14 @@ import {
 	TouchableOpacity,
 	View
 } from "react-native";
-import { FakeCards } from "../data";
-import { CategoryItem } from "../types";
 
 const { width } = Dimensions.get("window");
 
-const HomeDetailSameServices = () => {
+const HomeDetailSameServices = ({
+	data
+}: {
+	data: HumanServicesByIdData | undefined;
+}) => {
 	const router = useRouter();
 
 	const categoryFlatListRef = useRef<FlatList<any>>(null);
@@ -29,30 +32,38 @@ const HomeDetailSameServices = () => {
 			<Text style={styles.title}>Meňzeş hyzmatlar</Text>
 			<FlatList
 				ref={categoryFlatListRef}
-				data={FakeCards}
-				keyExtractor={item => item.id}
+				data={data?.similar}
+				keyExtractor={item => item.id.toString()}
 				horizontal
 				showsHorizontalScrollIndicator={false}
 				contentContainerStyle={{ alignItems: "center" }}
-				renderItem={({ item }: { item: CategoryItem }) => (
+				renderItem={({ item }: { item: SimilarServices }) => (
 					<View style={styles.categoryList}>
-						<View
+						<TouchableOpacity
+							onPress={() =>
+								router.push({
+									pathname: `/home/[id]`,
+									params: {
+										id: item.id
+									}
+								})
+							}
 							style={[
 								styles.categoryItem,
 								item.status === "premium"
 									? styles.categoryItemPremium
-									: item.status === "gold"
+									: item.status === "golden"
 									? styles.categoryItemGold
 									: ""
 							]}
 						>
-							{item.status !== "static" && (
+							{item.status !== "normal" && (
 								<View
 									style={[
 										styles.categoryItemStatus,
 										item.status === "premium"
 											? styles.categoryItemStatusPremium
-											: item.status === "gold"
+											: item.status === "golden"
 											? styles.categoryItemStatusGold
 											: item.status === "new"
 											? styles.categoryItemStatusNew
@@ -62,7 +73,7 @@ const HomeDetailSameServices = () => {
 									<Text style={styles.categoryItemStatusText}>
 										{item.status === "premium"
 											? "premium"
-											: item.status === "gold"
+											: item.status === "golden"
 											? `${"golden"}`
 											: item.status === "new"
 											? "täze"
@@ -70,40 +81,69 @@ const HomeDetailSameServices = () => {
 									</Text>
 									{item.status === "premium" ? (
 										<PremiumIcon />
-									) : item.status === "gold" ? (
+									) : item.status === "golden" ? (
 										<GoldenIcon />
 									) : item.status === "new" ? (
 										<NewIcon />
 									) : null}
 								</View>
 							)}
-							<Image source={item.image} style={styles.categoryProfileImg} />
-							<Text style={styles.categoryUsername}>Mark</Text>
-							<Text style={styles.categoryUserSurName}>Manson</Text>
+							<Image
+								source={{ uri: item.logo }}
+								style={styles.categoryProfileImg}
+							/>
+							{item.name ? (
+								(() => {
+									const [firstWord = "", secondWord = ""] =
+										item.name.split(" ");
+									return (
+										<>
+											<Text style={styles.categoryUsername}>{firstWord}</Text>
+											<Text style={styles.categoryUserSurName}>
+												{secondWord}
+											</Text>
+										</>
+									);
+								})()
+							) : (
+								<Text style={styles.categoryUsername}>
+									service-provider_{item?.id}
+								</Text>
+							)}
 							<View style={styles.serviceDivider} />
-							<TouchableOpacity onPress={() => router.push("/home/1")}>
-								<Text style={styles.categoryName}>Mashyn bezegci</Text>
-							</TouchableOpacity>
-							<Text style={styles.serviceName}>BMW</Text>
+							<Text style={styles.categoryName}>
+								{item.categories[0]?.name}
+							</Text>
+							<Text style={styles.serviceName}>{item?.name}</Text>
 							<View style={styles.serviceLocationWrapper}>
 								<LocationIcon />
-								<Text style={styles.serviceLocation}>Ahal, Gokdepe</Text>
+								{(() => {
+									const [firstWord = "", secondWord = ""] =
+										item.region.name.split(" ");
+									return (
+										<>
+											<Text style={styles.serviceLocation}>
+												{firstWord} {secondWord}, {item.region.province}
+											</Text>
+										</>
+									);
+								})()}
 							</View>
 							<View style={styles.serviceButtons}>
 								<View style={styles.subscriptionsButton}>
-									<Text style={styles.subscriptionsButtonText}>100K</Text>
+									<Text style={styles.subscriptionsButtonText}>111k</Text>
 									<Text style={styles.subscriptionsButtonText}>agza</Text>
 								</View>
 								<TouchableOpacity
 									style={[
 										styles.subscribeButton,
-										item.status === "gold" && styles.subscribeButtonGold
+										item.status === "golden" && styles.subscribeButtonGold
 									]}
 								>
 									<Text
 										style={[
 											styles.subscribeButtonText,
-											item.status === "gold" && styles.subscribeButtonGoldText
+											item.status === "golden" && styles.subscribeButtonGoldText
 										]}
 									>
 										Agza
@@ -111,14 +151,14 @@ const HomeDetailSameServices = () => {
 									<Text
 										style={[
 											styles.subscribeButtonText,
-											item.status === "gold" && styles.subscribeButtonGoldText
+											item.status === "golden" && styles.subscribeButtonGoldText
 										]}
 									>
 										bol
 									</Text>
 								</TouchableOpacity>
 							</View>
-						</View>
+						</TouchableOpacity>
 					</View>
 				)}
 			/>

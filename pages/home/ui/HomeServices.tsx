@@ -33,7 +33,7 @@ export const HomeServices = ({ data }: { data?: props }) => {
 				<TouchableOpacity
 					onPress={() =>
 						router.push({
-							pathname: `/categories/[categories_detail]/[id]`,
+							pathname: `/categories/[id]`,
 							params: {
 								categories_detail: categoryItem.id,
 								id: "all"

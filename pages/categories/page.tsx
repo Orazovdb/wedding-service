@@ -48,6 +48,11 @@ export const CategoriesScreen = () => {
 		}).start();
 	};
 
+	const handlePush = (id: number, subId: number) => {
+		router.push(`/categories/${id}/${subId}`);
+		console.log(id, subId, "navigateeee");
+	};
+
 	return (
 		<SafeAreaView style={styles.safeArea}>
 			<View style={styles.page}>
@@ -79,13 +84,18 @@ export const CategoriesScreen = () => {
 											{ opacity: animatedOpacity }
 										]}
 									>
+										<TouchableOpacity
+											style={styles.subItem}
+											onPress={() => router.push(`/categories/all`)}
+										>
+											<Text style={styles.subItemText}>Ahlisi</Text>
+											<ArrowRightIcon />
+										</TouchableOpacity>
 										{item.children.map(subItem => (
 											<TouchableOpacity
 												key={subItem.id}
 												style={styles.subItem}
-												onPress={() =>
-													router.push(`/categories/${item.id}/${subItem.id}`)
-												}
+												onPress={() => handlePush(item.id, subItem.id)}
 											>
 												<Text style={styles.subItemText}>{subItem.name}</Text>
 												<ArrowRightIcon />
