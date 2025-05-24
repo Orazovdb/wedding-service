@@ -1,0 +1,8 @@
+{
+  "routes": {
+    "home": "Home",
+		"categories": "Categories",
+		"subscribers": "Subscribers",
+		"settings": "Settings"
+  }
+}

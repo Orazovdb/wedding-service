@@ -8,22 +8,10 @@ type props = {
 	onChangeTab: (value: number) => void;
 };
 
-const data = [
-	{
-		id: "1",
-		icon: <IconTranslate />,
-		title: "TKM"
-	},
-	{
-		id: "2",
-		icon: <IconTranslate />,
-		title: "RUS"
-	},
-	{
-		id: "3",
-		icon: <IconTranslate />,
-		title: "ENG"
-	}
+export const languages = [
+	{ id: 1, icon: <IconTranslate />, title: "TKM", lang: "tm" },
+	{ id: 2, icon: <IconTranslate />, title: "RUS", lang: "ru" },
+	{ id: 3, icon: <IconTranslate />, title: "ENG", lang: "en" }
 ];
 
 export const LanguageTabs = ({ selectedTab = 1, onChangeTab }: props) => {
@@ -34,7 +22,7 @@ export const LanguageTabs = ({ selectedTab = 1, onChangeTab }: props) => {
 				<Text style={styles.title}>Dil</Text>
 			</View>
 			<View style={styles.tabs}>
-				{data.map(tab => (
+				{languages.map(tab => (
 					<TouchableOpacity
 						key={tab.id}
 						onPress={() => onChangeTab(Number(tab.id))}

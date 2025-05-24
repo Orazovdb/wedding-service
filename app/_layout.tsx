@@ -1,41 +1,15 @@
-import CategoryIcon from "@/assets/images/navigations/category.svg";
-import HomeIcon from "@/assets/images/navigations/home.svg";
-import SettingsIcon from "@/assets/images/navigations/settings.svg";
-import SubscribersIcon from "@/assets/images/navigations/subscribers.svg";
-import { Colors } from "@/constants/Colors";
+// app/_layout.tsx
+import i18n from "@/shared/i18n";
+import { AuthProvider } from "@/shared/store/AuthContext";
+import { ThemeProvider } from "@/shared/store/ThemeContext";
 import { useFonts } from "expo-font";
-import { Slot, Stack, usePathname, useRouter } from "expo-router";
-import { StatusBar } from "expo-status-bar";
-import {
-	ActivityIndicator,
-	Platform,
-	StyleSheet,
-	Text,
-	TouchableOpacity,
-	View
-} from "react-native";
-import "react-native-gesture-handler";
+import { Slot } from "expo-router";
+import { I18nextProvider } from "react-i18next";
+import { ActivityIndicator, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
-import { AuthProvider, useAuth } from "../store/AuthContext";
+import { SafeAreaProvider } from "react-native-safe-area-context";
 
-export default function Layout() {
-	return (
-		<SafeAreaProvider>
-			<AuthProvider>
-				<GestureHandlerRootView style={{ flex: 1 }}>
-					<Slot />
-					{/* <ProtectedRoutes /> */}
-				</GestureHandlerRootView>
-			</AuthProvider>
-		</SafeAreaProvider>
-	);
-}
-function ProtectedRoutes() {
-	const { isLoggedIn } = useAuth();
-	const pathname = usePathname();
-	const router = useRouter();
-
+export default function RootLayout() {
 	const [fontsLoaded] = useFonts({
 		"Lexend-Bold": require("@/shared/fonts/Lexend-Bold.ttf"),
 		"Lexend-ExtraBold": require("@/shared/fonts/Lexend-ExtraBold.ttf"),
@@ -55,174 +29,17 @@ function ProtectedRoutes() {
 			</View>
 		);
 	}
-
 	return (
-		<SafeAreaView style={styles.safeArea}>
-			<StatusBar style="dark" backgroundColor="#fff" />
-			<Stack
-				screenOptions={{
-					headerShown: false,
-					animation: "fade",
-					gestureEnabled: false
-				}}
-			>
-				{isLoggedIn ? (
-					<>
-						<Stack.Screen name="home" />
-						<Stack.Screen
-							name="home/[id]"
-							options={{
-								animation: "slide_from_bottom",
-								presentation: "modal"
-							}}
-						/>
-						<Stack.Screen name="categories" />
-						<Stack.Screen
-							name="categories/[categoryDetail]"
-							options={{
-								animation: "slide_from_bottom",
-								presentation: "modal"
-							}}
-						/>
-						<Stack.Screen name="subscribers" />
-						<Stack.Screen name="settings" />
-						<Stack.Screen name="settings/[id]" />
-					</>
-				) : (
-					<Stack.Screen name="index" />
-				)}
-			</Stack>
-
-			{isLoggedIn && (
-				<View style={styles.bottomNavigation}>
-					<TouchableOpacity onPress={() => router.push("/home")}>
-						<View
-							style={[
-								styles.navContainer,
-								(pathname === "/home" || pathname.startsWith("/home/")) &&
-									styles.activeNavContainer
-							]}
-						>
-							<HomeIcon />
-						</View>
-						<Text
-							style={[
-								styles.navItem,
-								pathname === "/home" && styles.activeNavItem
-							]}
-						>
-							Baş sahypa
-						</Text>
-					</TouchableOpacity>
-					<TouchableOpacity onPress={() => router.push("/categories")}>
-						<View
-							style={[
-								styles.navContainer,
-								(pathname === "/categories" ||
-									pathname.startsWith("/categories/")) &&
-									styles.activeNavContainer
-							]}
-						>
-							<CategoryIcon />
-						</View>
-						<Text
-							style={[
-								styles.navItem,
-								pathname === "/categories" && styles.activeNavItem
-							]}
-						>
-							Kategoriýalar
-						</Text>
-					</TouchableOpacity>
-					<TouchableOpacity onPress={() => router.push("/subscribers")}>
-						<View
-							style={[
-								styles.navContainer,
-								pathname === "/subscribers" && styles.activeNavContainer
-							]}
-						>
-							<SubscribersIcon />
-						</View>
-						<Text
-							style={[
-								styles.navItem,
-								pathname === "/subscribers" && styles.activeNavItem
-							]}
-						>
-							Agzalyklarym
-						</Text>
-					</TouchableOpacity>
-					<TouchableOpacity onPress={() => router.push("/settings")}>
-						<View
-							style={[
-								styles.navContainer,
-								pathname === "/settings" && styles.activeNavContainer
-							]}
-						>
-							<SettingsIcon />
-						</View>
-						<Text
-							style={[
-								styles.navItem,
-								pathname === "/settings" && styles.activeNavItem
-							]}
-						>
-							Sazlamalar
-						</Text>
-					</TouchableOpacity>
-				</View>
-			)}
-		</SafeAreaView>
+		<SafeAreaProvider>
+			<I18nextProvider i18n={i18n}>
+				<ThemeProvider>
+					<AuthProvider>
+						<GestureHandlerRootView style={{ flex: 1 }}>
+							<Slot />
+						</GestureHandlerRootView>
+					</AuthProvider>
+				</ThemeProvider>
+			</I18nextProvider>
+		</SafeAreaProvider>
 	);
 }
-
-const styles = StyleSheet.create({
-	safeArea: { flex: 1 },
-	bottomNavigation: {
-		position: "absolute",
-		bottom: 0,
-		width: "100%",
-		height: Platform.OS === "android" ? 65 : 80,
-		backgroundColor: "#fff",
-		flexDirection: "row",
-		justifyContent: "space-around",
-		alignItems: Platform.OS === "android" ? "center" : "flex-start",
-		borderTopWidth: 1,
-		borderTopColor: "#ddd",
-		zIndex: 10,
-		borderTopLeftRadius: 14,
-		borderTopRightRadius: 14,
-		shadowColor: "#000",
-		shadowOffset: { width: 4, height: 0 },
-		shadowOpacity: 0.25,
-		shadowRadius: 4,
-		elevation: 5,
-		paddingHorizontal: 14,
-		paddingTop: Platform.OS === "ios" ? 6 : 0
-	},
-	navItem: {
-		fontSize: 12,
-		fontFamily: "Lexend-ExtraLight",
-		color: Colors.dark.secondary
-	},
-
-	activeNavItem: {
-		fontSize: 12,
-		fontFamily: "Lexend-Medium"
-	},
-
-	navContainer: {
-		justifyContent: "center",
-		alignItems: "center",
-		borderRadius: 6,
-		width: 42,
-		height: 33,
-		marginHorizontal: "auto"
-	},
-
-	activeNavContainer: {
-		backgroundColor: Colors.dark.primary,
-		borderRadius: 8,
-		padding: 4
-	}
-});

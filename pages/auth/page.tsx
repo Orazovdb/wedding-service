@@ -1,7 +1,7 @@
 import { Colors } from "@/constants/Colors";
 import { authService } from "@/shared/api/services/auth.service";
 import type { Auth } from "@/shared/api/types";
-import { useAuth } from "@/store/AuthContext";
+import { useAuth } from "@/shared/store/AuthContext";
 import { useRouter } from "expo-router";
 import React, { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -30,7 +30,7 @@ export const AuthScreen = () => {
 	const colorScheme = useColorScheme();
 	const scrollX = useRef(new Animated.Value(0)).current;
 	const [currentIndex, setCurrentIndex] = useState(0);
-	const [isOtp, setIsOtp] = useState(false);
+	const [isOtp, setIsOtp] = useState(true);
 	const { login, isLoggedIn } = useAuth();
 	const [otp, setOtp] = useState<string[]>(["", "", "", "", ""]);
 
@@ -81,7 +81,8 @@ export const AuthScreen = () => {
 		try {
 			login({
 				otp: otp.join(""),
-				phone: phone
+				// phone: phone
+				phone: '62090252'
 			});
 		} catch (error) {
 			console.error("Verify failed:", error);

@@ -1,8 +1,8 @@
-import { axiosClassic } from "../interceptors";
+import { axiosWithAuth } from "../interceptors";
 
 class VideoService {
 	async getVideo(id: string) {
-		const response = await axiosClassic.get<any>(`/videos/stream/${id}`, {
+		const response = await axiosWithAuth.get<any>(`/videos/stream/${id}`, {
 			headers: {
 				Range: "bytes=400-100000"
 			}

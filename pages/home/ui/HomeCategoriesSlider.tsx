@@ -57,15 +57,7 @@ export const HomeCategoriesSlider = () => {
 				renderItem={({ item }) => (
 					<TouchableOpacity
 						style={styles.previewSlide}
-						onPress={() =>
-							router.push({
-								pathname: "/categories/[categories_detail]/[id]",
-								params: {
-									categories_detail: item.id,
-									id: "all"
-								}
-							})
-						}
+						onPress={() => router.push(`/categories/${item.id}/all`)}
 					>
 						<View style={styles.previewImageWrapper}>
 							<Image source={{ uri: item.icon }} style={styles.previewImage} />
@@ -77,7 +69,35 @@ export const HomeCategoriesSlider = () => {
 								fontWeight: "400"
 							}}
 						>
-							{item.name}
+							{item.name ? (
+								(() => {
+									const [firstWord = "", secondWord = ""] =
+										item.name.split(" ");
+									return (
+										<>
+											<Text
+												style={{
+													fontSize: 10,
+													color: Colors.light.secondary,
+													fontWeight: "400"
+												}}
+											>
+												{firstWord} {secondWord}
+											</Text>
+										</>
+									);
+								})()
+							) : (
+								<Text
+									style={{
+										fontSize: 10,
+										color: Colors.light.secondary,
+										fontWeight: "400"
+									}}
+								>
+									service-provider_{item.id}
+								</Text>
+							)}
 						</Text>
 					</TouchableOpacity>
 				)}

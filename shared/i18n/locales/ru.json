@@ -1,0 +1,8 @@
+{
+	"routes": {
+		"home": "Главная",
+		"categories": "Категории",
+		"subscribers": "Подписки",
+		"settings": "Настройки"
+	}
+}

@@ -7,6 +7,7 @@ import { authService } from "@/shared/api/services/auth.service";
 import { Verify } from "@/shared/api/types";
 import { useRouter } from "expo-router";
 import React, { createContext, useContext, useEffect, useState } from "react";
+import { InteractionManager } from "react-native";
 
 type AuthContextType = {
 	isLoggedIn: boolean;
@@ -20,19 +21,18 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 	const [isLoggedIn, setIsLoggedIn] = useState(false);
 	const router = useRouter();
 
-	useEffect(() => {
-		const checkAuth = async () => {
-			const token = await getAccessToken();
-			if (token) {
-				setIsLoggedIn(true);
-				router.push("/home");
-			} else {
-				router.replace("/");
-				setIsLoggedIn(false);
-			}
-		};
-		checkAuth();
-	}, []);
+useEffect(() => {
+	const checkAuth = async () => {
+		const token = await getAccessToken();
+		if (token) {
+			setIsLoggedIn(true);
+		} else {
+			setIsLoggedIn(false);
+		}
+	};
+	checkAuth();
+}, []);
+
 
 	const login = async (data: Verify) => {
 		try {
@@ -42,7 +42,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 				setIsLoggedIn(true);
 				router.push("/home");
 			} else {
-				router.replace("/");
+				router.replace("/login");
 			}
 		} catch (e) {
 			console.error("Login error:", e);
@@ -52,9 +52,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 	const logout = () => {
 		setIsLoggedIn(false);
 		removeFromStorage();
-		setTimeout(() => {
-			router.replace("/");
-		}, 0);
+
+		InteractionManager.runAfterInteractions(() => {
+			router.replace("/login");
+		});
 	};
 
 	return (

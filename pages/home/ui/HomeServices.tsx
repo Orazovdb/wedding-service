@@ -33,9 +33,9 @@ export const HomeServices = ({ data }: { data?: props }) => {
 				<TouchableOpacity
 					onPress={() =>
 						router.push({
-							pathname: `/categories/[id]`,
+							pathname: `/(protected)/categories/[categoryDetail]/[id]`,
 							params: {
-								categories_detail: categoryItem.id,
+								categoryDetail: categoryItem.id,
 								id: "all"
 							}
 						})
@@ -139,7 +139,8 @@ export const HomeServices = ({ data }: { data?: props }) => {
 									return (
 										<>
 											<Text style={styles.serviceLocation}>
-												{firstWord} {secondWord}, {item.region.province}
+												{firstWord} {secondWord.slice(0, 1)}.,{" "}
+												{item.region.province}
 											</Text>
 										</>
 									);

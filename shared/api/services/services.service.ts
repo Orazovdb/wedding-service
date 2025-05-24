@@ -1,4 +1,4 @@
-import { axiosClassic } from "../interceptors";
+import { axiosClassic, axiosWithAuth } from "../interceptors";
 import {
 	HumanServicesArgs,
 	HumanServicesByIdData,
@@ -7,7 +7,7 @@ import {
 
 class ServicesService {
 	async getServices(params: HumanServicesArgs) {
-		const response = await axiosClassic.get<HumanServicesData>("/services", {
+		const response = await axiosWithAuth.get<HumanServicesData>("/services", {
 			params
 		});
 		console.log(response.data.data, "responseeeee:");
@@ -16,7 +16,7 @@ class ServicesService {
 	}
 
 	async getServicesById(id: string) {
-		const response = await axiosClassic.get<HumanServicesByIdData | undefined>(
+		const response = await axiosWithAuth.get<HumanServicesByIdData | undefined>(
 			`/services/${id}`
 		);
 		return response.data;

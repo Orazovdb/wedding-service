@@ -1,8 +1,10 @@
 import { Colors } from "@/constants/Colors";
+import i18n from "@/shared/i18n"; // ensure this points to your i18n setup
 import IconAd from "@/shared/icons/settings/ad-icon.svg";
 import IconLogout from "@/shared/icons/settings/logout-icon.svg";
 import IconRocket from "@/shared/icons/settings/rocket-icon.svg";
-import { useAuth } from "@/store/AuthContext";
+import { useAuth } from "@/shared/store/AuthContext";
+import { useThemeMode } from "@/shared/store/ThemeContext";
 import React, { useState } from "react";
 import {
 	Image,
@@ -13,15 +15,29 @@ import {
 	View
 } from "react-native";
 import { ProfileAvatar } from "./ui/avatar";
-import { LanguageTabs } from "./ui/language-tabs";
+import { languages, LanguageTabs } from "./ui/language-tabs";
 import { ThemeTabs } from "./ui/theme-tabs";
 
 export const SettingsScreen = () => {
 	const [selectedLang, setSelectedLang] = useState(1);
 	const [selectedTheme, setSelectedTheme] = useState(1);
+	const { setMode } = useThemeMode();
 
 	const { logout } = useAuth();
-	
+
+	const handleChangeTab = (id: number) => {
+		setSelectedLang(id);
+		const selected = languages.find(d => d.id === id);
+		if (selected) {
+			i18n.changeLanguage(selected.lang);
+		}
+	};
+
+	const handleChangeThemeTab = (value: number) => {
+		setSelectedTheme(value);
+		const theme = value === 1 ? "light" : value === 2 ? "dark" : "system";
+		setMode(theme);
+	};
 
 	return (
 		<ScrollView style={styles.scrollView}>
@@ -29,9 +45,12 @@ export const SettingsScreen = () => {
 				<ProfileAvatar />
 				<LanguageTabs
 					selectedTab={selectedLang}
-					onChangeTab={setSelectedLang}
+					onChangeTab={handleChangeTab}
 				/>
-				<ThemeTabs selectedTab={selectedTheme} onChangeTab={setSelectedTheme} />
+				<ThemeTabs
+					selectedTab={selectedTheme}
+					onChangeTab={handleChangeThemeTab}
+				/>
 				<View style={styles.routes}>
 					<View style={styles.routeItemWrapper}>
 						<TouchableOpacity style={styles.routeItem}>

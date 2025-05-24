@@ -32,7 +32,6 @@ export const CategoriesDetailScreen = () => {
 			setSelectedCategory(categoryDetail);
 			setSelectedSubCategory(id);
 		}
-		console.log(categoryDetail, id);
 	}, [categoryDetail, id]);
 
 	// Fetch data when inputs are ready
@@ -42,7 +41,8 @@ export const CategoriesDetailScreen = () => {
 		const fetchData = async () => {
 			const result = await servicesService.getServices({
 				category_ids: selectedCategory,
-				subcategory_ids: selectedSubCategory,
+				subcategory_ids:
+					selectedSubCategory === "all" ? undefined : selectedSubCategory,
 				statuses: statuses.join(",") || undefined,
 				provinces: regions.join(",") || undefined,
 				name: search || undefined,
@@ -81,14 +81,7 @@ export const CategoriesDetailScreen = () => {
 					data={dataServices?.data[0]}
 					totalCount={dataServices?.meta.total}
 				/>
-				<CategoryServices
-					data={dataServices}
-					onPageChange={(nextPage: number) => {
-						if (nextPage !== page && hasMore && !loadingMore) {
-							setPage(nextPage);
-						}
-					}}
-				/>
+				<CategoryServices />
 			</View>
 		</View>
 	);

@@ -50,7 +50,6 @@ export const CategoriesScreen = () => {
 
 	const handlePush = (id: number, subId: number) => {
 		router.push(`/categories/${id}/${subId}`);
-		console.log(id, subId, "navigateeee");
 	};
 
 	return (
@@ -86,7 +85,7 @@ export const CategoriesScreen = () => {
 									>
 										<TouchableOpacity
 											style={styles.subItem}
-											onPress={() => router.push(`/categories/all`)}
+											onPress={() => router.push(`/categories/${item.id}/all`)}
 										>
 											<Text style={styles.subItemText}>Ahlisi</Text>
 											<ArrowRightIcon />

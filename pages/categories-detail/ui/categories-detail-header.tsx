@@ -50,7 +50,9 @@ export const CategoriesDetailHeader = (props: Props) => {
 					<ArrowLeft />
 				</TouchableOpacity>
 				<Text style={styles.categoryName}>
-					{props.data?.categories[0].name} /{" "}
+					{props.data?.categories.find(
+							item => String(item.id) === String(props.category_id)
+						)?.name} /{" "}
 					{
 						props.data?.categories.find(
 							item => String(item.id) === String(props.sub_category_id)
