@@ -15,7 +15,7 @@ import { HomeDetailBanner } from "./ui/home-detail-banner"
 import { HomeDetailFeedback } from "./ui/home-detail-feedback"
 import { HomeDetailProfile } from "./ui/home-detail-profile"
 import HomeDetailSameServices from "./ui/home-detail-same-services"
-import { HomeDetailContact } from "./ui/home-detail.contact"
+import { HomeDetailContact } from "./ui/home-detail-contact"
 
 const { width } = Dimensions.get("window");
 

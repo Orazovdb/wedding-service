@@ -21,18 +21,18 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 	const [isLoggedIn, setIsLoggedIn] = useState(false);
 	const router = useRouter();
 
-useEffect(() => {
-	const checkAuth = async () => {
-		const token = await getAccessToken();
-		if (token) {
-			setIsLoggedIn(true);
-		} else {
-			setIsLoggedIn(false);
-		}
-	};
-	checkAuth();
-}, []);
-
+	useEffect(() => {
+		const checkAuth = async () => {
+			const token = await getAccessToken();
+			if (token) {
+				setIsLoggedIn(true);
+				console.log(token);
+			} else {
+				setIsLoggedIn(false);
+			}
+		};
+		checkAuth();
+	}, []);
 
 	const login = async (data: Verify) => {
 		try {

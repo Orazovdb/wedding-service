@@ -15,7 +15,9 @@ export const HomeDetailProfile = ({
 	return (
 		<View style={styles.profile}>
 			<View style={styles.avatarBlock}>
-				<Image source={{ uri: data?.service?.logo }} style={styles.avatar} />
+				{data?.service.logo && (
+					<Image source={{ uri: data?.service?.logo }} style={styles.avatar} />
+				)}
 				<View style={styles.profileNameWrapper}>
 					<Text style={styles.profileName}>{data?.service?.name}</Text>
 					<TouchableOpacity
@@ -39,21 +41,27 @@ export const HomeDetailProfile = ({
 			<View style={styles.subscribersBlock}>
 				<View style={styles.location}>
 					<IconFlag />
-					<Text style={styles.locationText}>
-						{data?.service?.region.name}, {data?.service?.region.province}
+					{(() => {
+						const name = data?.service?.region?.name ?? "";
+						const [firstWord = "", secondWord = ""] = name.split(" ");
+						return (
+							<>
+								<Text style={styles.locationText}>
+									{firstWord} {secondWord}, {data?.service?.region?.province}
+								</Text>
+							</>
+						);
+					})()}
+				</View>
+				<View style={styles.subscribeCount}>
+					<IconAvatar />
+					<Text style={styles.subscribeCountText}>
+						{data?.service?.followers_count} agza
 					</Text>
 				</View>
-				<View style={styles.subscribeButtons}>
-					<View style={styles.subscribeCount}>
-						<IconAvatar />
-						<Text style={styles.subscribeCountText}>
-							{data?.service?.followers_count} agza
-						</Text>
-					</View>
-					<TouchableOpacity style={styles.subscribeButton}>
-						<Text style={styles.subscribeButtonText}>Agza bol</Text>
-					</TouchableOpacity>
-				</View>
+				<TouchableOpacity style={styles.subscribeButton}>
+					<Text style={styles.subscribeButtonText}>Agza bol</Text>
+				</TouchableOpacity>
 			</View>
 		</View>
 	);
@@ -116,22 +124,21 @@ export const styles = StyleSheet.create({
 		flexDirection: "row",
 		alignItems: "center",
 		justifyContent: "space-between",
-		paddingHorizontal: 24
+		paddingHorizontal: 24,
+		flexWrap: "wrap"
 	},
 	location: {
 		flexDirection: "row",
 		alignItems: "center",
-		gap: 4
+		gap: 4,
+		flexWrap: "wrap"
 	},
 	locationText: {
 		fontFamily: "Lexend-Light",
 		color: Colors.dark.secondary,
 		fontSize: 14
 	},
-	subscribeButtons: {
-		flexDirection: "row",
-		alignItems: "center"
-	},
+	subscribeButtons: {},
 	subscribeCount: {
 		flexDirection: "row",
 		alignItems: "center",
@@ -139,7 +146,8 @@ export const styles = StyleSheet.create({
 		backgroundColor: Colors.dark.secondary,
 		borderRadius: 6,
 		paddingVertical: 6,
-		paddingHorizontal: 12
+		paddingHorizontal: 12,
+		marginLeft: "auto"
 	},
 	subscribeCountText: {
 		color: Colors.dark.white,
@@ -149,7 +157,8 @@ export const styles = StyleSheet.create({
 	subscribeButton: {
 		paddingVertical: 6,
 		paddingHorizontal: 12,
-		borderRadius: 6
+		borderRadius: 6,
+		marginLeft: "auto"
 	},
 	subscribeButtonText: {
 		fontFamily: "Lexend-SemiBold",

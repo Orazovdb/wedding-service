@@ -1,10 +1,11 @@
 import { Colors } from "@/constants/Colors";
+import { HumanServices, HumanServicesData } from "@/shared/api/types";
 import LocationIcon from "@/shared/icons/location-icon.svg";
 import GoldenIcon from "@/shared/icons/status-golden.svg";
 import NewIcon from "@/shared/icons/status-new.svg";
 import PremiumIcon from "@/shared/icons/status-premium.svg";
 import { useRouter } from "expo-router";
-import React, { useRef, useState } from "react";
+import React, { useRef } from "react";
 import {
 	Dimensions,
 	FlatList,
@@ -16,54 +17,65 @@ import {
 	View
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { FakeSlides } from "../data";
-import { CategoryItem } from "../types";
 
 const { height, width } = Dimensions.get("window");
 
-export const CategoryServices = () => {
+const ITEMS_PER_PAGE = 6;
+
+interface Props {
+	page: number;
+	setPage: (page: number) => void;
+	data: HumanServicesData;
+}
+
+export const CategoryServices = (props: Props) => {
 	const insets = useSafeAreaInsets();
 	const PAGE_HEIGHT =
 		Dimensions.get("window").height - insets.top - insets.bottom - 180;
 	const ITEMS_PER_PAGE = 6;
 	const router = useRouter();
 	const flatListRef = useRef<FlatList<any>>(null);
-	const [currentPage, setCurrentPage] = useState(0);
-	const totalPages = Math.ceil(FakeSlides.length / ITEMS_PER_PAGE);
+
+	const totalItems = props.data.meta.total;
+	const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE);
 
 	const pagedData = Array.from({ length: totalPages }, (_, index) => {
 		const start = index * ITEMS_PER_PAGE;
-		const end = start + ITEMS_PER_PAGE;
-		return FakeSlides.slice(start, end);
+		const end = Math.min(start + ITEMS_PER_PAGE, totalItems);
+		return props.data.data.slice(start, end);
 	});
 
 	const onViewableItemsChanged = useRef(({ viewableItems }: any) => {
 		if (viewableItems.length > 0) {
-			setCurrentPage(viewableItems[0].index);
+			props.setPage(viewableItems[0].index);
 		}
 	}).current;
 
-	const renderPage = ({ item }: { item: CategoryItem[] }) => (
+	const renderPage = ({ item }: { item: HumanServices[] }) => (
 		<View style={[styles.pageContainer, { height: PAGE_HEIGHT }]}>
 			{item.map(user => (
-				<View key={user.id} style={styles.categoryList}>
+				<TouchableOpacity
+					onPress={() => router.push(`/home/${user.id}`)}
+					key={user.id}
+					style={styles.categoryList}
+				>
 					<View
 						style={[
 							styles.categoryItem,
 							user.status === "premium"
 								? styles.categoryItemPremium
-								: user.status === "gold"
+								: user.status === "golden"
 								? styles.categoryItemGold
 								: null
 						]}
 					>
-						{user.status !== "static" && (
+						{user.status !== "normal" && (
 							<View
 								style={[
 									styles.categoryItemStatus,
 									user.status === "premium"
 										? styles.categoryItemStatusPremium
-										: user.status === "gold"
+										: user.status === "golden"
 										? styles.categoryItemStatusGold
 										: user.status === "new"
 										? styles.categoryItemStatusNew
@@ -73,7 +85,7 @@ export const CategoryServices = () => {
 								<Text style={styles.categoryItemStatusText}>
 									{user.status === "premium"
 										? "premium"
-										: user.status === "gold"
+										: user.status === "golden"
 										? "golden"
 										: user.status === "new"
 										? "täze"
@@ -81,40 +93,67 @@ export const CategoryServices = () => {
 								</Text>
 								{user.status === "premium" ? (
 									<PremiumIcon />
-								) : user.status === "gold" ? (
+								) : user.status === "golden" ? (
 									<GoldenIcon />
 								) : user.status === "new" ? (
 									<NewIcon />
 								) : null}
 							</View>
 						)}
-						<Image source={user.image} style={styles.categoryProfileImg} />
-						<Text style={styles.categoryUsername}>Mark</Text>
-						<Text style={styles.categoryUserSurName}>Manson</Text>
+						<Image
+							source={{ uri: user.logo }}
+							style={styles.categoryProfileImg}
+						/>
+						{user.name ? (
+							(() => {
+								const [firstWord = "", secondWord = ""] = user.name.split(" ");
+								return (
+									<>
+										<Text style={styles.categoryUsername}>{firstWord}</Text>
+										<Text style={styles.categoryUserSurName}>{secondWord}</Text>
+									</>
+								);
+							})()
+						) : (
+							<Text style={styles.categoryUsername}>
+								service-provider_{user.id}
+							</Text>
+						)}
 						<View style={styles.serviceDivider} />
-						<TouchableOpacity onPress={() => router.push("/home/1")}>
-							<Text style={styles.categoryName}>Mashyn bezegci</Text>
-						</TouchableOpacity>
-						<Text style={styles.serviceName}>BMW</Text>
+						<Text style={styles.categoryName}>{user.categories[0].name}</Text>
+						<Text style={styles.serviceName}>{user.name}</Text>
 						<View style={styles.serviceLocationWrapper}>
 							<LocationIcon />
-							<Text style={styles.serviceLocation}>Ahal, Gokdepe</Text>
+							{(() => {
+								const [firstWord = "", secondWord = ""] =
+									user.region.name.split(" ");
+								return (
+									<>
+										<Text style={styles.serviceLocation}>
+											{firstWord} {secondWord.slice(0, 1)}.,{" "}
+											{user.region.province}
+										</Text>
+									</>
+								);
+							})()}
 						</View>
 						<View style={styles.serviceButtons}>
 							<View style={styles.subscriptionsButton}>
-								<Text style={styles.subscriptionsButtonText}>100K</Text>
+								<Text style={styles.subscriptionsButtonText}>
+									{user.followers_count}
+								</Text>
 								<Text style={styles.subscriptionsButtonText}>agza</Text>
 							</View>
 							<TouchableOpacity
 								style={[
 									styles.subscribeButton,
-									user.status === "gold" && styles.subscribeButtonGold
+									user.status === "golden" && styles.subscribeButtonGold
 								]}
 							>
 								<Text
 									style={[
 										styles.subscribeButtonText,
-										user.status === "gold" && styles.subscribeButtonGoldText
+										user.status === "golden" && styles.subscribeButtonGoldText
 									]}
 								>
 									Agza
@@ -122,7 +161,7 @@ export const CategoryServices = () => {
 								<Text
 									style={[
 										styles.subscribeButtonText,
-										user.status === "gold" && styles.subscribeButtonGoldText
+										user.status === "golden" && styles.subscribeButtonGoldText
 									]}
 								>
 									bol
@@ -130,7 +169,7 @@ export const CategoryServices = () => {
 							</TouchableOpacity>
 						</View>
 					</View>
-				</View>
+				</TouchableOpacity>
 			))}
 		</View>
 	);
@@ -150,7 +189,7 @@ export const CategoryServices = () => {
 						key={index}
 						style={[
 							styles.paginationDot,
-							index === currentPage && styles.paginationDotActive
+							index === props.page && styles.paginationDotActive
 						]}
 					/>
 				))}
@@ -165,7 +204,9 @@ export const CategoryServices = () => {
 				snapToInterval={PAGE_HEIGHT}
 				decelerationRate="fast"
 				onViewableItemsChanged={onViewableItemsChanged}
-				viewabilityConfig={{ viewAreaCoveragePercentThreshold: 50 }}
+				viewabilityConfig={{
+					viewAreaCoveragePercentThreshold: 50
+				}}
 			/>
 		</View>
 	);

@@ -1,9 +1,11 @@
 import { Colors } from "@/constants/Colors";
+import { regions } from "@/pages/home/data";
+import { CategoriesWithChildren, statusServices } from "@/shared/api/types";
 import CheckedIcon from "@/shared/icons/checked.svg";
 import CloseIcon from "@/shared/icons/close-icon.svg";
 import IconFilter from "@/shared/icons/filter-icon.svg";
 import UncheckedIcon from "@/shared/icons/unchecked.svg";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
 	Dimensions,
 	Modal,
@@ -14,16 +16,43 @@ import {
 	TouchableOpacity,
 	View
 } from "react-native";
-import { HomeFilterModalData } from "../data";
 
-type HomeFilterModalProps = {
+type props = {
 	isModalVisible: boolean;
 	setIsModalVisible: (isModalVisible: boolean) => void;
+	categories: CategoriesWithChildren[] | undefined;
+	isFiltered: boolean;
+	setIsFiltered: (val: boolean) => void;
+	onFilterApply?: (args: {
+		selectedStatuses?: string[];
+		selectedCategories?: string[];
+		selectedRegions?: string[];
+	}) => void;
+	clearTrigger: boolean;
 };
+
+const statusFilter = [
+	{
+		status: statusServices.NORMAL,
+		title: "Normal"
+	},
+	{
+		status: statusServices.NEW,
+		title: "Täze"
+	},
+	{
+		status: statusServices.PREMIUM,
+		title: "Premium"
+	},
+	{
+		status: statusServices.GOLDEN,
+		title: "Gold"
+	}
+];
 
 const { width, height } = Dimensions.get("window");
 
-const CategoriesFilterButton = (props: HomeFilterModalProps) => {
+const CategoriesFilterButton = (props: props) => {
 	return (
 		<TouchableOpacity
 			style={styles.filterButton}
@@ -34,64 +63,150 @@ const CategoriesFilterButton = (props: HomeFilterModalProps) => {
 	);
 };
 
-const CategoriesFilterModal = (props: HomeFilterModalProps) => {
-	const [selectedItems, setSelectedItems] = useState<string[]>([]);
+const CategoriesFilterModal = (props: props) => {
+	const [selectedStatuses, setSelectedStatuses] = useState<string[]>([]);
+	const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+	const [selectedRegions, setSelectedRegions] = useState<string[]>([]);
 
-	const toggleCheckbox = (categoryId: string, itemId: string) => {
-		const identifier = `${categoryId}_${itemId}`;
-		setSelectedItems((prevItems: string[]) =>
+	useEffect(() => {
+		setSelectedStatuses([]);
+		setSelectedCategories([]);
+		setSelectedRegions([]);
+	}, [props.clearTrigger]);
+
+	const toggleCheckboxStatus = (id: string) => {
+		const identifier = `${id}`;
+		setSelectedStatuses((prevItems: string[]) =>
 			prevItems.includes(identifier)
 				? prevItems.filter(id => id !== identifier)
 				: [...prevItems, identifier]
 		);
 	};
+
+	const toggleCheckboxCategories = (categoryId: string) => {
+		const identifier = `${categoryId}`;
+		setSelectedCategories((prevItems: string[]) =>
+			prevItems.includes(identifier)
+				? prevItems.filter(id => id !== identifier)
+				: [...prevItems, identifier]
+		);
+	};
+
+	const toggleCheckboxRegions = (region: string) => {
+		setSelectedRegions((prevItems: string[]) =>
+			prevItems.includes(region)
+				? prevItems.filter(id => id !== region)
+				: [...prevItems, region]
+		);
+	};
+
+	const closeFilter = () => {
+		props.setIsModalVisible(false);
+		props.setIsFiltered(true);
+		props.onFilterApply?.({
+			selectedStatuses,
+			selectedCategories,
+			selectedRegions
+		});
+		if (
+			selectedStatuses.length === 0 &&
+			selectedCategories.length === 0 &&
+			selectedRegions.length === 0
+		) {
+			props.setIsFiltered(false);
+		}
+	};
+
 	return (
 		<Modal
 			animationType="slide"
 			transparent={true}
 			visible={props.isModalVisible}
-			onRequestClose={() => props.setIsModalVisible(false)}
+			onRequestClose={closeFilter}
 		>
 			<View style={styles.modalContainer}>
 				<ScrollView contentContainerStyle={styles.modalContent}>
-					<TouchableOpacity
-						style={styles.closeButton}
-						onPress={() => props.setIsModalVisible(false)}
-					>
+					<TouchableOpacity style={styles.closeButton} onPress={closeFilter}>
 						<CloseIcon />
 						<Text style={styles.closeButtonText}>Filter</Text>
 					</TouchableOpacity>
 
 					<View style={styles.categoryItemModal}>
-						{HomeFilterModalData.map((category, index) => (
-							<View key={category.id} style={styles.categoryItemModalSection}>
-								<Text style={styles.categoryItemModalTitle}>
-									{category.title}
-								</Text>
-								{category.items.map((item, index) => (
-									<TouchableOpacity
-										key={item.id}
-										style={[
-											styles.categoryItemModalItem,
-											index !== category.items.length - 1 && { marginBottom: 4 }
-										]}
-										onPress={() => toggleCheckbox(category.id, item.id)}
-									>
-										{selectedItems.includes(`${category.id}_${item.id}`) ? (
-											<CheckedIcon />
-										) : (
-											<UncheckedIcon />
-										)}
-										<Text style={styles.categoryItemModalItemTitle}>
-											{item.title}
-										</Text>
-									</TouchableOpacity>
-								))}
-								{index !== HomeFilterModalData.length - 1 && (
-									<View style={styles.categoryItemModalDivider} />
-								)}
-							</View>
-						))}
+						<View style={styles.categoryItemModalSection}>
+							<Text style={styles.categoryItemModalTitle}>Agzalar</Text>
+							{statusFilter?.map((category, index) => (
+								<TouchableOpacity
+									key={category.status}
+									style={[
+										styles.categoryItemModalItem,
+										index !== statusFilter.length - 1 && {
+											marginBottom: 4
+										}
+									]}
+									onPress={() => toggleCheckboxStatus(category.status)}
+								>
+									{selectedStatuses.includes(category.status) ? (
+										<CheckedIcon />
+									) : (
+										<UncheckedIcon />
+									)}
+									<Text style={styles.categoryItemModalItemTitle}>
+										{category.title}
+									</Text>
+								</TouchableOpacity>
+							))}
+							<View style={styles.categoryItemModalDivider} />
+						</View>
+						<View style={styles.categoryItemModalSection}>
+							<Text style={styles.categoryItemModalTitle}>Kategoriýalar</Text>
+							{props.categories?.map((category, index) => (
+								<TouchableOpacity
+									key={category.id}
+									style={[
+										styles.categoryItemModalItem,
+										index !== category.children.length - 1 && {
+											marginBottom: 4
+										}
+									]}
+									onPress={() => toggleCheckboxCategories(String(category.id))}
+								>
+									{selectedCategories.includes(`${category.id}`) ? (
+										<CheckedIcon />
+									) : (
+										<UncheckedIcon />
+									)}
+									<Text style={styles.categoryItemModalItemTitle}>
+										{category.name}
+									</Text>
+								</TouchableOpacity>
+							))}
+							<View style={styles.categoryItemModalDivider} />
+						</View>
+						<View style={styles.categoryItemModalSection}>
+							<Text style={styles.categoryItemModalTitle}>Regionlar</Text>
+							{regions?.map((region, index) => (
+								<TouchableOpacity
+									key={region.id}
+									style={[
+										styles.categoryItemModalItem,
+										index !== regions.length - 1 && {
+											marginBottom: 4
+										}
+									]}
+									onPress={() => toggleCheckboxRegions(String(region.id))}
+								>
+									{selectedRegions.includes(`${region.id}`) ? (
+										<CheckedIcon />
+									) : (
+										<UncheckedIcon />
+									)}
+									<Text style={styles.categoryItemModalItemTitle}>
+										{region.name}
+									</Text>
+								</TouchableOpacity>
+							))}
+							<View style={styles.categoryItemModalDivider} />
+						</View>
 					</View>
 				</ScrollView>
 			</View>
@@ -107,7 +222,14 @@ export const FilterModal = {
 export const styles = StyleSheet.create({
 	filterButton: {
 		paddingVertical: 3,
-		borderColor: Colors.light.secondary
+		borderColor: Colors.light.secondary,
+		flexDirection: "row",
+		gap: 10
+	},
+	divider: {
+		width: 1,
+		height: 20,
+		backgroundColor: "#000"
 	},
 	filterText: {
 		color: Colors.light.secondary,
@@ -173,7 +295,7 @@ export const styles = StyleSheet.create({
 		width: "70%",
 		marginHorizontal: "auto",
 		height: 1,
-		backgroundColor: "#E3E3E3",
+		backgroundColor: "#00000033",
 		marginTop: 24
 	}
 });

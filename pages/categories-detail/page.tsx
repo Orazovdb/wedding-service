@@ -1,7 +1,8 @@
+import { categoriesService } from "@/shared/api/services/categories.service";
 import { servicesService } from "@/shared/api/services/services.service";
-import { HumanServicesData } from "@/shared/api/types";
+import { CategoriesWithChildren, HumanServicesData } from "@/shared/api/types";
 import { useLocalSearchParams } from "expo-router";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { CategoriesDetailHeader } from "./ui/categories-detail-header";
 import { CategoryServices } from "./ui/category-services";
@@ -21,12 +22,16 @@ export const CategoriesDetailScreen = () => {
 	const [hasMore, setHasMore] = useState(true);
 	const [loadingMore, setLoadingMore] = useState(false);
 	const [dataServices, setDataServices] = useState<HumanServicesData>();
-	const [categories, setCategories] = useState<string[]>([]);
+	const [dataCategories, setDataCategories] = useState<
+		CategoriesWithChildren[]
+	>([]);
 	const [regions, setRegions] = useState<string[]>([]);
 	const [statuses, setStatuses] = useState<string[]>([]);
+	const [categories, setCategories] = useState<string[]>([]);
 	const [isFiltered, setIsFiltered] = useState(false);
+	const [clearTrigger, setClearTrigger] = useState(false);
+	const [isModalVisible, setIsModalVisible] = useState(false);
 
-	// Sync state from route params once ready
 	useEffect(() => {
 		if (categoryDetail && id) {
 			setSelectedCategory(categoryDetail);
@@ -34,7 +39,6 @@ export const CategoriesDetailScreen = () => {
 		}
 	}, [categoryDetail, id]);
 
-	// Fetch data when inputs are ready
 	useEffect(() => {
 		if (!selectedCategory || !selectedSubCategory) return;
 
@@ -46,18 +50,31 @@ export const CategoriesDetailScreen = () => {
 				statuses: statuses.join(",") || undefined,
 				provinces: regions.join(",") || undefined,
 				name: search || undefined,
-				page
+				page,
+				limit: 100
 			});
 
 			if (page === 1) {
 				setDataServices(result);
 			} else {
 				setDataServices(prev =>
-					prev ? { ...result, data: [...prev.data, ...result.data] } : result
+					prev
+						? {
+								...result,
+								data: [
+									...new Map(
+										[...prev.data, ...result.data].map(item => [item.id, item])
+									).values()
+								]
+						  }
+						: result
 				);
 			}
 
-			setHasMore(result.data.length >= result.meta.per_page);
+			setHasMore(
+				result.meta.current_page <
+					Math.ceil(result.meta.total / (result?.meta?.limit || 1))
+			);
 		};
 
 		fetchData();
@@ -66,6 +83,43 @@ export const CategoriesDetailScreen = () => {
 	useEffect(() => {
 		setPage(1);
 	}, [search, statuses, regions, selectedCategory]);
+
+	const handleFilterApply = useCallback(
+		async ({
+			selectedRegions = [],
+			selectedStatuses = [],
+			selectedCategories = []
+		}: {
+			selectedRegions?: string[];
+			selectedStatuses?: string[];
+			selectedCategories?: string[];
+		}) => {
+			setRegions(selectedRegions);
+			setStatuses(selectedStatuses);
+			setCategories(selectedCategories);
+			setPage(1);
+			setHasMore(true);
+			setIsFiltered(true);
+
+			const result = await servicesService.getServices({
+				category_ids: selectedCategories.join(",") || undefined,
+				statuses: selectedStatuses.join(",") || undefined,
+				provinces: selectedRegions.join(",") || undefined,
+				name: search || undefined,
+				page: 1
+			});
+
+			setDataServices(result);
+		},
+		[search]
+	);
+
+	useEffect(() => {
+		if (!selectedCategory) return;
+		categoriesService
+			.getCategories({ parent: 0, category_id: selectedCategory })
+			.then(setDataCategories);
+	}, []);
 
 	if (!selectedCategory || !selectedSubCategory) {
 		return <Text>Loading category data...</Text>;
@@ -80,8 +134,17 @@ export const CategoriesDetailScreen = () => {
 					onSelectSubCategory={setSelectedSubCategory}
 					data={dataServices?.data[0]}
 					totalCount={dataServices?.meta.total}
+					categories={dataCategories}
+					isModalVisible={isModalVisible}
+					setIsModalVisible={setIsModalVisible}
+					onFilterApply={handleFilterApply}
+					setIsFiltered={setIsFiltered}
+					isFiltered={isFiltered}
+					clearTrigger={clearTrigger}
 				/>
-				<CategoryServices />
+				{dataServices && (
+					<CategoryServices page={page} setPage={setPage} data={dataServices} />
+				)}
 			</View>
 		</View>
 	);

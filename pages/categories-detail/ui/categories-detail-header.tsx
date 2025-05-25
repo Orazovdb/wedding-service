@@ -21,12 +21,22 @@ interface Props {
 	onSelectSubCategory: (id: string) => void;
 	data: HumanServices | undefined;
 	totalCount: number | undefined;
+	categories: CategoriesWithChildren[] | undefined;
+	isFiltered: boolean;
+	setIsFiltered: (val: boolean) => void;
+	onFilterApply?: (args: {
+		selectedStatuses?: string[];
+		selectedCategories?: string[];
+		selectedRegions?: string[];
+	}) => void;
+	clearTrigger: boolean;
+	isModalVisible: boolean;
+	setIsModalVisible: (isModalVisible: boolean) => void;
 }
 
 export const CategoriesDetailHeader = (props: Props) => {
 	const router = useRouter();
 	const [search, setSearch] = useState("");
-	const [isModalVisible, setIsModalVisible] = useState(false);
 
 	const [dataCategories, setDataCategories] =
 		useState<CategoriesWithChildren[]>();
@@ -34,7 +44,7 @@ export const CategoriesDetailHeader = (props: Props) => {
 	useEffect(() => {
 		const fetchData = async () => {
 			const result = await categoriesService.getCategories({
-				category_id: Number(props.sub_category_id),
+				category_id: String(props.category_id),
 				parent: 0
 			});
 			setDataCategories(result);
@@ -50,9 +60,12 @@ export const CategoriesDetailHeader = (props: Props) => {
 					<ArrowLeft />
 				</TouchableOpacity>
 				<Text style={styles.categoryName}>
-					{props.data?.categories.find(
+					{
+						props.data?.categories.find(
 							item => String(item.id) === String(props.category_id)
-						)?.name} /{" "}
+						)?.name
+					}{" "}
+					/{" "}
 					{
 						props.data?.categories.find(
 							item => String(item.id) === String(props.sub_category_id)
@@ -73,7 +86,7 @@ export const CategoriesDetailHeader = (props: Props) => {
 				>
 					<SearchIcon width={20} height={20} color="#000000" />
 					<TextInput
-						placeholder="search"
+						placeholder=""
 						value={search}
 						onChangeText={setSearch}
 						style={styles.input}
@@ -81,8 +94,13 @@ export const CategoriesDetailHeader = (props: Props) => {
 					/>
 				</View>
 				<FilterModal.Button
-					isModalVisible={isModalVisible}
-					setIsModalVisible={setIsModalVisible}
+					isModalVisible={props.isModalVisible}
+					setIsModalVisible={props.setIsModalVisible}
+					categories={props.categories}
+					clearTrigger={props.clearTrigger}
+					isFiltered={props.isFiltered}
+					setIsFiltered={props.setIsFiltered}
+					onFilterApply={props.onFilterApply}
 				/>
 			</View>
 			<View style={styles.categoryList}>
@@ -116,8 +134,13 @@ export const CategoriesDetailHeader = (props: Props) => {
 				/>
 			</View>
 			<FilterModal.Modal
-				isModalVisible={isModalVisible}
-				setIsModalVisible={setIsModalVisible}
+				isModalVisible={props.isModalVisible}
+				setIsModalVisible={props.setIsModalVisible}
+				categories={props.categories}
+				clearTrigger={props.clearTrigger}
+				isFiltered={props.isFiltered}
+				setIsFiltered={props.setIsFiltered}
+				onFilterApply={props.onFilterApply}
 			/>
 		</View>
 	);

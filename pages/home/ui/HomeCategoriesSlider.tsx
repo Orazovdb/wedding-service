@@ -82,7 +82,7 @@ export const HomeCategoriesSlider = () => {
 													fontWeight: "400"
 												}}
 											>
-												{firstWord} {secondWord}
+												{firstWord} {secondWord.slice(0, 5)}
 											</Text>
 										</>
 									);
@@ -125,7 +125,7 @@ export const styles = StyleSheet.create({
 		paddingHorizontal: 20
 	},
 	previewSlide: {
-		borderRadius: width / 12.2 / 2,
+		borderRadius: width / 11 / 2,
 		justifyContent: "center",
 		alignItems: "center",
 		marginHorizontal: 5
@@ -140,19 +140,19 @@ export const styles = StyleSheet.create({
 		marginBottom: 4
 	},
 	previewImage: {
-		borderRadius: width / 14.2 / 2,
-		width: width / 14.2,
-		height: width / 14.2
+		borderRadius: width / 15 / 2,
+		width: width / 15,
+		height: width / 15
 	},
 	arrow: { fontSize: 24, fontWeight: "bold", paddingHorizontal: 10 },
 	arrowLeft: {
 		position: "absolute",
-		left: 0,
+		left: 4,
 		zIndex: 1
 	},
 	arrowRight: {
 		position: "absolute",
-		right: 0,
+		right: 4,
 		zIndex: 1,
 		transform: [{ rotate: "180deg" }]
 	}

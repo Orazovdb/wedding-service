@@ -57,7 +57,7 @@ export enum parentCategories {
 
 export type CategoriesWithChildrenArgs = {
 	parent?: parentCategories;
-	category_id?: number
+	category_id?: string
 };
 
 export type CategoriesWithChildren = {
@@ -78,6 +78,7 @@ export type HumanServicesArgs = {
 	provinces: string | undefined;
 	statuses: statusServices | string | undefined;
 	page: number | undefined;
+	limit?: number
 };
 
 export type HumanServices = {
@@ -107,6 +108,7 @@ export type HumanServicesData = {
 		current_page: number;
 		per_page: number;
 		total: number;
+		limit?: number
 	};
 };
 

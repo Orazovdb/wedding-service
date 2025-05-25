@@ -1,6 +1,7 @@
 import { Colors } from "@/constants/Colors";
 import { useColorScheme } from "@/hooks/useColorScheme.web";
 import { BASE_URL } from "@/shared/api/interceptors";
+import { getAccessToken } from "@/shared/api/services/auth-token.service";
 import { HumanServicesByIdData } from "@/shared/api/types";
 import { Video } from "expo-av";
 import { BlurView } from "expo-blur";
@@ -33,6 +34,11 @@ export const HomeDetailBanner = ({
 	const [isVideoSlide, setIsVideoSlide] = useState(true);
 	const [isImageViewerVisible, setImageViewerVisible] = useState(false);
 	const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+	const [authToken, setAuthToken] = useState<string | null>(null);
+
+	useEffect(() => {
+		getAccessToken().then(setAuthToken);
+	}, []);
 
 	const colorScheme: "light" | "dark" = useColorScheme() ?? "light";
 	const scrollX = useRef(new Animated.Value(0)).current;
@@ -80,10 +86,14 @@ export const HomeDetailBanner = ({
 		if (!data?.service.videos.length) {
 			setIsVideoSlide(false);
 		}
+		console.log(
+			`${BASE_URL}/videos/stream/${data?.service?.videos[0]?.filename}`
+		);
 	}, []);
 
 	const handleChangeVideo = (value: boolean) => {
 		setIsVideoSlide(value);
+		setCurrentIndex(0)
 	};
 
 	useEffect(() => {
@@ -149,7 +159,14 @@ export const HomeDetailBanner = ({
 									onPress={async () => {
 										try {
 											await videoRef.current?.presentFullscreenPlayer();
-											await videoRef.current?.playAsync();
+
+											setTimeout(() => {
+												videoRef.current
+													?.playAsync()
+													.catch(err =>
+														console.error("Video play failed:", err)
+													);
+											}, 500);
 										} catch (e) {
 											console.error("Fullscreen play error:", e);
 										}
@@ -159,7 +176,11 @@ export const HomeDetailBanner = ({
 									<Video
 										ref={videoRef}
 										source={{
-											uri: `${BASE_URL}/videos/stream/${item?.filename}`
+											uri: `${BASE_URL}/videos/stream/${item?.filename}`,
+											headers: {
+												Authorization: `${authToken}`,
+												Range: "bytes=400-100000"
+											}
 										}}
 										style={styles.image}
 										useNativeControls
@@ -168,7 +189,7 @@ export const HomeDetailBanner = ({
 									/>
 
 									<View style={styles.overlayPlayButton}>
-										<Text style={styles.playIcon}>▶</Text>
+										<Text style={styles.playIcon}>▶ ${item?.filename}</Text>
 									</View>
 								</TouchableOpacity>
 							</View>

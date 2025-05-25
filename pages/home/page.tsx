@@ -272,7 +272,7 @@ export const HomeScreen = () => {
 					<View style={[styles.inputContainer, { borderColor: "#000000" }]}>
 						<SearchIcon width={20} height={20} color="#000000" />
 						<TextInput
-							placeholder="Search"
+							placeholder=""
 							value={search}
 							onChangeText={setSearch}
 							style={styles.input}

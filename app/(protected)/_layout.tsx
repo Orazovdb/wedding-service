@@ -18,6 +18,7 @@ import SubscribersIcon from "@/assets/images/navigations/subscribers.svg";
 import { useAppTheme } from "@/shared/hooks/use-app-theme";
 import { useAuth } from "@/shared/store/AuthContext";
 import { t } from "i18next";
+import { JSX } from "react";
 
 const navItems: {
 	path: "/home" | "/categories" | "/subscribers" | "/settings";
@@ -63,6 +64,15 @@ export default function ProtectedLayout() {
 				<Stack.Screen
 					name="categories/[categoryDetail]/[id]"
 					options={{ animation: "slide_from_right", presentation: "card" }}
+				/>
+
+				<Stack.Screen
+					name="pdf-viewer"
+					options={{
+						animation: "slide_from_right",
+						presentation: "modal",
+						title: "PDF Görnüşi"
+					}}
 				/>
 			</Stack>
 

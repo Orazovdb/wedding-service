@@ -12,13 +12,17 @@ export const HomeDetailAbout = ({
 		<View style={styles.about}>
 			<Text style={styles.title}>Men hakynda</Text>
 			<View style={styles.row}>
-				<Image source={{ uri: data?.service?.logo }} style={styles.image} />
-				<View style={styles.info}>
+				{data?.service.logo && (
+					<Image source={{ uri: data?.service?.logo }} style={styles.image} />
+				)}
+				<View style={(styles.info, !data?.service.logo && { width: "auto" })}>
 					<Text style={styles.description}>
 						<Text style={{ fontFamily: "Lexend-Regular" }}>Salam</Text>,{" "}
 						{data?.service?.description}
 					</Text>
-					<Text style={styles.meeting}>Hormatlamak bilen, {data?.service.name}</Text>
+					<Text style={styles.meeting}>
+						Hormatlamak bilen, {data?.service.name}
+					</Text>
 				</View>
 			</View>
 		</View>
