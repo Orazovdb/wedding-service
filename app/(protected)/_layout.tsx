@@ -1,6 +1,6 @@
 // app/(protected)/_layout.tsx
-import { Redirect, Stack, usePathname, useRouter } from "expo-router";
-import { useTranslation } from "react-i18next";
+import { Redirect, Stack, usePathname, useRouter } from "expo-router"
+import { useTranslation } from "react-i18next"
 import {
 	Platform,
 	SafeAreaView,
@@ -8,16 +8,16 @@ import {
 	Text,
 	TouchableOpacity,
 	View
-} from "react-native";
+} from "react-native"
 
-import CategoryIcon from "@/assets/images/navigations/category.svg";
-import HomeIcon from "@/assets/images/navigations/home.svg";
-import SettingsIcon from "@/assets/images/navigations/settings.svg";
-import SubscribersIcon from "@/assets/images/navigations/subscribers.svg";
+import CategoryIcon from "@/assets/images/navigations/category.svg"
+import HomeIcon from "@/assets/images/navigations/home.svg"
+import SettingsIcon from "@/assets/images/navigations/settings.svg"
+import SubscribersIcon from "@/assets/images/navigations/subscribers.svg"
 
-import { useAppTheme } from "@/shared/hooks/use-app-theme";
-import { useAuth } from "@/shared/store/AuthContext";
-import { JSX } from "react";
+import { useAppTheme } from "@/shared/hooks/use-app-theme"
+import { useAuth } from "@/shared/store/AuthContext"
+import { JSX } from "react"
 
 const navItems: {
 	path: "/home" | "/categories" | "/subscribers" | "/settings";

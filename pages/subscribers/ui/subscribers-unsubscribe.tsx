@@ -2,6 +2,7 @@ import IconArrowRightMin from "@/shared/icons/arrow-right-min.svg";
 import IconClose from "@/shared/icons/close-confirm-icon.svg";
 import IconInfo from "@/shared/icons/info-icon.svg";
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { Modal, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 type Props = {
@@ -12,13 +13,14 @@ type Props = {
 };
 
 const UnsubscribeButton = (props: Props) => {
+	const { t } = useTranslation();
 	return (
 		<TouchableOpacity
 			onPress={props.handleOpenModal}
 			style={styles.unsubscribeButton}
 		>
 			<IconArrowRightMin />
-			<Text style={styles.unsubscribeButtonText}>Agzalykdan çyk</Text>
+			<Text style={styles.unsubscribeButtonText}>{t("unSubscribe")}</Text>
 		</TouchableOpacity>
 	);
 };

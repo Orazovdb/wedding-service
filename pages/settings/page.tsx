@@ -5,7 +5,7 @@ import IconLogout from "@/shared/icons/settings/logout-icon.svg";
 import IconRocket from "@/shared/icons/settings/rocket-icon.svg";
 import { useAuth } from "@/shared/store/AuthContext";
 import { useThemeMode } from "@/shared/store/ThemeContext";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
 	Image,
@@ -22,8 +22,8 @@ import { ThemeTabs } from "./ui/theme-tabs";
 export const SettingsScreen = () => {
 	const { t } = useTranslation();
 	const [selectedLang, setSelectedLang] = useState(1);
+	const { mode, setMode } = useThemeMode();
 	const [selectedTheme, setSelectedTheme] = useState(1);
-	const { setMode } = useThemeMode();
 
 	const { logout } = useAuth();
 
@@ -35,9 +35,33 @@ export const SettingsScreen = () => {
 		}
 	};
 
+	useEffect(() => {
+		const currentLang = i18n.language;
+		const initialLang = languages.find(lang => lang.lang === currentLang);
+		if (initialLang) {
+			setSelectedLang(initialLang.id);
+		}
+
+		if (mode) {
+			const themeMap: Record<string, number> = {
+				light: 1,
+				dark: 2,
+				system: 3
+			};
+			setSelectedTheme(themeMap[mode] || 3);
+		}
+	}, [mode]);
+
 	const handleChangeThemeTab = (value: number) => {
 		setSelectedTheme(value);
-		const theme = value === 1 ? "light" : value === 2 ? "dark" : "system";
+		const theme =
+			value === 1
+				? "light"
+				: value === 2
+				? "dark"
+				: value === 3
+				? "system"
+				: "system";
 		setMode(theme);
 	};
 
