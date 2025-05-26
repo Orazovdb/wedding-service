@@ -4,6 +4,7 @@ import CheckedIcon from "@/shared/icons/checked.svg";
 import CloseIcon from "@/shared/icons/close-icon.svg";
 import UncheckedIcon from "@/shared/icons/unchecked.svg";
 import React, { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
 	Dimensions,
 	Modal,
@@ -52,18 +53,21 @@ const statusFilter = [
 ];
 
 const HomeFilterButton = (props: HomeFilterModalProps) => {
+	const { t } = useTranslation();
+
 	return (
 		<TouchableOpacity
 			style={styles.filterButton}
 			onPress={() => props.setIsModalVisible(true)}
 		>
 			<View style={styles.divider} />
-			<Text style={styles.filterText}>Filter</Text>
+			<Text style={styles.filterText}>{t("filter")}</Text>
 		</TouchableOpacity>
 	);
 };
 
 const HomeFilterModal = (props: HomeFilterModalProps) => {
+	const { t } = useTranslation();
 	const [selectedStatuses, setSelectedStatuses] = useState<string[]>([]);
 	const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
 	const [selectedRegions, setSelectedRegions] = useState<string[]>([]);
@@ -128,12 +132,14 @@ const HomeFilterModal = (props: HomeFilterModalProps) => {
 				<ScrollView contentContainerStyle={styles.modalContent}>
 					<TouchableOpacity style={styles.closeButton} onPress={closeFilter}>
 						<CloseIcon />
-						<Text style={styles.closeButtonText}>Filter</Text>
+						<Text style={styles.closeButtonText}>{t("filter")}</Text>
 					</TouchableOpacity>
 
 					<View style={styles.categoryItemModal}>
 						<View style={styles.categoryItemModalSection}>
-							<Text style={styles.categoryItemModalTitle}>Agzalar</Text>
+							<Text style={styles.categoryItemModalTitle}>
+								{t("subscribers")}
+							</Text>
 							{statusFilter?.map((category, index) => (
 								<TouchableOpacity
 									key={category.status}
@@ -158,7 +164,9 @@ const HomeFilterModal = (props: HomeFilterModalProps) => {
 							<View style={styles.categoryItemModalDivider} />
 						</View>
 						<View style={styles.categoryItemModalSection}>
-							<Text style={styles.categoryItemModalTitle}>Kategoriýalar</Text>
+							<Text style={styles.categoryItemModalTitle}>
+								{t("categories")}
+							</Text>
 							{props.categories?.map((category, index) => (
 								<TouchableOpacity
 									key={category.id}
@@ -183,7 +191,7 @@ const HomeFilterModal = (props: HomeFilterModalProps) => {
 							<View style={styles.categoryItemModalDivider} />
 						</View>
 						<View style={styles.categoryItemModalSection}>
-							<Text style={styles.categoryItemModalTitle}>Regionlar</Text>
+							<Text style={styles.categoryItemModalTitle}>{t("regions")}</Text>
 							{regions?.map((region, index) => (
 								<TouchableOpacity
 									key={region.id}
@@ -224,7 +232,7 @@ export const styles = StyleSheet.create({
 		paddingVertical: 3,
 		borderColor: Colors.light.secondary,
 		flexDirection: "row",
-		gap: 10,
+		gap: 10
 	},
 	divider: {
 		width: 1,

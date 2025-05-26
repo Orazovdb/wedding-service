@@ -151,6 +151,10 @@ export const HomeScreen = () => {
 		setLoadingMore(false);
 	};
 
+	const onToggleFollow = async () => {
+		await homeService.getHome().then(setData);
+	};
+
 	const renderItem = ({ item }: { item: HumanServices }) => (
 		<View style={[styles.gridItem, { height: gridItemHeight }]}>
 			<TouchableOpacity
@@ -311,7 +315,7 @@ export const HomeScreen = () => {
 
 						<HomeCategoriesSlider />
 
-						<HomeServices data={data} />
+						<HomeServices data={data} onToggleFollow={onToggleFollow} />
 					</ScrollView>
 				)}
 			</View>

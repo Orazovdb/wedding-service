@@ -1,5 +1,8 @@
+import { HumanServicesByIdData } from "@/shared/api/types";
 import IconAvatarCircle from "@/shared/icons/avatar-circle.svg";
+import { useRouter } from "expo-router";
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { SubscribersInfoBanner } from "./subscribers-info-banner";
 import { SubscribersUnsubscribe } from "./subscribers-unsubscribe";
@@ -9,13 +12,16 @@ type Props = {
 	handleOpenModal: () => void;
 	handleCloseModal: () => void;
 	handleConfirm: () => void;
+	data: HumanServicesByIdData | undefined;
 };
 
 export const SubscribersInfo = (props: Props) => {
+	const { t } = useTranslation();
+	const router = useRouter();
 	return (
 		<View style={styles.box}>
 			<View style={styles.header}>
-				<Text style={styles.userName}>Myrat Myradow</Text>
+				<Text style={styles.userName}>{props.data?.service?.name}</Text>
 				<SubscribersUnsubscribe.Button
 					handleConfirm={props.handleConfirm}
 					isModalVisible={props.isModalVisible}
@@ -25,31 +31,44 @@ export const SubscribersInfo = (props: Props) => {
 			</View>
 			<View style={styles.categories}>
 				<View style={styles.categoryItem}>
-					<Text style={styles.categoryType}>Kategoriýa</Text>
-					<Text style={styles.categoryTitle}>Mashyn bezegci</Text>
+					<Text style={styles.categoryType}>{t("category")}</Text>
+					<Text style={styles.categoryTitle}>
+						{props.data?.service?.categories[0]?.name}
+					</Text>
 					<View style={styles.categoryDivider} />
-					<Text style={styles.categoryService}>BMW</Text>
+					<Text style={styles.categoryService}>
+						{
+							props.data?.service?.categories.filter(
+								item => item?.parent_id !== null
+							)?.[0]?.name
+						}
+					</Text>
 				</View>
 				<View style={styles.categoryItem}>
-					<Text style={styles.categoryType}>Salgy</Text>
-					<Text style={styles.categoryTitle}>Gokdepe,Ahal (Gypjak metjit)</Text>
+					<Text style={styles.categoryType}>{t("subscribed")}</Text>
+					<Text style={styles.categoryTitle}>
+						{props.data?.service?.region?.name}
+					</Text>
 				</View>
 				<View style={styles.categoryItem}>
-					<Text style={styles.categoryType}>Agzalar</Text>
+					<Text style={styles.categoryType}>{t("subscriber")}</Text>
 					<Text style={[styles.categoryTitle, { fontFamily: "Lexend-Medium" }]}>
-						101 agza
+						{props.data?.service?.followers_count} {t("subscriber")}
 					</Text>
 					<View style={styles.categoryDivider} />
 					<View style={styles.categorySubscribed}>
 						<View style={styles.categorySubscribedDot} />
-						<Text style={styles.categorySubscribedText}>Agza bolundy</Text>
+						<Text style={styles.categorySubscribedText}>{t("subscribed")}</Text>
 					</View>
 				</View>
 			</View>
-			<SubscribersInfoBanner />
-			<TouchableOpacity style={styles.goProfileButton}>
+			<SubscribersInfoBanner data={props.data} />
+			<TouchableOpacity
+				onPress={() => router.push(`/home/${props.data?.service?.id}`)}
+				style={styles.goProfileButton}
+			>
 				<IconAvatarCircle />
-				<Text style={styles.goProfileButtonText}>Profile git</Text>
+				<Text style={styles.goProfileButtonText}>{t("goProfile")}</Text>
 			</TouchableOpacity>
 			<SubscribersUnsubscribe.Modal
 				handleCloseModal={() => props.handleCloseModal()}
@@ -67,7 +86,7 @@ export const styles = StyleSheet.create({
 		borderStyle: "solid",
 		borderRadius: 6,
 		paddingBottom: 20,
-		marginHorizontal: 16,
+		marginHorizontal: 16
 	},
 
 	header: {

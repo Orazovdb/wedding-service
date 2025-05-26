@@ -1,4 +1,5 @@
 import { Colors } from "@/constants/Colors";
+import { servicesService } from "@/shared/api/services/services.service";
 import { Services } from "@/shared/api/types";
 import CategoryIcon from "@/shared/icons/category-icon.svg";
 import LocationIcon from "@/shared/icons/location-icon.svg";
@@ -7,6 +8,7 @@ import NewIcon from "@/shared/icons/status-new.svg";
 import PremiumIcon from "@/shared/icons/status-premium.svg";
 import { useRouter } from "expo-router";
 import React, { useRef } from "react";
+import { useTranslation } from "react-i18next";
 import {
 	Dimensions,
 	FlatList,
@@ -22,8 +24,21 @@ interface props extends Home {}
 
 const { width } = Dimensions.get("window");
 
-export const HomeServices = ({ data }: { data?: props }) => {
+export const HomeServices = ({
+	data,
+	onToggleFollow
+}: {
+	data?: props;
+	onToggleFollow: () => void;
+}) => {
+	const { t } = useTranslation();
+
 	const router = useRouter();
+
+	const toggleFollow = async (service_id: number) => {
+		await servicesService.toggleFollowService({ service_id });
+		onToggleFollow();
+	};
 
 	const categoryFlatListRef = useRef<FlatList<Services>>(null);
 	return data?.categories?.map(categoryItem => (
@@ -43,7 +58,7 @@ export const HomeServices = ({ data }: { data?: props }) => {
 					style={styles.servicesCategoryButton}
 				>
 					<CategoryIcon />
-					<Text style={styles.servicesCategoryButtonText}>Hemmesini gor</Text>
+					<Text style={styles.servicesCategoryButtonText}>{t("seeAll")}</Text>
 				</TouchableOpacity>
 			</View>
 			<FlatList
@@ -89,11 +104,11 @@ export const HomeServices = ({ data }: { data?: props }) => {
 								>
 									<Text style={styles.categoryItemStatusText}>
 										{item.status === "premium"
-											? "premium"
+											? t("premium")
 											: item.status === "golden"
-											? `${"golden"}`
+											? t("golden")
 											: item.status === "new"
-											? "täze"
+											? t("new")
 											: ""}
 									</Text>
 									{item.status === "premium" ? (
@@ -140,7 +155,7 @@ export const HomeServices = ({ data }: { data?: props }) => {
 										<>
 											<Text style={styles.serviceLocation}>
 												{firstWord} {secondWord.slice(0, 1)}.,{" "}
-												{item.region.province}
+												{item.region.province.slice(0, 4)}
 											</Text>
 										</>
 									);
@@ -151,9 +166,12 @@ export const HomeServices = ({ data }: { data?: props }) => {
 									<Text style={styles.subscriptionsButtonText}>
 										{item.followers_count}
 									</Text>
-									<Text style={styles.subscriptionsButtonText}>agza</Text>
+									<Text style={styles.subscriptionsButtonText}>
+										{t("subscriber")}
+									</Text>
 								</View>
 								<TouchableOpacity
+									onPress={() => toggleFollow(item.id)}
 									style={[
 										styles.subscribeButton,
 										item.status === "golden" && styles.subscribeButtonGold
@@ -165,15 +183,7 @@ export const HomeServices = ({ data }: { data?: props }) => {
 											item.status === "golden" && styles.subscribeButtonGoldText
 										]}
 									>
-										Agza
-									</Text>
-									<Text
-										style={[
-											styles.subscribeButtonText,
-											item.status === "golden" && styles.subscribeButtonGoldText
-										]}
-									>
-										bol
+										{t("subscribe")}
 									</Text>
 								</TouchableOpacity>
 							</View>
@@ -314,27 +324,33 @@ export const styles = StyleSheet.create({
 	},
 	serviceLocationWrapper: {
 		flexDirection: "row",
+		justifyContent: 'center',
 		alignItems: "center",
 		gap: 4,
 		paddingVertical: 3,
 		paddingHorizontal: 4,
 		borderRadius: 5,
 		backgroundColor: Colors.dark.primary,
-		marginBottom: 12
+		marginBottom: 12,
+		wordWrap: "wrap",
+		flexWrap: "wrap",
+		maxWidth: "90%",
+		marginHorizontal: "auto"
 	},
 	serviceLocation: {
 		fontSize: 10,
 		fontFamily: "Lexend-Light",
-		color: Colors.light.secondary
+		color: Colors.light.secondary,
+		textAlign: "center",
 	},
 	serviceButtons: {
-		flexDirection: "row",
-		justifyContent: "space-between",
+		// flexDirection: "row",
+		gap: 4,
 		width: "100%",
 		paddingHorizontal: 12
 	},
 	subscriptionsButton: {
-		paddingVertical: 6.5,
+		paddingVertical: 2.5,
 		paddingHorizontal: 4.5,
 		backgroundColor: Colors.light.secondary,
 		borderRadius: 3
@@ -360,7 +376,8 @@ export const styles = StyleSheet.create({
 		fontSize: 10,
 		color: Colors.light.secondary,
 		fontFamily: "Lexend-Regular",
-		textAlign: "center"
+		textAlign: "center",
+		wordWrap: "wrap"
 	},
 	subscribeButtonGoldText: {
 		color: "#fff"

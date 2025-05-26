@@ -1,4 +1,5 @@
 import { Colors } from "@/constants/Colors";
+import { HumanServicesByIdData } from "@/shared/api/types";
 import React, { useRef, useState } from "react";
 import {
 	Animated,
@@ -10,14 +11,16 @@ import {
 	NativeSyntheticEvent,
 	StyleSheet,
 	useColorScheme,
-	View,
-	
+	View
 } from "react-native";
-import { FakeSlides } from "../data";
 
 const { width, height } = Dimensions.get("window");
 
-export const SubscribersInfoBanner = () => {
+export const SubscribersInfoBanner = ({
+	data
+}: {
+	data: HumanServicesByIdData | undefined;
+}) => {
 	const colorScheme: "light" | "dark" = useColorScheme() ?? "light";
 	const scrollX = useRef(new Animated.Value(0)).current;
 	const [currentIndex, setCurrentIndex] = useState(0);
@@ -37,23 +40,22 @@ export const SubscribersInfoBanner = () => {
 	return (
 		<View style={styles.flatList}>
 			<FlatList
-				data={FakeSlides}
-				keyExtractor={item => item.id}
+				data={data?.service?.images}
+				keyExtractor={item => item?.id?.toString()}
 				horizontal
 				pagingEnabled
 				showsHorizontalScrollIndicator={false}
 				onScroll={handleScroll}
 				onMomentumScrollEnd={handleMomentumScrollEnd}
-				
 				renderItem={({ item }) => (
 					<View style={styles.slide}>
-						<Image source={item.image} style={styles.image} />
+						<Image source={{ uri: item?.url }} style={styles.image} />
 					</View>
 				)}
 			/>
 			<View style={styles.paginationContainer}>
 				<View style={styles.pagination}>
-					{FakeSlides.map((_, i) => (
+					{data?.service?.images.map((_, i) => (
 						<View
 							key={i}
 							style={[
@@ -76,9 +78,9 @@ export const SubscribersInfoBanner = () => {
 export const styles = StyleSheet.create({
 	flatList: {
 		paddingBottom: 40,
-		position: 'relative'
+		position: "relative"
 	},
-	slide: { width: width * 0.85, },
+	slide: { width: width * 0.85 },
 	image: {
 		width: width * 0.9,
 		height: height * 0.23,

@@ -5,6 +5,7 @@ import ArrowRightIcon from "@/shared/icons/arrow-right.svg";
 import NavBottomIcon from "@/shared/icons/nav-bottom.svg";
 import { useRouter } from "expo-router";
 import React, { useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
 	Animated,
 	Dimensions,
@@ -21,6 +22,7 @@ import {
 const { width } = Dimensions.get("window");
 
 export const CategoriesScreen = () => {
+	const { t } = useTranslation();
 	const [openItemId, setOpenItemId] = useState<number | null>(null);
 	const animatedOpacity = useRef(new Animated.Value(0)).current;
 	const router = useRouter();
@@ -55,7 +57,7 @@ export const CategoriesScreen = () => {
 	return (
 		<SafeAreaView style={styles.safeArea}>
 			<View style={styles.page}>
-				<Text style={styles.title}>Kategoriýalar</Text>
+				<Text style={styles.title}>{t("categories")}</Text>
 				<FlatList
 					data={dataCategories}
 					keyExtractor={item => item.id.toString()}
@@ -87,7 +89,7 @@ export const CategoriesScreen = () => {
 											style={styles.subItem}
 											onPress={() => router.push(`/categories/${item.id}/all`)}
 										>
-											<Text style={styles.subItemText}>Ahlisi</Text>
+											<Text style={styles.subItemText}>{t("all")}</Text>
 											<ArrowRightIcon />
 										</TouchableOpacity>
 										{item.children.map(subItem => (

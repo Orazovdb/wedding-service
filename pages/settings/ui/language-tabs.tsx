@@ -1,6 +1,7 @@
 import IconLanguage from "@/shared/icons/settings/language-icon.svg";
 import IconTranslate from "@/shared/icons/settings/translate-icon.svg";
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 type props = {
@@ -15,11 +16,12 @@ export const languages = [
 ];
 
 export const LanguageTabs = ({ selectedTab = 1, onChangeTab }: props) => {
+	const { t } = useTranslation();
 	return (
 		<View style={styles.languageTabs}>
 			<View style={styles.titleRow}>
 				<IconLanguage />
-				<Text style={styles.title}>Dil</Text>
+				<Text style={styles.title}>{t("language")}</Text>
 			</View>
 			<View style={styles.tabs}>
 				{languages.map(tab => (

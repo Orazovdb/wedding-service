@@ -1,5 +1,6 @@
-import { axiosClassic, axiosWithAuth } from "../interceptors";
+import { axiosWithAuth } from "@/shared/api/interceptors";
 import {
+	FollowersData,
 	HumanServicesArgs,
 	HumanServicesByIdData,
 	HumanServicesData
@@ -18,6 +19,16 @@ class ServicesService {
 			`/services/${id}`
 		);
 		return response.data;
+	}
+
+	async toggleFollowService(data: { service_id: number }) {
+		const response = await axiosWithAuth.post("/toggle/following", data);
+		return response.data;
+	}
+
+	async getFollowers() {
+		const response  = await axiosWithAuth.get<FollowersData>('/followings')
+		return response.data
 	}
 }
 

@@ -3,6 +3,7 @@ import { HumanServicesByIdData } from "@/shared/api/types";
 import IconAlarm from "@/shared/icons/alarm-icon.svg";
 import IconHeadphones from "@/shared/icons/headphones.svg";
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 import IconFeedBack from "./icons/feedback-icon.svg";
 
@@ -11,6 +12,7 @@ export const HomeDetailFeedback = ({
 }: {
 	data: HumanServicesByIdData | undefined;
 }) => {
+	const { t } = useTranslation();
 	return (
 		<View style={styles.feedback}>
 			<ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
@@ -20,7 +22,7 @@ export const HomeDetailFeedback = ({
 							<View style={styles.iconFeedback}>
 								<IconFeedBack />
 							</View>
-							<Text style={styles.title}>Bahalandyrma</Text>
+							<Text style={styles.title}>{t("evaluation")}</Text>
 						</View>
 						{data?.service.pricing.map((price, index) => (
 							<View
@@ -44,7 +46,7 @@ export const HomeDetailFeedback = ({
 							<View style={styles.iconFeedback}>
 								<IconAlarm />
 							</View>
-							<Text style={styles.title}>Bronlamak üçin </Text>
+							<Text style={styles.title}>{t("booking")}</Text>
 						</View>
 						{data?.service.booking.map((alarm, index) => (
 							<View
@@ -68,7 +70,7 @@ export const HomeDetailFeedback = ({
 							<View style={styles.iconFeedback}>
 								<IconHeadphones />
 							</View>
-							<Text style={styles.title}>Habarlaşmak</Text>
+							<Text style={styles.title}>{t("contact")}</Text>
 						</View>
 						{data?.service.contacts.map((contact, index) => (
 							<View

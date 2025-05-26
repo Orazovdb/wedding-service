@@ -1,33 +1,54 @@
+import { servicesService } from "@/shared/api/services/services.service";
+import { Followers, FollowersData } from "@/shared/api/types";
 import IconArrowLeft from "@/shared/icons/arrow-left-big.svg";
-import IconSubscribed from "@/shared/icons/subscribed-icon.svg";
 import React, { useEffect, useRef, useState } from "react";
 import {
 	Animated,
 	Dimensions,
 	FlatList,
 	StyleSheet,
-	Text,
 	TouchableOpacity,
 	View
 } from "react-native";
-import { SubscribersData } from "../data";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 const ITEM_WIDTH = SCREEN_WIDTH / 5.6;
 
 type Props = {
-	subscribe_id: string | string[];
+	subscribe_id: string;
 	onSelectSubCategory: (id: string) => void;
 };
 
 export const SubscribersSubscribeSlider = (props: Props) => {
 	const flatListRef = useRef<FlatList>(null);
 	const [currentIndex, setCurrentIndex] = useState(0);
+	const [dataSubscribes, setDataSubscribers] = useState<FollowersData>();
 
 	useEffect(() => {
-		const index = SubscribersData.findIndex(
-			item => item.id === props.subscribe_id
+		const fetchData = async () => {
+			const result = await servicesService.getFollowers();
+			setDataSubscribers(result);
+
+			if (result?.data?.length && !props.subscribe_id) {
+				props.onSelectSubCategory(String(result.data[0].id));
+			}
+		};
+
+		fetchData();
+	}, []);
+
+	useEffect(() => {
+		if (!dataSubscribes?.data?.length) return;
+
+		const subscribeId =
+			Array.isArray(props.subscribe_id) && props.subscribe_id.length > 0
+				? props.subscribe_id[0]
+				: props.subscribe_id;
+
+		const index = dataSubscribes.data.findIndex(
+			item => String(item.id) === String(subscribeId)
 		);
+
 		if (index !== -1 && flatListRef.current) {
 			flatListRef.current.scrollToIndex({
 				index,
@@ -36,17 +57,21 @@ export const SubscribersSubscribeSlider = (props: Props) => {
 			});
 			setCurrentIndex(index);
 		}
-	}, [props.subscribe_id]);
+	}, [props.subscribe_id, dataSubscribes]);
 
 	const scrollToIndex = (index: number) => {
-		if (index >= 0 && index < SubscribersData.length) {
+		if (
+			dataSubscribes?.data &&
+			index >= 0 &&
+			index < dataSubscribes.data.length
+		) {
 			flatListRef.current?.scrollToIndex({
 				index,
 				animated: true,
 				viewPosition: 0
 			});
 			setCurrentIndex(index);
-			props.onSelectSubCategory(SubscribersData[index].id);
+			props.onSelectSubCategory(String(dataSubscribes.data[index].id));
 		}
 	};
 
@@ -61,8 +86,8 @@ export const SubscribersSubscribeSlider = (props: Props) => {
 			<View style={styles.container}>
 				<FlatList
 					ref={flatListRef}
-					data={SubscribersData}
-					keyExtractor={item => item.id}
+					data={dataSubscribes?.data}
+					keyExtractor={(item, index) => `${item.id}_${index}`}
 					horizontal
 					pagingEnabled={false}
 					scrollEnabled={true}
@@ -70,7 +95,7 @@ export const SubscribersSubscribeSlider = (props: Props) => {
 					renderItem={({ item, index }) => (
 						<SubscriberItem
 							item={item}
-							isActive={SubscribersData[currentIndex].id === item.id}
+							isActive={index === currentIndex}
 							onPress={() => scrollToIndex(index)}
 						/>
 					)}
@@ -96,7 +121,7 @@ export const SubscribersSubscribeSlider = (props: Props) => {
 };
 
 type ItemProps = {
-	item: any;
+	item: Followers;
 	isActive: boolean;
 	onPress: () => void;
 };
@@ -123,7 +148,7 @@ const SubscriberItem = ({ item, isActive, onPress }: ItemProps) => {
 			activeOpacity={0.8}
 		>
 			<Animated.Image
-				source={item.image}
+				source={{ uri: item.logo }}
 				style={[
 					styles.image,
 					{
@@ -133,37 +158,6 @@ const SubscriberItem = ({ item, isActive, onPress }: ItemProps) => {
 					}
 				]}
 			/>
-			{/* <View
-				style={[styles.titleBlock, isActive ? styles.titleBlockActive : null]}
-			>
-				<Text
-					style={[
-						styles.categoryItemText,
-						isActive ? styles.categoryItemTextActive : null
-					]}
-				>
-					{item.name}
-				</Text>
-				{item.isPremium && isActive && (
-					<View
-						style={[
-							styles.categoryItemIcon,
-							isActive ? styles.categoryItemIconActive : null
-						]}
-					>
-						<IconSubscribed />
-					</View>
-				)}
-				{isActive ? (
-					<Text
-						style={[styles.categoryItemText, styles.categoryItemTextActive]}
-					>
-						{item.surname}
-					</Text>
-				) : (
-					<Text style={styles.categoryItemText}>{item.surname}</Text>
-				)}
-			</View> */}
 		</TouchableOpacity>
 	);
 };
@@ -208,9 +202,9 @@ export const styles = StyleSheet.create({
 		fontWeight: "bold"
 	},
 	categoryItem: {
-		width: SCREEN_WIDTH,
+		width: 300,
 		alignItems: "center",
-		justifyContent: "center",
+		justifyContent: "center"
 	},
 	categoryItemActive: {
 		marginLeft: 40,
@@ -220,8 +214,7 @@ export const styles = StyleSheet.create({
 	image: {
 		marginBottom: 2
 	},
-	titleBlock: {
-	},
+	titleBlock: {},
 	titleBlockActive: {
 		position: "absolute",
 		top: "100%",

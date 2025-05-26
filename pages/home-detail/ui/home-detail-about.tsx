@@ -1,6 +1,7 @@
 import { Colors } from "@/constants/Colors";
 import { HumanServicesByIdData } from "@/shared/api/types";
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { Image, StyleSheet, Text, View } from "react-native";
 
 export const HomeDetailAbout = ({
@@ -8,20 +9,21 @@ export const HomeDetailAbout = ({
 }: {
 	data: HumanServicesByIdData | undefined;
 }) => {
+	const { t } = useTranslation();
 	return (
 		<View style={styles.about}>
-			<Text style={styles.title}>Men hakynda</Text>
+			<Text style={styles.title}>{t("aboutMe")}</Text>
 			<View style={styles.row}>
 				{data?.service.logo && (
 					<Image source={{ uri: data?.service?.logo }} style={styles.image} />
 				)}
 				<View style={(styles.info, !data?.service.logo && { width: "auto" })}>
 					<Text style={styles.description}>
-						<Text style={{ fontFamily: "Lexend-Regular" }}>Salam</Text>,{" "}
+						<Text style={{ fontFamily: "Lexend-Regular" }}>{t("hi")}</Text>,{" "}
 						{data?.service?.description}
 					</Text>
 					<Text style={styles.meeting}>
-						Hormatlamak bilen, {data?.service.name}
+						{t("sincerely")}, {data?.service.name}
 					</Text>
 				</View>
 			</View>

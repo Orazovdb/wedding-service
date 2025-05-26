@@ -6,6 +6,7 @@ import IconRocket from "@/shared/icons/settings/rocket-icon.svg";
 import { useAuth } from "@/shared/store/AuthContext";
 import { useThemeMode } from "@/shared/store/ThemeContext";
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
 	Image,
 	ScrollView,
@@ -19,6 +20,7 @@ import { languages, LanguageTabs } from "./ui/language-tabs";
 import { ThemeTabs } from "./ui/theme-tabs";
 
 export const SettingsScreen = () => {
+	const { t } = useTranslation();
 	const [selectedLang, setSelectedLang] = useState(1);
 	const [selectedTheme, setSelectedTheme] = useState(1);
 	const { setMode } = useThemeMode();
@@ -68,7 +70,7 @@ export const SettingsScreen = () => {
 					</View>
 				</View>
 				<TouchableOpacity onPress={logout} style={styles.logoutButton}>
-					<Text style={styles.logoutButtonText}>Ulgamda cyk</Text>
+					<Text style={styles.logoutButtonText}>{t("logout")}</Text>
 					<IconLogout />
 				</TouchableOpacity>
 				<View style={styles.gratitude}>

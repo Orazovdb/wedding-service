@@ -17,7 +17,6 @@ import SubscribersIcon from "@/assets/images/navigations/subscribers.svg";
 
 import { useAppTheme } from "@/shared/hooks/use-app-theme";
 import { useAuth } from "@/shared/store/AuthContext";
-import { t } from "i18next";
 import { JSX } from "react";
 
 const navItems: {
@@ -34,7 +33,7 @@ const navItems: {
 	{
 		path: "/subscribers",
 		icon: <SubscribersIcon />,
-		label: t("routes.subscribers")
+		label: "routes.subscribers"
 	},
 	{ path: "/settings", icon: <SettingsIcon />, label: "routes.settings" }
 ];

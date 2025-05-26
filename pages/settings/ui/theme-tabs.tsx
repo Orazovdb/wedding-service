@@ -3,6 +3,7 @@ import IconDevice from "@/shared/icons/settings/device-icon.svg";
 import IconLight from "@/shared/icons/settings/light-icon.svg";
 import IconSystem from "@/shared/icons/settings/system-icon.svg";
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 type props = {
@@ -29,11 +30,13 @@ const data = [
 ];
 
 export const ThemeTabs = ({ selectedTab = 1, onChangeTab }: props) => {
+	const { t } = useTranslation();
+
 	return (
 		<View style={styles.ThemeTabs}>
 			<View style={styles.titleRow}>
 				<IconDevice />
-				<Text style={styles.title}>Ekran</Text>
+				<Text style={styles.title}>{t("theme")}</Text>
 			</View>
 			<View style={styles.tabs}>
 				{data.map(tab => (

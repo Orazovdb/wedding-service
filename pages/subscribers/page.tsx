@@ -1,18 +1,30 @@
 import { Colors } from "@/constants/Colors";
-import React, { useState } from "react";
+import { servicesService } from "@/shared/api/services/services.service";
+import { HumanServicesByIdData } from "@/shared/api/types";
+import React, { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { SubscribersFilterModal } from "./ui/subscribers-filter";
 import { SubscribersInfo } from "./ui/subscribers-info";
 import { SubscribersRecommendCategories } from "./ui/subscribers-recommend-categories";
 import { SubscribersSubscribeSlider } from "./ui/subscribers-subscribe-slider";
-import { SubscribersUnsubscribe } from "./ui/subscribers-unsubscribe";
 
 export const SubscribersScreen = () => {
+	const { t } = useTranslation();
 	const [isModalVisible, setIsModalVisible] = useState(false);
-	const [selectedSubscribeId, setSelectedSubscribeId] = useState<string>("1");
+	const [selectedSubscribeId, setSelectedSubscribeId] = useState<string>("");
 	const [selectedCategoryId, setSelectedCategoryId] = useState<string>("");
 	const [isUnsubscribeModalVisible, setIsUnsubscribeModalVisible] =
 		useState<boolean>(false);
+	const [dataService, setDataService] = useState<HumanServicesByIdData>();
+
+	useEffect(() => {
+		const fetchData = async () => {
+			const result = await servicesService.getServicesById(selectedSubscribeId);
+			setDataService(result);
+		};
+		fetchData();
+	}, [selectedSubscribeId]);
 
 	const handleModalOpen = () => {
 		setIsModalVisible(true);
@@ -28,7 +40,6 @@ export const SubscribersScreen = () => {
 
 	const handleOpenUnsubscribeModal = () => {
 		setIsUnsubscribeModalVisible(true);
-		console.log(isUnsubscribeModalVisible);
 	};
 
 	return (
@@ -36,8 +47,10 @@ export const SubscribersScreen = () => {
 			<View style={styles.page}>
 				<View style={styles.header}>
 					<View style={styles.subscribersRow}>
-						<Text style={styles.subscribersTitle}>20</Text>
-						<Text style={styles.subscribersText}>agzalyk</Text>
+						<Text style={styles.subscribersTitle}>
+							{dataService?.service?.followers_count}
+						</Text>
+						<Text style={styles.subscribersText}>{t("subscriber")}</Text>
 					</View>
 					<SubscribersFilterModal.Button
 						isModalVisible={isModalVisible}
@@ -53,6 +66,7 @@ export const SubscribersScreen = () => {
 					handleCloseModal={() => setIsUnsubscribeModalVisible(false)}
 					isModalVisible={isUnsubscribeModalVisible}
 					handleConfirm={handleConfirmUnsubscribe}
+					data={dataService}
 				/>
 				<View style={styles.subscribersCount}>
 					<View style={styles.subscribersCountButton}>
@@ -64,7 +78,9 @@ export const SubscribersScreen = () => {
 						>
 							1
 						</Text>
-						<Text style={styles.subscribersCountText}> / 212 agzalyklar</Text>
+						<Text style={styles.subscribersCountText}>
+							/ 212 {t("subscriber")}
+						</Text>
 					</View>
 				</View>
 				<View style={styles.subscribersCountDivider} />
@@ -78,7 +94,6 @@ export const SubscribersScreen = () => {
 				isModalVisible={isModalVisible}
 				setIsModalVisible={handleModalClose}
 			/>
-		
 		</ScrollView>
 	);
 };

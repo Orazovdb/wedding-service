@@ -1,4 +1,5 @@
 import { Colors } from "@/constants/Colors";
+import { servicesService } from "@/shared/api/services/services.service";
 import { HumanServicesByIdData, SimilarServices } from "@/shared/api/types";
 import LocationIcon from "@/shared/icons/location-icon.svg";
 import GoldenIcon from "@/shared/icons/status-golden.svg";
@@ -6,6 +7,7 @@ import NewIcon from "@/shared/icons/status-new.svg";
 import PremiumIcon from "@/shared/icons/status-premium.svg";
 import { useRouter } from "expo-router";
 import React, { useRef } from "react";
+import { useTranslation } from "react-i18next";
 import {
 	Dimensions,
 	FlatList,
@@ -18,18 +20,27 @@ import {
 
 const { width } = Dimensions.get("window");
 
-const HomeDetailSameServices = ({
-	data
+export const HomeDetailSameServices = ({
+	data,
+	onToggleFollow
 }: {
 	data: HumanServicesByIdData | undefined;
+	onToggleFollow: () => void;
 }) => {
 	const router = useRouter();
 
 	const categoryFlatListRef = useRef<FlatList<any>>(null);
 
+	const toggleFollow = async (service_id: number) => {
+		await servicesService.toggleFollowService({ service_id });
+		onToggleFollow();
+	};
+
+	const { t } = useTranslation();
+
 	return (
 		<View style={styles.sameServices}>
-			<Text style={styles.title}>Meňzeş hyzmatlar</Text>
+			<Text style={styles.title}>{t("sameServices")}</Text>
 			<FlatList
 				ref={categoryFlatListRef}
 				data={data?.similar}
@@ -72,11 +83,11 @@ const HomeDetailSameServices = ({
 								>
 									<Text style={styles.categoryItemStatusText}>
 										{item.status === "premium"
-											? "premium"
+											? t("premium")
 											: item.status === "golden"
-											? `${"golden"}`
+											? t("gold")
 											: item.status === "new"
-											? "täze"
+											? t("new")
 											: ""}
 									</Text>
 									{item.status === "premium" ? (
@@ -131,10 +142,15 @@ const HomeDetailSameServices = ({
 							</View>
 							<View style={styles.serviceButtons}>
 								<View style={styles.subscriptionsButton}>
-									<Text style={styles.subscriptionsButtonText}>111k</Text>
-									<Text style={styles.subscriptionsButtonText}>agza</Text>
+									<Text style={styles.subscriptionsButtonText}>
+										{item.followers_count}
+									</Text>
+									<Text style={styles.subscriptionsButtonText}>
+										{t("subscriber")}
+									</Text>
 								</View>
 								<TouchableOpacity
+									onPress={() => toggleFollow(item.id)}
 									style={[
 										styles.subscribeButton,
 										item.status === "golden" && styles.subscribeButtonGold
@@ -146,15 +162,7 @@ const HomeDetailSameServices = ({
 											item.status === "golden" && styles.subscribeButtonGoldText
 										]}
 									>
-										Agza
-									</Text>
-									<Text
-										style={[
-											styles.subscribeButtonText,
-											item.status === "golden" && styles.subscribeButtonGoldText
-										]}
-									>
-										bol
+										{t("subscribe")}
 									</Text>
 								</TouchableOpacity>
 							</View>
@@ -165,8 +173,6 @@ const HomeDetailSameServices = ({
 		</View>
 	);
 };
-
-export default HomeDetailSameServices;
 
 export const styles = StyleSheet.create({
 	sameServices: {
@@ -297,14 +303,17 @@ export const styles = StyleSheet.create({
 	serviceButtons: {
 		flexDirection: "row",
 		justifyContent: "space-between",
+		flexWrap: "wrap",
 		width: "100%",
-		paddingHorizontal: 12
+		paddingHorizontal: 12,
+		gap: 4
 	},
 	subscriptionsButton: {
-		paddingVertical: 6.5,
+		paddingVertical: 1.5,
 		paddingHorizontal: 4.5,
 		backgroundColor: Colors.light.secondary,
-		borderRadius: 3
+		borderRadius: 3,
+		width: "100%"
 	},
 	subscriptionsButtonText: {
 		fontSize: 10,
@@ -313,11 +322,12 @@ export const styles = StyleSheet.create({
 		textAlign: "center"
 	},
 	subscribeButton: {
-		paddingVertical: 6.5,
+		paddingVertical: 2.5,
 		paddingHorizontal: 4.5,
 		borderRadius: 3,
 		borderWidth: 1,
-		borderColor: "#000"
+		borderColor: "#000",
+		width: "100%"
 	},
 	subscribeButtonGold: {
 		backgroundColor: "#D4AF37",

@@ -4,14 +4,19 @@ import IconAvatar from "@/shared/icons/avatar-icon.svg";
 import IconFlag from "@/shared/icons/flag-icon.svg";
 import { useRouter } from "expo-router";
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 export const HomeDetailProfile = ({
-	data
+	data,
+	onToggleFollow
 }: {
 	data: HumanServicesByIdData | undefined;
+	onToggleFollow: () => void;
 }) => {
 	const router = useRouter();
+	const { t } = useTranslation();
+
 	return (
 		<View style={styles.profile}>
 			<View style={styles.avatarBlock}>
@@ -47,7 +52,8 @@ export const HomeDetailProfile = ({
 						return (
 							<>
 								<Text style={styles.locationText}>
-									{firstWord} {secondWord}, {data?.service?.region?.province}
+									{firstWord} {secondWord},{" "}
+									{data?.service?.region?.province.slice(0, 4)}
 								</Text>
 							</>
 						);
@@ -56,11 +62,14 @@ export const HomeDetailProfile = ({
 				<View style={styles.subscribeCount}>
 					<IconAvatar />
 					<Text style={styles.subscribeCountText}>
-						{data?.service?.followers_count} agza
+						{data?.service?.followers_count} {t("subscriber")}
 					</Text>
 				</View>
-				<TouchableOpacity style={styles.subscribeButton}>
-					<Text style={styles.subscribeButtonText}>Agza bol</Text>
+				<TouchableOpacity
+					onPress={() => onToggleFollow()}
+					style={styles.subscribeButton}
+				>
+					<Text style={styles.subscribeButtonText}>{t("subscribe")}</Text>
 				</TouchableOpacity>
 			</View>
 		</View>

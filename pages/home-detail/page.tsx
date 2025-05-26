@@ -1,21 +1,21 @@
-import { Colors } from "@/constants/Colors"
-import { servicesService } from "@/shared/api/services/services.service"
-import { HumanServicesByIdData } from "@/shared/api/types"
-import ArrowLeftBigIcon from "@/shared/icons/arrow-left-big.svg"
-import { useLocalSearchParams, useRouter } from "expo-router"
-import { useEffect, useState } from "react"
+import { Colors } from "@/constants/Colors";
+import { servicesService } from "@/shared/api/services/services.service";
+import { HumanServicesByIdData } from "@/shared/api/types";
+import ArrowLeftBigIcon from "@/shared/icons/arrow-left-big.svg";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import { useEffect, useState } from "react";
 import {
 	Dimensions,
 	ScrollView,
 	StyleSheet,
 	TouchableOpacity
-} from "react-native"
-import { HomeDetailAbout } from "./ui/home-detail-about"
-import { HomeDetailBanner } from "./ui/home-detail-banner"
-import { HomeDetailFeedback } from "./ui/home-detail-feedback"
-import { HomeDetailProfile } from "./ui/home-detail-profile"
-import HomeDetailSameServices from "./ui/home-detail-same-services"
-import { HomeDetailContact } from "./ui/home-detail-contact"
+} from "react-native";
+import { HomeDetailAbout } from "./ui/home-detail-about";
+import { HomeDetailBanner } from "./ui/home-detail-banner";
+import { HomeDetailContact } from "./ui/home-detail-contact";
+import { HomeDetailFeedback } from "./ui/home-detail-feedback";
+import { HomeDetailProfile } from "./ui/home-detail-profile";
+import { HomeDetailSameServices } from "./ui/home-detail-same-services";
 
 const { width } = Dimensions.get("window");
 
@@ -36,6 +36,19 @@ export const HomeDynamicScreen = () => {
 
 	const router = useRouter();
 
+	const onToggleFollow = async () => {
+		await servicesService.toggleFollowService({ service_id: Number(id) });
+
+		const result = await servicesService.getServicesById(id as string);
+		if (result) {
+			setData(result);
+		}
+	};
+
+	const onToggleSimilarFollow = async () => {
+		await servicesService.getServicesById(id as string).then(setData);
+	};
+
 	return (
 		<ScrollView style={styles.container}>
 			{data?.service.videos.length || data?.service.images.length ? (
@@ -44,7 +57,7 @@ export const HomeDynamicScreen = () => {
 			<TouchableOpacity onPress={() => router.back()} style={styles.backIcon}>
 				<ArrowLeftBigIcon />
 			</TouchableOpacity>
-			<HomeDetailProfile data={data} />
+			<HomeDetailProfile data={data} onToggleFollow={onToggleFollow} />
 			<HomeDetailAbout data={data} />
 			{data?.service.pricing[0] !== "" ||
 			data?.service.booking[0] !== "" ||
@@ -52,7 +65,12 @@ export const HomeDynamicScreen = () => {
 				<HomeDetailFeedback data={data} />
 			) : null}
 			<HomeDetailContact data={data} />
-			{data?.similar.length ? <HomeDetailSameServices data={data} /> : null}
+			{data?.similar.length ? (
+				<HomeDetailSameServices
+					onToggleFollow={onToggleSimilarFollow}
+					data={data}
+				/>
+			) : null}
 		</ScrollView>
 	);
 };

@@ -7,6 +7,7 @@ import { Video } from "expo-av";
 import { BlurView } from "expo-blur";
 import { useVideoPlayer } from "expo-video";
 import React, { useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
 	ActivityIndicator,
 	Animated,
@@ -30,6 +31,7 @@ export const HomeDetailBanner = ({
 }: {
 	data: HumanServicesByIdData | undefined;
 }) => {
+	const { t } = useTranslation();
 	const [isBuffering, setIsBuffering] = useState(true);
 	const [isVideoSlide, setIsVideoSlide] = useState(true);
 	const [isImageViewerVisible, setImageViewerVisible] = useState(false);
@@ -93,7 +95,7 @@ export const HomeDetailBanner = ({
 
 	const handleChangeVideo = (value: boolean) => {
 		setIsVideoSlide(value);
-		setCurrentIndex(0)
+		setCurrentIndex(0);
 	};
 
 	useEffect(() => {
@@ -123,7 +125,7 @@ export const HomeDetailBanner = ({
 						<Text
 							style={[styles.tabText, isVideoSlide && styles.tabActiveText]}
 						>
-							Videolar ({data?.service.videos.length})
+							{t("videos")} ({data?.service.videos.length})
 						</Text>
 					</TouchableOpacity>
 					{data && data?.service.images?.length > 0 && (
@@ -134,7 +136,7 @@ export const HomeDetailBanner = ({
 							<Text
 								style={[styles.tabText, !isVideoSlide && styles.tabActiveText]}
 							>
-								Suratlar ({data?.service.images.length})
+								{t('images')} ({data?.service.images.length})
 							</Text>
 						</TouchableOpacity>
 					)}
@@ -189,7 +191,7 @@ export const HomeDetailBanner = ({
 									/>
 
 									<View style={styles.overlayPlayButton}>
-										<Text style={styles.playIcon}>▶ ${item?.filename}</Text>
+										<Text style={styles.playIcon}>▶</Text>
 									</View>
 								</TouchableOpacity>
 							</View>

@@ -1,14 +1,11 @@
-import IconImage from "@/shared/icons/settings/image-icon.svg";
 import IconPen from "@/shared/icons/settings/pen-icon.svg";
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 export const ProfileAvatar = () => {
+	const { t } = useTranslation();
 	return (
 		<View style={styles.avatarBlock}>
-			<TouchableOpacity style={styles.avatar}>
-				<IconImage />
-				<Text style={styles.avatarText}>Surat ýükle</Text>
-			</TouchableOpacity>
 			<View style={styles.avatarContent}>
 				<View style={styles.avatarName}>
 					<Text style={styles.avatarNameText}>Durdy</Text>
@@ -18,7 +15,7 @@ export const ProfileAvatar = () => {
 				</View>
 				<Text style={styles.avatarNameText}>Annanyýazow</Text>
 				<TouchableOpacity style={styles.serviceButton}>
-					<Text style={styles.serviceButtonText}>Hyzmat berjekmi?</Text>
+					<Text style={styles.serviceButtonText}>{t("addService")}</Text>
 				</TouchableOpacity>
 			</View>
 		</View>

@@ -1,8 +1,40 @@
 {
-  "routes": {
-    "home": "Baș sahypa",
+	"routes": {
+		"home": "Baș sahypa",
 		"categories": "Kategoriýalar",
 		"subscribers": "Agzalarym",
 		"settings": "Sazlamalar"
-  }
+	},
+	"seeAll": "Hemmesini gör",
+	"filter": "Filter",
+	"subscribers": "Agzalar",
+	"categories": "Kategoriýalar",
+	"category": "Kategoriýa",
+	"regions": "Regionlar",
+	"subscribe": "Agza bol",
+	"subscriber": "Agza",
+	"videos": "Videolar",
+	"images": "Suratlar",
+	"aboutMe": "Biz barada",
+	"hi": "Salam",
+	"sincerely": "Hormatlamak bilen",
+	"sameServices": "Meňzeş hyzmatlar",
+	"new": "Täze",
+	"premium": "Premium",
+	"gold": "Gold",
+	"normal": "Normal",
+	"unSubscribe": "Agzadan çyk",
+	"goProfile": "profile git",
+	"recommendedServices": "Maslahat berilýän kategoriýalar",
+	"language": "Dil",
+	"theme": "Tema",
+	"logout": "Ulgamdan çyk",
+	"evaluation": "Bahalandyrma",
+	"booking": "Bronlamak üçin",
+	"contact": "Habarlaşmak",
+	"call": "Jaň et",
+	"all": "Ählisi",
+	"addService": "Hyzmat berjekmi?",
+	"address": "Salgy",
+	"subscribed": "Agzala bolundy"
 }

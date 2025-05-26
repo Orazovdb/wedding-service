@@ -5,6 +5,7 @@ import IconDownload from "@/shared/icons/download-icon.svg";
 import * as Linking from "expo-linking";
 import { useRouter } from "expo-router";
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 export const HomeDetailContact = ({
@@ -36,6 +37,7 @@ export const HomeDetailContact = ({
 		const url = pdf;
 		router.push({ pathname: "/(protected)/pdf-viewer", params: { uri: url } });
 	};
+	const { t } = useTranslation();
 
 	return (
 		<View style={styles.contact}>
@@ -44,13 +46,13 @@ export const HomeDetailContact = ({
 				style={styles.callButton}
 			>
 				<IconCall />
-				<Text style={styles.callButtonText}>JAŇ ET</Text>
+				<Text style={styles.callButtonText}>{t("call")}</Text>
 			</TouchableOpacity>
 			<TouchableOpacity
 				onPress={() => handleDownload(data?.service.catalog)}
 				style={styles.catalogButton}
 			>
-				<Text style={styles.catalogButtonText}>Katalog</Text>
+				<Text style={styles.catalogButtonText}>{t("catalog")}</Text>
 				<IconDownload />
 			</TouchableOpacity>
 		</View>
