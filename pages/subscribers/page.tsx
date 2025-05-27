@@ -1,13 +1,18 @@
-import { Colors } from "@/constants/Colors";
-import { servicesService } from "@/shared/api/services/services.service";
-import { HumanServicesByIdData } from "@/shared/api/types";
-import React, { useEffect, useState } from "react";
-import { useTranslation } from "react-i18next";
-import { ScrollView, StyleSheet, Text, View } from "react-native";
-import { SubscribersFilterModal } from "./ui/subscribers-filter";
-import { SubscribersInfo } from "./ui/subscribers-info";
-import { SubscribersRecommendCategories } from "./ui/subscribers-recommend-categories";
-import { SubscribersSubscribeSlider } from "./ui/subscribers-subscribe-slider";
+import { Colors } from "@/constants/Colors"
+import { categoriesService } from "@/shared/api/services/categories.service"
+import { servicesService } from "@/shared/api/services/services.service"
+import {
+	CategoriesWithChildren,
+	FollowersData,
+	HumanServicesByIdData
+} from "@/shared/api/types"
+import React, { useEffect, useState } from "react"
+import { useTranslation } from "react-i18next"
+import { ScrollView, StyleSheet, Text, View } from "react-native"
+import { SubscribersFilterModal } from "./ui/subscribers-filter"
+import { SubscribersInfo } from "./ui/subscribers-info"
+import { SubscribersRecommendCategories } from "./ui/subscribers-recommend-categories"
+import { SubscribersSubscribeSlider } from "./ui/subscribers-subscribe-slider"
 
 export const SubscribersScreen = () => {
 	const { t } = useTranslation();
@@ -18,13 +23,51 @@ export const SubscribersScreen = () => {
 		useState<boolean>(false);
 	const [dataService, setDataService] = useState<HumanServicesByIdData>();
 
+	const [dataSubscribes, setDataSubscribers] = useState<FollowersData>();
+	const [indexProfileSlider, setIndexProfileSlider] = useState(0);
+
+	const [isFiltered, setIsFiltered] = useState(false);
+	const [dataCategories, setDataCategories] =
+		useState<CategoriesWithChildren[]>();
+
+	const [statuses, setStatuses] = useState<string[]>([]);
+	const [categories, setCategories] = useState<string[]>([]);
+	const [regions, setRegions] = useState<string[]>([]);
+	const [clearTrigger, setClearTrigger] = useState(false);
+
+	const [page, setPage] = useState(1);
+	const [hasMore, setHasMore] = useState(true);
+
+	useEffect(() => {
+		categoriesService.getCategories({ parent: 1 }).then(setDataCategories);
+	}, []);
+
 	useEffect(() => {
 		const fetchData = async () => {
 			const result = await servicesService.getServicesById(selectedSubscribeId);
 			setDataService(result);
 		};
+
 		fetchData();
+
+		console.log(indexProfileSlider);
 	}, [selectedSubscribeId]);
+
+	useEffect(() => {
+		// if (!isFiltered) return;
+
+		const fetchData = async () => {
+			const result = await servicesService.getFollowers({
+				category_ids: categories.join(",") || undefined,
+				statuses: statuses.join(",") || undefined,
+				provinces: regions.join(",") || undefined,
+				page: 1
+			});
+			setDataSubscribers(result);
+		};
+
+		fetchData();
+	}, [categories, statuses, regions]);
 
 	const handleModalOpen = () => {
 		setIsModalVisible(true);
@@ -42,24 +85,78 @@ export const SubscribersScreen = () => {
 		setIsUnsubscribeModalVisible(true);
 	};
 
+	const clearFilter = async () => {
+		const empty = "";
+		setIsFiltered(false);
+		setStatuses([]);
+		setCategories([]);
+		setRegions([]);
+		setClearTrigger(prev => !prev);
+		setPage(1);
+		setHasMore(true);
+
+		const result = await servicesService.getFollowers({
+			category_ids: empty,
+			statuses: empty,
+			provinces: empty,
+			page: 1
+		});
+		setDataSubscribers(result);
+	};
+
+	const handleFilterApply = async ({
+		selectedRegions = [],
+		selectedStatuses = [],
+		selectedCategories = []
+	}: {
+		selectedRegions?: string[];
+		selectedStatuses?: string[];
+		selectedCategories?: string[];
+	}) => {
+		setRegions(selectedRegions);
+		setStatuses(selectedStatuses);
+		setCategories(selectedCategories);
+		setPage(1);
+		setHasMore(true);
+		setIsFiltered(true);
+
+		const result = await servicesService.getFollowers({
+			category_ids: selectedCategories.join(",") || undefined,
+			statuses: selectedStatuses.join(",") || undefined,
+			provinces: selectedRegions.join(",") || undefined,
+			page: 1
+		});
+		setDataSubscribers(result);
+		setIsModalVisible(false);
+		setIndexProfileSlider(0);
+	};
+
 	return (
 		<ScrollView style={styles.safeArea}>
 			<View style={styles.page}>
 				<View style={styles.header}>
 					<View style={styles.subscribersRow}>
 						<Text style={styles.subscribersTitle}>
-							{dataService?.service?.followers_count}
+							{dataSubscribes?.data.length}
 						</Text>
-						<Text style={styles.subscribersText}>{t("subscriber")}</Text>
+						<Text style={styles.subscribersText}>{t("subscribers")}</Text>
 					</View>
 					<SubscribersFilterModal.Button
 						isModalVisible={isModalVisible}
 						setIsModalVisible={handleModalOpen}
+						categories={dataCategories}
+						clearTrigger={clearTrigger}
+						isFiltered={isFiltered}
+						setIsFiltered={setIsFiltered}
+						onFilterApply={handleFilterApply}
 					/>
 				</View>
 				<SubscribersSubscribeSlider
 					subscribe_id={selectedSubscribeId}
 					onSelectSubCategory={setSelectedSubscribeId}
+					dataSubscribers={dataSubscribes}
+					index={indexProfileSlider}
+					setIndex={setIndexProfileSlider}
 				/>
 				<SubscribersInfo
 					handleOpenModal={handleOpenUnsubscribeModal}
@@ -67,7 +164,9 @@ export const SubscribersScreen = () => {
 					isModalVisible={isUnsubscribeModalVisible}
 					handleConfirm={handleConfirmUnsubscribe}
 					data={dataService}
+					dataSubscribersLength={dataSubscribes?.data.length}
 				/>
+
 				<View style={styles.subscribersCount}>
 					<View style={styles.subscribersCountButton}>
 						<Text
@@ -76,23 +175,29 @@ export const SubscribersScreen = () => {
 								styles.subscribersCountTextActive
 							]}
 						>
-							1
+							{indexProfileSlider + 1}
 						</Text>
 						<Text style={styles.subscribersCountText}>
-							/ 212 {t("subscriber")}
+							/ {dataSubscribes?.data.length} {t("subscriber")}
 						</Text>
 					</View>
 				</View>
 				<View style={styles.subscribersCountDivider} />
+
 				<SubscribersRecommendCategories
-					onSelectCategory={setSelectedCategoryId}
+					data={dataService}
 					category_id={selectedCategoryId}
 				/>
 			</View>
 
 			<SubscribersFilterModal.Modal
 				isModalVisible={isModalVisible}
-				setIsModalVisible={handleModalClose}
+				setIsModalVisible={handleModalOpen}
+				categories={dataCategories}
+				clearTrigger={clearTrigger}
+				isFiltered={isFiltered}
+				setIsFiltered={setIsFiltered}
+				onFilterApply={handleFilterApply}
 			/>
 		</ScrollView>
 	);

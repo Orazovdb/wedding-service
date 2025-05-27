@@ -1,5 +1,6 @@
 import { axiosWithAuth } from "@/shared/api/interceptors";
 import {
+	FollowersArgs,
 	FollowersData,
 	HumanServicesArgs,
 	HumanServicesByIdData,
@@ -26,9 +27,11 @@ class ServicesService {
 		return response.data;
 	}
 
-	async getFollowers() {
-		const response  = await axiosWithAuth.get<FollowersData>('/followings')
-		return response.data
+	async getFollowers(params: FollowersArgs) {
+		const response = await axiosWithAuth.get<FollowersData>("/followings", {
+			params
+		});
+		return response.data;
 	}
 }
 

@@ -1,9 +1,11 @@
 import { Colors } from "@/constants/Colors";
+import { CategoriesWithChildren, statusServices } from "@/shared/api/types";
 import CheckedIcon from "@/shared/icons/checked.svg";
 import CloseIcon from "@/shared/icons/close-icon.svg";
 import IconFilter from "@/shared/icons/filter-subscribers-icon.svg";
 import UncheckedIcon from "@/shared/icons/unchecked.svg";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
 	Dimensions,
 	Modal,
@@ -14,85 +16,204 @@ import {
 	TouchableOpacity,
 	View
 } from "react-native";
-import { HomeFilterModalData } from "../../home/data";
+import { regions } from "../data";
 
 type SubscribersFilterProps = {
 	isModalVisible: boolean;
-	setIsModalVisible: () => void;
+	setIsModalVisible: (val: boolean) => void;
+	categories: CategoriesWithChildren[] | undefined;
+	isFiltered: boolean;
+	setIsFiltered: (val: boolean) => void;
+	onFilterApply?: (args: {
+		selectedStatuses?: string[];
+		selectedCategories?: string[];
+		selectedRegions?: string[];
+	}) => void;
+	clearTrigger: boolean;
 };
+
+const statusFilter = [
+	{
+		status: statusServices.NORMAL,
+		title: "Normal"
+	},
+	{
+		status: statusServices.NEW,
+		title: "Täze"
+	},
+	{
+		status: statusServices.PREMIUM,
+		title: "Premium"
+	},
+	{
+		status: statusServices.GOLDEN,
+		title: "Gold"
+	}
+];
 
 const { width, height } = Dimensions.get("window");
 
 const SubscribersFilterButton = (props: SubscribersFilterProps) => {
+	const { t } = useTranslation();
 	return (
 		<TouchableOpacity
 			style={styles.filterButton}
-			onPress={ props.setIsModalVisible}
+			onPress={() => props.setIsModalVisible(true)}
 		>
-			<Text style={styles.filterText}>Фильтр</Text>
+			<Text style={styles.filterText}>{t("filter")}</Text>
 			<IconFilter />
 		</TouchableOpacity>
 	);
 };
 
 const SubscribersDetailFilter = (props: SubscribersFilterProps) => {
-	const [selectedItems, setSelectedItems] = useState<string[]>([]);
+	const { t } = useTranslation();
+	const [selectedStatuses, setSelectedStatuses] = useState<string[]>([]);
+	const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+	const [selectedRegions, setSelectedRegions] = useState<string[]>([]);
 
-	const toggleCheckbox = (categoryId: string, itemId: string) => {
-		const identifier = `${categoryId}_${itemId}`;
-		setSelectedItems((prevItems: string[]) =>
+	useEffect(() => {
+		setSelectedStatuses([]);
+		setSelectedCategories([]);
+		setSelectedRegions([]);
+	}, [props.clearTrigger]);
+
+	const toggleCheckboxStatus = (id: string) => {
+		const identifier = `${id}`;
+		setSelectedStatuses((prevItems: string[]) =>
 			prevItems.includes(identifier)
 				? prevItems.filter(id => id !== identifier)
 				: [...prevItems, identifier]
 		);
 	};
+
+	const toggleCheckboxCategories = (categoryId: string) => {
+		const identifier = `${categoryId}`;
+		setSelectedCategories((prevItems: string[]) =>
+			prevItems.includes(identifier)
+				? prevItems.filter(id => id !== identifier)
+				: [...prevItems, identifier]
+		);
+	};
+
+	const toggleCheckboxRegions = (region: string) => {
+		setSelectedRegions((prevItems: string[]) =>
+			prevItems.includes(region)
+				? prevItems.filter(id => id !== region)
+				: [...prevItems, region]
+		);
+	};
+
+	const closeFilter = () => {
+		const hasFilters =
+			selectedStatuses.length > 0 ||
+			selectedCategories.length > 0 ||
+			selectedRegions.length > 0;
+
+		props.onFilterApply?.({
+			selectedStatuses,
+			selectedCategories,
+			selectedRegions
+		});
+
+		props.setIsFiltered(hasFilters);
+		props.setIsModalVisible(false);
+	};
+
 	return (
 		<Modal
 			animationType="slide"
 			transparent={true}
 			visible={props.isModalVisible}
-			onRequestClose={props.setIsModalVisible}
+			onRequestClose={closeFilter}
 		>
 			<View style={styles.modalContainer}>
 				<ScrollView contentContainerStyle={styles.modalContent}>
-					<TouchableOpacity
-						style={styles.closeButton}
-						onPress={props.setIsModalVisible}
-					>
+					<TouchableOpacity style={styles.closeButton} onPress={closeFilter}>
 						<CloseIcon />
-						<Text style={styles.closeButtonText}>Filter</Text>
+						<Text style={styles.closeButtonText}>{t("filter")}</Text>
 					</TouchableOpacity>
 
 					<View style={styles.categoryItemModal}>
-						{HomeFilterModalData.map((category, index) => (
-							<View key={category.id} style={styles.categoryItemModalSection}>
-								<Text style={styles.categoryItemModalTitle}>
-									{category.title}
-								</Text>
-								{category.items.map((item, index) => (
-									<TouchableOpacity
-										key={item.id}
-										style={[
-											styles.categoryItemModalItem,
-											index !== category.items.length - 1 && { marginBottom: 4 }
-										]}
-										onPress={() => toggleCheckbox(category.id, item.id)}
-									>
-										{selectedItems.includes(`${category.id}_${item.id}`) ? (
-											<CheckedIcon />
-										) : (
-											<UncheckedIcon />
-										)}
-										<Text style={styles.categoryItemModalItemTitle}>
-											{item.title}
-										</Text>
-									</TouchableOpacity>
-								))}
-								{index !== HomeFilterModalData.length - 1 && (
-									<View style={styles.categoryItemModalDivider} />
-								)}
-							</View>
-						))}
+						<View style={styles.categoryItemModalSection}>
+							<Text style={styles.categoryItemModalTitle}>
+								{t("subscribers")}
+							</Text>
+							{statusFilter?.map((category, index) => (
+								<TouchableOpacity
+									key={category.status}
+									style={[
+										styles.categoryItemModalItem,
+										index !== statusFilter.length - 1 && {
+											marginBottom: 4
+										}
+									]}
+									onPress={() => toggleCheckboxStatus(category.status)}
+								>
+									{selectedStatuses.includes(category.status) ? (
+										<CheckedIcon />
+									) : (
+										<UncheckedIcon />
+									)}
+									<Text style={styles.categoryItemModalItemTitle}>
+										{category.title}
+									</Text>
+								</TouchableOpacity>
+							))}
+							<View style={styles.categoryItemModalDivider} />
+						</View>
+						<View style={styles.categoryItemModalSection}>
+							<Text style={styles.categoryItemModalTitle}>
+								{t("categories")}
+							</Text>
+							{props.categories?.map((category, index) => (
+								<TouchableOpacity
+									key={category.id}
+									style={[
+										styles.categoryItemModalItem,
+										index !== category.children.length - 1 && {
+											marginBottom: 4
+										}
+									]}
+									onPress={() => toggleCheckboxCategories(String(category.id))}
+								>
+									{selectedCategories.includes(`${category.id}`) ? (
+										<CheckedIcon />
+									) : (
+										<UncheckedIcon />
+									)}
+									<Text style={styles.categoryItemModalItemTitle}>
+										{category.name}
+									</Text>
+								</TouchableOpacity>
+							))}
+							<View style={styles.categoryItemModalDivider} />
+						</View>
+						<View style={styles.categoryItemModalSection}>
+							<Text style={styles.categoryItemModalTitle}>{t("regions")}</Text>
+							{regions?.map((region, index) => (
+								<TouchableOpacity
+									key={region.id}
+									style={[
+										styles.categoryItemModalItem,
+										index !== regions.length - 1 && {
+											marginBottom: 4
+										}
+									]}
+									onPress={() => toggleCheckboxRegions(String(region.id))}
+								>
+									{selectedRegions.includes(`${region.id}`) ? (
+										<CheckedIcon />
+									) : (
+										<UncheckedIcon />
+									)}
+									<Text style={styles.categoryItemModalItemTitle}>
+										{region.name}
+									</Text>
+								</TouchableOpacity>
+							))}
+							<View style={styles.categoryItemModalDivider} />
+						</View>
 					</View>
 				</ScrollView>
 			</View>
@@ -110,7 +231,7 @@ export const styles = StyleSheet.create({
 		paddingVertical: 4,
 		paddingHorizontal: 6,
 		flexDirection: "row",
-		alignItems: 'center',
+		alignItems: "center",
 		gap: 4,
 		backgroundColor: "#0000004D",
 		borderRadius: 6

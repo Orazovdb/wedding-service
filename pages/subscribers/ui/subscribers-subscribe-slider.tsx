@@ -1,4 +1,3 @@
-import { servicesService } from "@/shared/api/services/services.service";
 import { Followers, FollowersData } from "@/shared/api/types";
 import IconArrowLeft from "@/shared/icons/arrow-left-big.svg";
 import React, { useEffect, useRef, useState } from "react";
@@ -17,37 +16,32 @@ const ITEM_WIDTH = SCREEN_WIDTH / 5.6;
 type Props = {
 	subscribe_id: string;
 	onSelectSubCategory: (id: string) => void;
+	dataSubscribers: FollowersData | undefined;
+	index: number;
+	setIndex: (index: number) => void;
 };
 
 export const SubscribersSubscribeSlider = (props: Props) => {
 	const flatListRef = useRef<FlatList>(null);
 	const [currentIndex, setCurrentIndex] = useState(0);
-	const [dataSubscribes, setDataSubscribers] = useState<FollowersData>();
 
 	useEffect(() => {
-		const fetchData = async () => {
-			const result = await servicesService.getFollowers();
-			setDataSubscribers(result);
-
-			if (result?.data?.length && !props.subscribe_id) {
-				props.onSelectSubCategory(String(result.data[0].id));
-			}
-		};
-
-		fetchData();
-	}, []);
-
-	useEffect(() => {
-		if (!dataSubscribes?.data?.length) return;
+		if (!props.dataSubscribers?.data?.length) return;
 
 		const subscribeId =
 			Array.isArray(props.subscribe_id) && props.subscribe_id.length > 0
 				? props.subscribe_id[0]
 				: props.subscribe_id;
 
-		const index = dataSubscribes.data.findIndex(
+		const index = props.dataSubscribers.data.findIndex(
 			item => String(item.id) === String(subscribeId)
 		);
+		if (index === -1) {
+			setCurrentIndex(0);
+			props.setIndex(0);
+			props.onSelectSubCategory(String(props.dataSubscribers.data[0].id));
+			return;
+		}
 
 		if (index !== -1 && flatListRef.current) {
 			flatListRef.current.scrollToIndex({
@@ -56,14 +50,16 @@ export const SubscribersSubscribeSlider = (props: Props) => {
 				viewPosition: 0
 			});
 			setCurrentIndex(index);
+			props.setIndex(index);
+			props.onSelectSubCategory(String(props.dataSubscribers.data[index].id));
 		}
-	}, [props.subscribe_id, dataSubscribes]);
+	}, [props.subscribe_id, props.dataSubscribers]);
 
 	const scrollToIndex = (index: number) => {
 		if (
-			dataSubscribes?.data &&
+			props.dataSubscribers?.data &&
 			index >= 0 &&
-			index < dataSubscribes.data.length
+			index < props.dataSubscribers.data.length
 		) {
 			flatListRef.current?.scrollToIndex({
 				index,
@@ -71,7 +67,7 @@ export const SubscribersSubscribeSlider = (props: Props) => {
 				viewPosition: 0
 			});
 			setCurrentIndex(index);
-			props.onSelectSubCategory(String(dataSubscribes.data[index].id));
+			props.onSelectSubCategory(String(props.dataSubscribers.data[index].id));
 		}
 	};
 
@@ -86,7 +82,7 @@ export const SubscribersSubscribeSlider = (props: Props) => {
 			<View style={styles.container}>
 				<FlatList
 					ref={flatListRef}
-					data={dataSubscribes?.data}
+					data={props.dataSubscribers?.data}
 					keyExtractor={(item, index) => `${item.id}_${index}`}
 					horizontal
 					pagingEnabled={false}

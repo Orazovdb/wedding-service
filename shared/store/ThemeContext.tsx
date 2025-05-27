@@ -1,4 +1,3 @@
-// theme/ThemeContext.tsx
 import React, { createContext, useContext, useState } from "react";
 import { Appearance } from "react-native";
 

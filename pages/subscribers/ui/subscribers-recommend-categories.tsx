@@ -1,5 +1,8 @@
+import { HumanServicesByIdData } from "@/shared/api/types";
 import IconRestaurant from "@/shared/icons/restaurant-icon.svg";
+import { useRouter } from "expo-router";
 import React from "react";
+import { useTranslation } from "react-i18next";
 import {
 	FlatList,
 	StyleSheet,
@@ -7,42 +10,45 @@ import {
 	TouchableOpacity,
 	View
 } from "react-native";
-import { CategoryData } from "../data";
 
 interface Props {
 	category_id: string | string[];
-	onSelectCategory: (id: string) => void;
+	data: HumanServicesByIdData | undefined;
 }
 
 export const SubscribersRecommendCategories = (props: Props) => {
+	const { t } = useTranslation();
+	const router = useRouter();
 	return (
 		<View style={styles.recommendCategories}>
 			<Text style={styles.recommendCategoriesTitle}>
-				Teklip berilýän kategoriýalar
+				{t("recommendedServices")}
 			</Text>
 			<FlatList
-				data={CategoryData}
-				keyExtractor={item => item.id}
+				data={props.data && props.data?.similar}
+				keyExtractor={item => item?.id.toString()}
 				horizontal={true}
 				showsHorizontalScrollIndicator={false}
 				renderItem={({ item }) => (
 					<TouchableOpacity
 						style={[
 							styles.categoryItem,
-							props.category_id === item.id ? styles.categoryItemActive : null
+							Number(props.category_id) === item?.id
+								? styles.categoryItemActive
+								: null
 						]}
-						onPress={() => props.onSelectCategory(item.id)}
+						onPress={() => router.push(`/categories/${item?.id}/all`)}
 					>
 						<IconRestaurant />
 						<Text
 							style={[
 								styles.categoryItemText,
-								props.category_id === item.id
+								Number(props.category_id) === item?.id
 									? styles.categoryItemTextActive
 									: null
 							]}
 						>
-							{item.title}
+							{item?.name}
 						</Text>
 					</TouchableOpacity>
 				)}
@@ -78,14 +84,11 @@ export const styles = StyleSheet.create({
 		marginRight: 10,
 		paddingHorizontal: 6
 	},
-	categoryItemActive: {
-		
-	},
+	categoryItemActive: {},
 	categoryItemText: {
 		color: "#000000",
 		fontFamily: "Lexend-Light",
 		fontSize: 14
 	},
-	categoryItemTextActive: {
-	}
+	categoryItemTextActive: {}
 });

@@ -218,3 +218,30 @@ export const CategoryData = [
 		title: "Restoranlar"
 	},
 ];
+
+export const regions = [
+	{
+		id: "ashgabat",
+		name: "Aşgabat"
+	},
+	{
+		id: "balkan",
+		name: "Balkan welaýaty"
+	},
+	{
+		id: "mary",
+		name: "Mary welaýaty"
+	},
+	{
+		id: "lebap",
+		name: "Lebap welaýaty"
+	},
+	{
+		id: "dashoguz",
+		name: "Daşoguz welaýaty"
+	},
+	{
+		id: "ahal",
+		name: "Ahal welaýaty"
+	}
+];

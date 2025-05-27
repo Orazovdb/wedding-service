@@ -13,6 +13,7 @@ type Props = {
 	handleCloseModal: () => void;
 	handleConfirm: () => void;
 	data: HumanServicesByIdData | undefined;
+	dataSubscribersLength: number | undefined;
 };
 
 export const SubscribersInfo = (props: Props) => {
@@ -179,5 +180,37 @@ export const styles = StyleSheet.create({
 		fontFamily: "Lexend-Regular",
 		fontSize: 16,
 		color: "#FFFFFF"
+	},
+
+	subscribersCount: {
+		marginTop: 20,
+		marginBottom: 16,
+		marginHorizontal: "auto",
+		width: "50%"
+	},
+	subscribersCountButton: {
+		flexDirection: "row",
+		alignItems: "center",
+		justifyContent: "center",
+		backgroundColor: "#C0FFB9",
+		borderRadius: 6,
+		height: 35,
+		width: "100%"
+	},
+	subscribersCountTextActive: {
+		color: "#000000"
+	},
+	subscribersCountText: {
+		color: "#0000004D",
+		fontFamily: "Lexend-Medium",
+		fontSize: 16,
+		textAlign: "center"
+	},
+	subscribersCountDivider: {
+		width: "60%",
+		height: 1,
+		backgroundColor: "#0000001A",
+		marginHorizontal: "auto",
+		marginBottom: 21
 	}
 });

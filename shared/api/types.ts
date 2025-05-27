@@ -155,6 +155,7 @@ export type SimilarServices = {
 		{
 			id: number;
 			name: string;
+			parent_id: number | null
 		}
 	];
 	region: {
@@ -168,6 +169,14 @@ export type HumanServicesByIdData = {
 	service: HumanServicesById;
 	similar: SimilarServices[];
 	service_provider: null | boolean;
+};
+
+export type FollowersArgs = {
+	category_ids: string | undefined;
+	provinces: string | undefined;
+	statuses: statusServices | string | undefined;
+	page: number | undefined;
+	limit?: number;
 };
 
 export type Followers = {
