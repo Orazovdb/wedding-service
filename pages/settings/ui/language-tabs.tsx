@@ -10,7 +10,7 @@ type props = {
 };
 
 export const languages = [
-	{ id: 1, icon: <IconTranslate />, title: "TKM", lang: "tm" },
+	{ id: 1, icon: <IconTranslate />, title: "TKM", lang: "tk" },
 	{ id: 2, icon: <IconTranslate />, title: "RUS", lang: "ru" },
 	{ id: 3, icon: <IconTranslate />, title: "ENG", lang: "en" }
 ];

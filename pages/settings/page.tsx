@@ -1,5 +1,5 @@
 import { Colors } from "@/constants/Colors";
-import i18n from "@/shared/i18n"; // ensure this points to your i18n setup
+import i18n from "@/shared/i18n";
 import IconAd from "@/shared/icons/settings/ad-icon.svg";
 import IconLogout from "@/shared/icons/settings/logout-icon.svg";
 import IconRocket from "@/shared/icons/settings/rocket-icon.svg";

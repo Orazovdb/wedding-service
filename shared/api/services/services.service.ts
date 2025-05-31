@@ -15,19 +15,19 @@ class ServicesService {
 		return response.data;
 	}
 
-	async getServicesById(id: string) {
+	async getServicesById(id: string, lang: string) {
 		const response = await axiosWithAuth.get<HumanServicesByIdData | undefined>(
-			`/services/${id}`
+			`/services/${id}?lang=${lang}`
 		);
 		return response.data;
 	}
 
 	async toggleFollowService(data: { service_id: number }) {
-		const response = await axiosWithAuth.post("/toggle/following", data);
+		const response = await axiosWithAuth.post(`/toggle/following`, data);
 		return response.data;
 	}
 
-	async getFollowers(params: FollowersArgs) {
+	async getFollowers(params: FollowersArgs){
 		const response = await axiosWithAuth.get<FollowersData>("/followings", {
 			params
 		});

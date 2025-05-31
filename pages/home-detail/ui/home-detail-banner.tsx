@@ -181,7 +181,7 @@ export const HomeDetailBanner = ({
 											uri: `${BASE_URL}/videos/stream/${item?.filename}`,
 											headers: {
 												Authorization: `${authToken}`,
-												Range: "bytes=400-100000"
+												Range: "bytes=0-100000"
 											}
 										}}
 										style={styles.image}

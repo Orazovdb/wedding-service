@@ -1,5 +1,7 @@
 const primaryColor = "#C0FFB9";
 
+const darkBg = "#272727";
+
 const swatch = "#FFD2CF";
 const premium = "#2FD2FF";
 const golden = "#D4AF37";
@@ -19,6 +21,11 @@ const secondary15 = "#D9D9D9";
 const secondary10 = "#E5E5E5";
 const secondary5 = "#F2F2F2";
 
+const secondary100 = "#00000040";
+const secondary110 = "#FFFFFF40";
+const secondary120 = "#00000099";
+const secondary130 = "#00000033";
+
 const brand = "#5BB271";
 const discount = "#FF2D55";
 const logout = "#FFC2BE";
@@ -26,6 +33,12 @@ const filter = "#FF9500";
 
 export const Colors = {
 	light: {
+		bgPage: white,
+		navBg: white,
+		navBorder: secondary100,
+		text: secondary,
+		divider: secondary130,
+
 		primary: primaryColor,
 		swatch: swatch,
 		premium: premium,
@@ -50,6 +63,14 @@ export const Colors = {
 		white: white
 	},
 	dark: {
+		bgPage: darkBg,
+		navBg: secondary,
+		navBorder: secondary110,
+		text: white,
+		divider: secondary120,
+
+
+		
 		primary: primaryColor,
 		swatch: swatch,
 		premium: premium,

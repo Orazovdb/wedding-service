@@ -58,6 +58,7 @@ export enum parentCategories {
 export type CategoriesWithChildrenArgs = {
 	parent?: parentCategories;
 	category_id?: string;
+	lang: string
 };
 
 export type CategoriesWithChildren = {
@@ -79,6 +80,7 @@ export type HumanServicesArgs = {
 	statuses: statusServices | string | undefined;
 	page: number | undefined;
 	limit?: number;
+	lang: string
 };
 
 export type HumanServices = {
@@ -177,6 +179,7 @@ export type FollowersArgs = {
 	statuses: statusServices | string | undefined;
 	page: number | undefined;
 	limit?: number;
+	lang: string
 };
 
 export type Followers = {

@@ -1,8 +1,10 @@
-import { Colors } from "@/constants/Colors";
 import { CategoriesWithChildren, statusServices } from "@/shared/api/types";
+import { useAppTheme } from "@/shared/hooks/use-app-theme";
 import CheckedIcon from "@/shared/icons/checked.svg";
+import CloseIconDark from "@/shared/icons/close-icon-dark.svg";
 import CloseIcon from "@/shared/icons/close-icon.svg";
 import UncheckedIcon from "@/shared/icons/unchecked.svg";
+import { useThemeMode } from "@/shared/store/ThemeContext";
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
@@ -54,20 +56,26 @@ const statusFilter = [
 
 const HomeFilterButton = (props: HomeFilterModalProps) => {
 	const { t } = useTranslation();
+	const { colors } = useAppTheme();
 
 	return (
 		<TouchableOpacity
-			style={styles.filterButton}
+			style={[styles.filterButton, { borderColor: colors.text }]}
 			onPress={() => props.setIsModalVisible(true)}
 		>
-			<View style={styles.divider} />
-			<Text style={styles.filterText}>{t("filter")}</Text>
+			<View style={[styles.divider, { backgroundColor: colors.text }]} />
+			<Text style={[styles.filterText, { color: colors.text }]}>
+				{t("filter")}
+			</Text>
 		</TouchableOpacity>
 	);
 };
 
 const HomeFilterModal = (props: HomeFilterModalProps) => {
 	const { t } = useTranslation();
+	const { colors } = useAppTheme();
+	const { mode } = useThemeMode();
+
 	const [selectedStatuses, setSelectedStatuses] = useState<string[]>([]);
 	const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
 	const [selectedRegions, setSelectedRegions] = useState<string[]>([]);
@@ -127,17 +135,27 @@ const HomeFilterModal = (props: HomeFilterModalProps) => {
 			transparent={true}
 			visible={props.isModalVisible}
 			onRequestClose={closeFilter}
+			style={{ backgroundColor: colors.bgPage }}
 		>
-			<View style={styles.modalContainer}>
-				<ScrollView contentContainerStyle={styles.modalContent}>
+			<View style={[styles.modalContainer, { backgroundColor: colors.bgPage }]}>
+				<ScrollView
+					contentContainerStyle={[
+						styles.modalContent,
+						{ backgroundColor: colors.bgPage }
+					]}
+				>
 					<TouchableOpacity style={styles.closeButton} onPress={closeFilter}>
-						<CloseIcon />
-						<Text style={styles.closeButtonText}>{t("filter")}</Text>
+						{mode === "light" ? <CloseIcon /> : <CloseIconDark />}
+						<Text style={[styles.closeButtonText, { color: colors.text }]}>
+							{t("filter")}
+						</Text>
 					</TouchableOpacity>
 
 					<View style={styles.categoryItemModal}>
 						<View style={styles.categoryItemModalSection}>
-							<Text style={styles.categoryItemModalTitle}>
+							<Text
+								style={[styles.categoryItemModalTitle, { color: colors.text }]}
+							>
 								{t("subscribers")}
 							</Text>
 							{statusFilter?.map((category, index) => (
@@ -156,12 +174,22 @@ const HomeFilterModal = (props: HomeFilterModalProps) => {
 									) : (
 										<UncheckedIcon />
 									)}
-									<Text style={styles.categoryItemModalItemTitle}>
+									<Text
+										style={[
+											styles.categoryItemModalItemTitle,
+											{ color: colors.text }
+										]}
+									>
 										{category.title}
 									</Text>
 								</TouchableOpacity>
 							))}
-							<View style={styles.categoryItemModalDivider} />
+							<View
+								style={[
+									styles.categoryItemModalDivider,
+									{ backgroundColor: colors.divider }
+								]}
+							/>
 						</View>
 						<View style={styles.categoryItemModalSection}>
 							<Text style={styles.categoryItemModalTitle}>
@@ -230,31 +258,26 @@ export const FilterModal = {
 export const styles = StyleSheet.create({
 	filterButton: {
 		paddingVertical: 3,
-		borderColor: Colors.light.secondary,
 		flexDirection: "row",
 		gap: 10
 	},
 	divider: {
 		width: 1,
-		height: 20,
-		backgroundColor: "#000"
+		height: 20
 	},
 	filterText: {
-		color: Colors.light.secondary,
 		fontSize: 14,
 		fontWeight: "400",
 		textDecorationLine: "underline"
 	},
 	modalContainer: {
 		flex: 1,
-		backgroundColor: Colors.light.white,
 		justifyContent: "center",
 		alignItems: "center"
 	},
 	modalContent: {
 		width: width,
 		height: height,
-		backgroundColor: "white",
 		padding: 20,
 		paddingTop: Platform.OS === "ios" ? 60 : 0,
 		alignItems: "center"
@@ -281,7 +304,6 @@ export const styles = StyleSheet.create({
 	categoryItemModalTitle: {
 		fontSize: 14,
 		fontFamily: "Lexend-Bold",
-		color: Colors.light.secondary,
 		marginBottom: 14
 	},
 	categoryItemModalItem: {
@@ -291,8 +313,7 @@ export const styles = StyleSheet.create({
 	},
 	categoryItemModalItemTitle: {
 		fontSize: 14,
-		fontFamily: "Lexend-Regular",
-		color: Colors.light.secondary
+		fontFamily: "Lexend-Regular"
 	},
 	checkboxIcon: {
 		width: 24,
@@ -303,7 +324,6 @@ export const styles = StyleSheet.create({
 		width: "70%",
 		marginHorizontal: "auto",
 		height: 1,
-		backgroundColor: "#00000033",
 		marginTop: 24
 	}
 });

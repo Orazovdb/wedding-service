@@ -1,6 +1,7 @@
 import { Colors } from "@/constants/Colors";
 import { categoriesService } from "@/shared/api/services/categories.service";
 import { CategoriesWithChildren } from "@/shared/api/types";
+import i18n from "@/shared/i18n";
 import ArrowRightIcon from "@/shared/icons/arrow-right.svg";
 import NavBottomIcon from "@/shared/icons/nav-bottom.svg";
 import { useRouter } from "expo-router";
@@ -22,6 +23,7 @@ import {
 const { width } = Dimensions.get("window");
 
 export const CategoriesScreen = () => {
+	const currentLang = i18n.language;
 	const { t } = useTranslation();
 	const [openItemId, setOpenItemId] = useState<number | null>(null);
 	const animatedOpacity = useRef(new Animated.Value(0)).current;
@@ -31,7 +33,10 @@ export const CategoriesScreen = () => {
 
 	useEffect(() => {
 		const fetchData = async () => {
-			const result = await categoriesService.getCategories({ parent: 1 });
+			const result = await categoriesService.getCategories({
+				parent: 1,
+				lang: currentLang
+			});
 			setDataCategories(result);
 		};
 

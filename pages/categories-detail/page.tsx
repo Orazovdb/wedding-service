@@ -1,6 +1,7 @@
 import { categoriesService } from "@/shared/api/services/categories.service";
 import { servicesService } from "@/shared/api/services/services.service";
 import { CategoriesWithChildren, HumanServicesData } from "@/shared/api/types";
+import i18n from "@/shared/i18n";
 import { useLocalSearchParams } from "expo-router";
 import React, { useCallback, useEffect, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
@@ -8,6 +9,8 @@ import { CategoriesDetailHeader } from "./ui/categories-detail-header";
 import { CategoryServices } from "./ui/category-services";
 
 export const CategoriesDetailScreen = () => {
+	const currentLang = i18n.language;
+
 	const { categoryDetail, id } = useLocalSearchParams<{
 		categoryDetail: string;
 		id: string;
@@ -40,6 +43,16 @@ export const CategoriesDetailScreen = () => {
 	}, [categoryDetail, id]);
 
 	useEffect(() => {
+		if (!selectedCategory) return;
+		categoriesService
+			.getCategories({ parent: 0, category_id: selectedCategory, lang: currentLang })
+			.then(data => {
+				setDataCategories(data);
+				console.log("Fetched dataCategories:", data);
+			});
+	}, [selectedCategory]);
+
+	useEffect(() => {
 		if (!selectedCategory || !selectedSubCategory) return;
 
 		const fetchData = async () => {
@@ -51,7 +64,8 @@ export const CategoriesDetailScreen = () => {
 				provinces: regions.join(",") || undefined,
 				name: search || undefined,
 				page,
-				limit: 100
+				limit: 100,
+				lang: currentLang
 			});
 
 			if (page === 1) {
@@ -106,20 +120,14 @@ export const CategoriesDetailScreen = () => {
 				statuses: selectedStatuses.join(",") || undefined,
 				provinces: selectedRegions.join(",") || undefined,
 				name: search || undefined,
-				page: 1
+				page: 1,
+				lang: currentLang
 			});
 
 			setDataServices(result);
 		},
 		[search]
 	);
-
-	useEffect(() => {
-		if (!selectedCategory) return;
-		categoriesService
-			.getCategories({ parent: 0, category_id: selectedCategory })
-			.then(setDataCategories);
-	}, []);
 
 	if (!selectedCategory || !selectedSubCategory) {
 		return <Text>Loading category data...</Text>;

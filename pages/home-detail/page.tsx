@@ -1,6 +1,7 @@
 import { Colors } from "@/constants/Colors";
 import { servicesService } from "@/shared/api/services/services.service";
 import { HumanServicesByIdData } from "@/shared/api/types";
+import i18n from "@/shared/i18n";
 import ArrowLeftBigIcon from "@/shared/icons/arrow-left-big.svg";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
@@ -20,12 +21,17 @@ import { HomeDetailSameServices } from "./ui/home-detail-same-services";
 const { width } = Dimensions.get("window");
 
 export const HomeDynamicScreen = () => {
+	const currentLang = i18n.language;
+
 	const { id } = useLocalSearchParams();
 	const [data, setData] = useState<HumanServicesByIdData>();
 
 	useEffect(() => {
 		const fetchData = async () => {
-			const result = await servicesService.getServicesById(id as string);
+			const result = await servicesService.getServicesById(
+				id as string,
+				currentLang
+			);
 			if (result) {
 				setData(result);
 			}
@@ -39,14 +45,19 @@ export const HomeDynamicScreen = () => {
 	const onToggleFollow = async () => {
 		await servicesService.toggleFollowService({ service_id: Number(id) });
 
-		const result = await servicesService.getServicesById(id as string);
+		const result = await servicesService.getServicesById(
+			id as string,
+			currentLang
+		);
 		if (result) {
 			setData(result);
 		}
 	};
 
 	const onToggleSimilarFollow = async () => {
-		await servicesService.getServicesById(id as string).then(setData);
+		await servicesService
+			.getServicesById(id as string, currentLang)
+			.then(setData);
 	};
 
 	return (

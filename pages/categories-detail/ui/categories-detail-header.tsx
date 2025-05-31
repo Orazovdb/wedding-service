@@ -14,6 +14,7 @@ import {
 } from "react-native";
 import { Colors } from "react-native/Libraries/NewAppScreen";
 import { FilterModal } from "./categories-filter";
+import i18n from '@/shared/i18n'
 
 interface Props {
 	category_id: string | string[];
@@ -35,6 +36,7 @@ interface Props {
 }
 
 export const CategoriesDetailHeader = (props: Props) => {
+	const currentLang = i18n.language
 	const router = useRouter();
 	const [search, setSearch] = useState("");
 
@@ -45,7 +47,8 @@ export const CategoriesDetailHeader = (props: Props) => {
 		const fetchData = async () => {
 			const result = await categoriesService.getCategories({
 				category_id: String(props.category_id),
-				parent: 0
+				parent: 0,
+				lang: currentLang
 			});
 			setDataCategories(result);
 		};

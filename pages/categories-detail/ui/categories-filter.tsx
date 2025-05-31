@@ -126,7 +126,7 @@ const CategoriesFilterModal = (props: props) => {
 			visible={props.isModalVisible}
 			onRequestClose={closeFilter}
 		>
-			<View style={styles.modalContainer}>
+			<View style={[styles.modalContainer, { height: height }]}>
 				<ScrollView contentContainerStyle={styles.modalContent}>
 					<TouchableOpacity style={styles.closeButton} onPress={closeFilter}>
 						<CloseIcon />

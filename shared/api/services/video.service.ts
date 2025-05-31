@@ -7,7 +7,6 @@ class VideoService {
 				Range: "bytes=400-100000"
 			}
 		});
-		console.log("response", response);
 		return response.data;
 	}
 }

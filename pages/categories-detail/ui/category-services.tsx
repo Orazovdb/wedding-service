@@ -20,8 +20,6 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const { height, width } = Dimensions.get("window");
 
-const ITEMS_PER_PAGE = 6;
-
 interface Props {
 	page: number;
 	setPage: (page: number) => void;
@@ -32,6 +30,8 @@ export const CategoryServices = (props: Props) => {
 	const insets = useSafeAreaInsets();
 	const PAGE_HEIGHT =
 		Dimensions.get("window").height - insets.top - insets.bottom - 180;
+	const itemHeight = PAGE_HEIGHT / 3;
+
 	const ITEMS_PER_PAGE = 6;
 	const router = useRouter();
 	const flatListRef = useRef<FlatList<any>>(null);
@@ -52,16 +52,17 @@ export const CategoryServices = (props: Props) => {
 	}).current;
 
 	const renderPage = ({ item }: { item: HumanServices[] }) => (
-		<View style={[styles.pageContainer, { height: PAGE_HEIGHT }]}>
+		<View style={[styles.pageContainer, { minHeight: PAGE_HEIGHT }]}>
 			{item.map(user => (
 				<TouchableOpacity
 					onPress={() => router.push(`/home/${user.id}`)}
 					key={user.id}
-					style={styles.categoryList}
+					style={[styles.categoryList]}
 				>
 					<View
 						style={[
 							styles.categoryItem,
+							{ height: itemHeight - 20 },
 							user.status === "premium"
 								? styles.categoryItemPremium
 								: user.status === "golden"
@@ -183,17 +184,19 @@ export const CategoryServices = (props: Props) => {
 				paddingBottom: 50
 			}}
 		>
-			<View style={styles.paginationContainer}>
-				{pagedData.map((_, index) => (
-					<View
-						key={index}
-						style={[
-							styles.paginationDot,
-							index === props.page && styles.paginationDotActive
-						]}
-					/>
-				))}
-			</View>
+			{pagedData.length > 1 && (
+				<View style={styles.paginationContainer}>
+					{pagedData.map((_, index) => (
+						<View
+							key={index}
+							style={[
+								styles.paginationDot,
+								index === props.page && styles.paginationDotActive
+							]}
+						/>
+					))}
+				</View>
+			)}
 			<FlatList
 				ref={flatListRef}
 				data={pagedData}
@@ -364,7 +367,7 @@ const styles = StyleSheet.create({
 		paddingHorizontal: 4,
 		borderRadius: 5,
 		backgroundColor: Colors.dark.primary,
-		marginBottom: Platform.OS === "ios" ? 6 : 10
+		marginBottom: Platform.OS === "ios" ? 6 : 10,
 	},
 	serviceLocation: {
 		fontSize: 10,
@@ -375,7 +378,8 @@ const styles = StyleSheet.create({
 		flexDirection: "row",
 		justifyContent: "space-between",
 		width: "100%",
-		paddingHorizontal: 12
+		paddingHorizontal: 12,
+		marginTop: 'auto'
 	},
 	subscriptionsButton: {
 		paddingVertical: 6.5,

@@ -1,6 +1,6 @@
 // app/(protected)/_layout.tsx
-import { Redirect, Stack, usePathname, useRouter } from "expo-router"
-import { useTranslation } from "react-i18next"
+import { Redirect, Stack, usePathname, useRouter } from "expo-router";
+import { useTranslation } from "react-i18next";
 import {
 	Platform,
 	SafeAreaView,
@@ -8,34 +8,51 @@ import {
 	Text,
 	TouchableOpacity,
 	View
-} from "react-native"
+} from "react-native";
 
-import CategoryIcon from "@/assets/images/navigations/category.svg"
-import HomeIcon from "@/assets/images/navigations/home.svg"
-import SettingsIcon from "@/assets/images/navigations/settings.svg"
-import SubscribersIcon from "@/assets/images/navigations/subscribers.svg"
-
-import { useAppTheme } from "@/shared/hooks/use-app-theme"
-import { useAuth } from "@/shared/store/AuthContext"
-import { JSX } from "react"
+import IconCategoryDark from "@/assets/images/navigations/category-dark.svg";
+import IconCategory from "@/assets/images/navigations/category.svg";
+import HomeIconDark from "@/assets/images/navigations/home-dark.svg";
+import HomeIcon from "@/assets/images/navigations/home.svg";
+import SettingsIconDark from "@/assets/images/navigations/settings-dark.svg";
+import SettingsIcon from "@/assets/images/navigations/settings.svg";
+import SubscribersIconDark from "@/assets/images/navigations/subscribers-dark.svg";
+import SubscribersIcon from "@/assets/images/navigations/subscribers.svg";
+import { useAppTheme } from "@/shared/hooks/use-app-theme";
+import { useAuth } from "@/shared/store/AuthContext";
+import { useThemeMode } from "@/shared/store/ThemeContext";
+import { JSX } from "react";
 
 const navItems: {
 	path: "/home" | "/categories" | "/subscribers" | "/settings";
 	icon: JSX.Element;
+	darkIcon: JSX.Element;
 	label: string;
 }[] = [
-	{ path: "/home", icon: <HomeIcon />, label: "routes.home" },
+	{
+		path: "/home",
+		icon: <HomeIcon />,
+		darkIcon: <HomeIconDark />,
+		label: "routes.home"
+	},
 	{
 		path: "/categories",
-		icon: <CategoryIcon />,
+		icon: <IconCategory />,
+		darkIcon: <IconCategoryDark />,
 		label: "routes.categories"
 	},
 	{
 		path: "/subscribers",
 		icon: <SubscribersIcon />,
+		darkIcon: <SubscribersIconDark />,
 		label: "routes.subscribers"
 	},
-	{ path: "/settings", icon: <SettingsIcon />, label: "routes.settings" }
+	{
+		path: "/settings",
+		icon: <SettingsIcon />,
+		darkIcon: <SettingsIconDark />,
+		label: "routes.settings"
+	}
 ];
 
 export default function ProtectedLayout() {
@@ -44,6 +61,7 @@ export default function ProtectedLayout() {
 	const router = useRouter();
 	const { t } = useTranslation();
 	const { colors } = useAppTheme();
+	const { mode } = useThemeMode();
 
 	if (!isLoggedIn) return <Redirect href="/login" />;
 
@@ -68,7 +86,7 @@ export default function ProtectedLayout() {
 				<Stack.Screen
 					name="pdf-viewer"
 					options={{
-						animation: "slide_from_right",
+						animation: "fade",
 						presentation: "modal",
 						title: "PDF Görnüşi"
 					}}
@@ -78,7 +96,11 @@ export default function ProtectedLayout() {
 			<View
 				style={[
 					styles.bottomNavigation,
-					{ backgroundColor: colors.white, borderTopColor: colors.secondary15 }
+					{
+						backgroundColor: colors.navBg,
+						borderTopColor: colors.navBorder,
+						shadowColor: colors.navBorder
+					}
 				]}
 			>
 				{navItems.map(item => {
@@ -95,13 +117,19 @@ export default function ProtectedLayout() {
 									isActive && styles.activeNavContainer
 								]}
 							>
-								{item.icon}
+								{mode === "light"
+									? isActive
+										? item.icon
+										: item.icon
+									: isActive
+									? item.icon
+									: item.darkIcon}
 							</View>
 							<Text
 								style={[
 									styles.navItem,
 									isActive && styles.activeNavItem,
-									{ color: colors.secondary }
+									{ color: colors.text }
 								]}
 							>
 								{t(item.label)}
@@ -113,14 +141,13 @@ export default function ProtectedLayout() {
 		</SafeAreaView>
 	);
 }
-
 const styles = StyleSheet.create({
-	safeArea: { flex: 1 },
+	safeArea: { flex: 1, paddingTop: Platform.OS === "android" ? 40 : 0 },
 	bottomNavigation: {
 		position: "absolute",
 		bottom: 0,
 		width: "100%",
-		height: Platform.OS === "android" ? 65 : 80,
+		height: Platform.OS === "android" ? 90 : 80,
 		flexDirection: "row",
 		justifyContent: "space-around",
 		alignItems: Platform.OS === "android" ? "center" : "flex-start",
@@ -128,7 +155,6 @@ const styles = StyleSheet.create({
 		zIndex: 10,
 		borderTopLeftRadius: 14,
 		borderTopRightRadius: 14,
-		shadowColor: "#000",
 		shadowOffset: { width: 4, height: 0 },
 		shadowOpacity: 0.25,
 		shadowRadius: 4,

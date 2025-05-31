@@ -22,6 +22,8 @@ import {
 	HumanServices,
 	HumanServicesData
 } from "@/shared/api/types";
+import { useAppTheme } from "@/shared/hooks/use-app-theme";
+import i18n from "@/shared/i18n";
 import IconArrowLeft from "@/shared/icons/arrow-left-big-black.svg";
 import LocationIcon from "@/shared/icons/location-icon.svg";
 import GoldenIcon from "@/shared/icons/status-golden.svg";
@@ -39,6 +41,8 @@ const { width, height } = Dimensions.get("window");
 const gridItemHeight = (height - 280) / 3 + 1;
 
 export const HomeScreen = () => {
+	const currentLang = i18n.language;
+	const { colors } = useAppTheme();
 	const router = useRouter();
 
 	const [search, setSearch] = useState("");
@@ -59,7 +63,9 @@ export const HomeScreen = () => {
 	const [loadingMore, setLoadingMore] = useState(false);
 
 	useEffect(() => {
-		categoriesService.getCategories({ parent: 1 }).then(setDataCategories);
+		categoriesService
+			.getCategories({ parent: 1, lang: currentLang })
+			.then(setDataCategories);
 		homeService.getHome().then(setData);
 	}, []);
 
@@ -74,7 +80,8 @@ export const HomeScreen = () => {
 				statuses: statuses.join(",") || undefined,
 				provinces: regions.join(",") || undefined,
 				name: search,
-				page: 1
+				page: 1,
+				lang: currentLang
 			});
 			setDataServices(result);
 		};
@@ -102,7 +109,8 @@ export const HomeScreen = () => {
 			statuses: selectedStatuses.join(",") || undefined,
 			provinces: selectedRegions.join(",") || undefined,
 			name: search || undefined,
-			page: 1
+			page: 1,
+			lang: currentLang
 		});
 		setDataServices(result);
 	};
@@ -123,7 +131,8 @@ export const HomeScreen = () => {
 			statuses: empty,
 			provinces: empty,
 			name: empty,
-			page: 1
+			page: 1,
+			lang: currentLang
 		});
 		setDataServices(result);
 	};
@@ -137,7 +146,8 @@ export const HomeScreen = () => {
 			statuses: statuses.join(",") || undefined,
 			provinces: regions.join(",") || undefined,
 			name: search || undefined,
-			page: nextPage
+			page: nextPage,
+			lang: currentLang
 		});
 
 		setDataServices(prev => ({
@@ -264,7 +274,7 @@ export const HomeScreen = () => {
 	);
 
 	return (
-		<SafeAreaView style={styles.safeArea}>
+		<SafeAreaView style={[styles.safeArea, { backgroundColor: colors.bgPage }]}>
 			<View style={styles.scrollContainer}>
 				<View style={styles.searchBox}>
 					{isFiltered && (
@@ -273,13 +283,13 @@ export const HomeScreen = () => {
 						</TouchableOpacity>
 					)}
 
-					<View style={[styles.inputContainer, { borderColor: "#000000" }]}>
-						<SearchIcon width={20} height={20} color="#000000" />
+					<View style={[styles.inputContainer, { borderColor: colors.text }]}>
+						<SearchIcon width={20} height={20} color={colors.text} />
 						<TextInput
 							placeholder=""
 							value={search}
 							onChangeText={setSearch}
-							style={styles.input}
+							style={[styles.input]}
 							placeholderTextColor="#999"
 						/>
 						<FilterModal.Button
@@ -333,7 +343,7 @@ export const HomeScreen = () => {
 };
 
 const styles = StyleSheet.create({
-	safeArea: { flex: 1, backgroundColor: Colors.light.white },
+	safeArea: { flex: 1 },
 	scrollContainer: { flexGrow: 1, paddingBottom: 50 },
 	home: {
 		width: width,
@@ -352,12 +362,17 @@ const styles = StyleSheet.create({
 		paddingVertical: 3,
 		borderWidth: 2,
 		borderRadius: 8,
-		backgroundColor: "white",
+		backgroundColor: "transparent",
 		paddingHorizontal: 10,
 		marginTop: 16,
 		marginBottom: 20
 	},
-	input: { flex: 1, fontSize: 14, paddingVertical: 6, marginLeft: 8 },
+	input: {
+		flex: 1,
+		fontSize: 14,
+		paddingVertical: 6,
+		marginLeft: 8,
+	},
 	gridItem: { width: width / 2 - 30, marginBottom: 20 },
 	categoryItem: {
 		paddingTop: 2,

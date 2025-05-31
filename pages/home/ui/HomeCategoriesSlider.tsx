@@ -12,12 +12,14 @@ import {
 import { Colors } from "@/constants/Colors";
 import { categoriesService } from "@/shared/api/services/categories.service";
 import type { CategoriesWithChildren } from "@/shared/api/types";
+import i18n from "@/shared/i18n";
 import ArrowLeft from "@/shared/icons/arrow-left.svg";
 import { useRouter } from "expo-router";
 
 const { width } = Dimensions.get("window");
 
 export const HomeCategoriesSlider = () => {
+	const currentLang = i18n.language;
 	const router = useRouter();
 	const previewFlatListRef = useRef<FlatList<any>>(null);
 
@@ -31,7 +33,10 @@ export const HomeCategoriesSlider = () => {
 
 	useEffect(() => {
 		const fetchData = async () => {
-			const result = await categoriesService.getCategories({ parent: 1 });
+			const result = await categoriesService.getCategories({
+				parent: 1,
+				lang: currentLang
+			});
 			setData(result);
 		};
 
