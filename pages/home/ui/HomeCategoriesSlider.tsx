@@ -12,13 +12,16 @@ import {
 import { Colors } from "@/constants/Colors";
 import { categoriesService } from "@/shared/api/services/categories.service";
 import type { CategoriesWithChildren } from "@/shared/api/types";
+import { useAppTheme } from "@/shared/hooks/use-app-theme";
 import i18n from "@/shared/i18n";
+import ArrowLeftDark from "@/shared/icons/arrow-left-dark.svg";
 import ArrowLeft from "@/shared/icons/arrow-left.svg";
 import { useRouter } from "expo-router";
 
 const { width } = Dimensions.get("window");
 
 export const HomeCategoriesSlider = () => {
+	const { colors, mode } = useAppTheme();
 	const currentLang = i18n.language;
 	const router = useRouter();
 	const previewFlatListRef = useRef<FlatList<any>>(null);
@@ -49,7 +52,7 @@ export const HomeCategoriesSlider = () => {
 				style={styles.arrowLeft}
 				onPress={() => scrollToIndex(Math.max(currentIndex - 1, 0))}
 			>
-				<ArrowLeft />
+				{mode === "light" ? <ArrowLeft /> : <ArrowLeftDark />}
 			</TouchableOpacity>
 
 			<FlatList
@@ -70,7 +73,7 @@ export const HomeCategoriesSlider = () => {
 						<Text
 							style={{
 								fontSize: 10,
-								color: Colors.light.secondary,
+								color: colors.text,
 								fontWeight: "400"
 							}}
 						>
@@ -83,7 +86,7 @@ export const HomeCategoriesSlider = () => {
 											<Text
 												style={{
 													fontSize: 10,
-													color: Colors.light.secondary,
+													color: colors.text,
 													fontWeight: "400"
 												}}
 											>
@@ -96,7 +99,7 @@ export const HomeCategoriesSlider = () => {
 								<Text
 									style={{
 										fontSize: 10,
-										color: Colors.light.secondary,
+										color: colors.text,
 										fontWeight: "400"
 									}}
 								>
@@ -114,7 +117,7 @@ export const HomeCategoriesSlider = () => {
 					scrollToIndex(Math.min(currentIndex + 1, data?.length || 0 - 1))
 				}
 			>
-				<ArrowLeft />
+				{mode === "light" ? <ArrowLeft /> : <ArrowLeftDark />}
 			</TouchableOpacity>
 		</View>
 	);

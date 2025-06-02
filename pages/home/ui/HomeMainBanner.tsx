@@ -1,4 +1,4 @@
-import { Colors } from "@/constants/Colors";
+import { useAppTheme } from "@/shared/hooks/use-app-theme";
 import React, { useRef, useState } from "react";
 import {
 	Animated,
@@ -9,17 +9,14 @@ import {
 	NativeScrollEvent,
 	NativeSyntheticEvent,
 	StyleSheet,
-	useColorScheme,
 	View
 } from "react-native";
 import { Home } from "../types";
 
 const { width, height } = Dimensions.get("window");
 
-interface props extends Home {}
-
 export const HomeMainBanner = ({ data }: { data: Home | undefined }) => {
-	const colorScheme: "light" | "dark" = useColorScheme() ?? "light";
+	const { colors, mode } = useAppTheme();
 	const scrollX = useRef(new Animated.Value(0)).current;
 	const [currentIndex, setCurrentIndex] = useState(0);
 
@@ -61,9 +58,7 @@ export const HomeMainBanner = ({ data }: { data: Home | undefined }) => {
 								styles.dot,
 								{
 									backgroundColor:
-										i === currentIndex
-											? Colors[colorScheme ?? "light"].primary
-											: Colors[colorScheme ?? "light"].white
+										i === currentIndex ? colors.primary : colors.bgDot
 								}
 							]}
 						/>

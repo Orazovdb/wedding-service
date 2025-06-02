@@ -21,10 +21,17 @@ const secondary15 = "#D9D9D9";
 const secondary10 = "#E5E5E5";
 const secondary5 = "#F2F2F2";
 
+
 const secondary100 = "#00000040";
 const secondary110 = "#FFFFFF40";
 const secondary120 = "#00000099";
-const secondary130 = "#00000033";
+const secondary130 = "#1F1F1F";
+const secondary140 = "#0000001A";
+const secondary150 = "#FFFFFF40";
+const secondary160 = "#FFFFFF1A";
+
+
+
 
 const brand = "#5BB271";
 const discount = "#FF2D55";
@@ -33,13 +40,20 @@ const filter = "#FF9500";
 
 export const Colors = {
 	light: {
+		primary: primaryColor,
+
 		bgPage: white,
 		navBg: white,
 		navBorder: secondary100,
 		text: secondary,
 		divider: secondary130,
+		bgDot: white,
+		bgSeeMoreBtn: secondary140,
+		bgServiceItem: white,
+		bgShadowServiceItem: secondary,
+		bgCategoryItem: secondary140,
 
-		primary: primaryColor,
+
 		swatch: swatch,
 		premium: premium,
 		golden: golden,
@@ -63,15 +77,19 @@ export const Colors = {
 		white: white
 	},
 	dark: {
+		primary: primaryColor,
+
 		bgPage: darkBg,
 		navBg: secondary,
 		navBorder: secondary110,
 		text: white,
 		divider: secondary120,
+		bgDot: white,
+		bgSeeMoreBtn: secondary150,
+		bgServiceItem: secondary130,
+		bgCategoryItem: secondary160,
 
 
-		
-		primary: primaryColor,
 		swatch: swatch,
 		premium: premium,
 		golden: golden,

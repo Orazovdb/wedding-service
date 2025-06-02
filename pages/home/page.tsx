@@ -24,12 +24,16 @@ import {
 } from "@/shared/api/types";
 import { useAppTheme } from "@/shared/hooks/use-app-theme";
 import i18n from "@/shared/i18n";
-import IconArrowLeft from "@/shared/icons/arrow-left-big-black.svg";
+import {
+	default as IconArrowLeft,
+	default as IconArrowLeftDark
+} from "@/shared/icons/arrow-left-big-black.svg";
 import LocationIcon from "@/shared/icons/location-icon.svg";
 import GoldenIcon from "@/shared/icons/status-golden.svg";
 import NewIcon from "@/shared/icons/status-new.svg";
 import PremiumIcon from "@/shared/icons/status-premium.svg";
 import { useRouter } from "expo-router";
+import { t } from "i18next";
 import { homeService } from "./home.service";
 import { Home } from "./types";
 import { HomeCategoriesSlider } from "./ui/HomeCategoriesSlider";
@@ -42,7 +46,7 @@ const gridItemHeight = (height - 280) / 3 + 1;
 
 export const HomeScreen = () => {
 	const currentLang = i18n.language;
-	const { colors } = useAppTheme();
+	const { colors, mode } = useAppTheme();
 	const router = useRouter();
 
 	const [search, setSearch] = useState("");
@@ -165,17 +169,34 @@ export const HomeScreen = () => {
 		await homeService.getHome().then(setData);
 	};
 
+	const toggleFollow = async (service_id: number) => {
+		await servicesService.toggleFollowService({ service_id });
+		onToggleFollow();
+	};
+
 	const renderItem = ({ item }: { item: HumanServices }) => (
 		<View style={[styles.gridItem, { height: gridItemHeight }]}>
 			<TouchableOpacity
-				onPress={() => router.push(`/home/${item.id}`)}
+				onPress={() =>
+					router.push({
+						pathname: `/home/[id]`,
+						params: {
+							id: item.id
+						}
+					})
+				}
+				activeOpacity={0.6}
 				style={[
 					styles.categoryItem,
 					item.status === "premium"
 						? styles.categoryItemPremium
 						: item.status === "golden"
 						? styles.categoryItemGold
-						: null
+						: "",
+					{
+						backgroundColor: colors.bgServiceItem,
+						shadowColor: colors.bgSeeMoreBtn
+					}
 				]}
 			>
 				{item.status !== "normal" && (
@@ -188,16 +209,16 @@ export const HomeScreen = () => {
 								? styles.categoryItemStatusGold
 								: item.status === "new"
 								? styles.categoryItemStatusNew
-								: null
+								: ""
 						]}
 					>
 						<Text style={styles.categoryItemStatusText}>
 							{item.status === "premium"
-								? "premium"
+								? t("premium")
 								: item.status === "golden"
-								? "golden"
+								? t("golden")
 								: item.status === "new"
-								? "täze"
+								? t("new")
 								: ""}
 						</Text>
 						{item.status === "premium" ? (
@@ -210,29 +231,47 @@ export const HomeScreen = () => {
 					</View>
 				)}
 				<Image source={{ uri: item.logo }} style={styles.categoryProfileImg} />
-				{(() => {
-					const [firstWord = "", secondWord = ""] = item.name.split(" ");
-					return (
-						<>
-							<Text style={styles.categoryUsername}>{firstWord}</Text>
-							<Text style={styles.categoryUserSurName}>{secondWord}</Text>
-						</>
-					);
-				})()}
-				<View style={styles.serviceDivider} />
+				{item.name ? (
+					(() => {
+						const [firstWord = "", secondWord = ""] = item.name.split(" ");
+						return (
+							<>
+								<Text style={[styles.categoryUsername, { color: colors.text }]}>
+									{firstWord}
+								</Text>
+								<Text
+									style={[styles.categoryUserSurName, { color: colors.text }]}
+								>
+									{secondWord}
+								</Text>
+							</>
+						);
+					})()
+				) : (
+					<Text style={[styles.categoryUsername, { color: colors.text }]}>
+						service-provider_{item.id}
+					</Text>
+				)}
 
-				<Text style={styles.categoryName}>{item.categories[0]?.name}</Text>
-
+				<View
+					style={[styles.serviceDivider, { backgroundColor: colors.text }]}
+				/>
+				<Text style={[styles.categoryName, { color: colors.text }]}>
+					{item.categories[0].name}
+				</Text>
+				<Text style={[styles.serviceName, { color: colors.text }]}>
+					{item.name}
+				</Text>
 				<View style={styles.serviceLocationWrapper}>
 					<LocationIcon />
-
 					{(() => {
 						const [firstWord = "", secondWord = ""] =
 							item.region.name.split(" ");
 						return (
 							<>
 								<Text style={styles.serviceLocation}>
-									{firstWord} {secondWord}, {item.region.province}
+									{firstWord} {secondWord.slice(0, 1)}.,{" "}
+									{item.region.province.slice(0, 4)}
 								</Text>
 							</>
 						);
@@ -243,29 +282,28 @@ export const HomeScreen = () => {
 						<Text style={styles.subscriptionsButtonText}>
 							{item.followers_count}
 						</Text>
-						<Text style={styles.subscriptionsButtonText}>agza</Text>
+						<Text style={styles.subscriptionsButtonText}>
+							{t("subscriber")}
+						</Text>
 					</View>
 					<TouchableOpacity
+						onPress={() => toggleFollow(item.id)}
 						style={[
 							styles.subscribeButton,
+							mode === "dark"
+								? { backgroundColor: colors.secondary }
+								: { backgroundColor: colors.white },
 							item.status === "golden" && styles.subscribeButtonGold
 						]}
 					>
 						<Text
 							style={[
 								styles.subscribeButtonText,
+								{ color: colors.text },
 								item.status === "golden" && styles.subscribeButtonGoldText
 							]}
 						>
-							Agza
-						</Text>
-						<Text
-							style={[
-								styles.subscribeButtonText,
-								item.status === "golden" && styles.subscribeButtonGoldText
-							]}
-						>
-							bol
+							{t("subscribe")}
 						</Text>
 					</TouchableOpacity>
 				</View>
@@ -279,7 +317,7 @@ export const HomeScreen = () => {
 				<View style={styles.searchBox}>
 					{isFiltered && (
 						<TouchableOpacity onPress={clearFilter}>
-							<IconArrowLeft />
+							{mode === "light" ? <IconArrowLeft /> : <IconArrowLeftDark />}
 						</TouchableOpacity>
 					)}
 
@@ -371,7 +409,7 @@ const styles = StyleSheet.create({
 		flex: 1,
 		fontSize: 14,
 		paddingVertical: 6,
-		marginLeft: 8,
+		marginLeft: 8
 	},
 	gridItem: { width: width / 2 - 30, marginBottom: 20 },
 	categoryItem: {
@@ -483,8 +521,8 @@ const styles = StyleSheet.create({
 		textAlign: "center"
 	},
 	serviceButtons: {
-		flexDirection: "row",
 		justifyContent: "space-between",
+		gap: 8,
 		width: "100%",
 		paddingHorizontal: 12
 	},

@@ -1,8 +1,10 @@
 import { CategoriesWithChildren, statusServices } from "@/shared/api/types";
 import { useAppTheme } from "@/shared/hooks/use-app-theme";
+import CheckedIconDark from "@/shared/icons/checked-dark.svg";
 import CheckedIcon from "@/shared/icons/checked.svg";
 import CloseIconDark from "@/shared/icons/close-icon-dark.svg";
 import CloseIcon from "@/shared/icons/close-icon.svg";
+import UncheckedIconDark from "@/shared/icons/unchecked-dark.svg";
 import UncheckedIcon from "@/shared/icons/unchecked.svg";
 import { useThemeMode } from "@/shared/store/ThemeContext";
 import React, { useEffect, useState } from "react";
@@ -56,7 +58,7 @@ const statusFilter = [
 
 const HomeFilterButton = (props: HomeFilterModalProps) => {
 	const { t } = useTranslation();
-	const { colors } = useAppTheme();
+	const { colors, mode } = useAppTheme();
 
 	return (
 		<TouchableOpacity
@@ -170,9 +172,15 @@ const HomeFilterModal = (props: HomeFilterModalProps) => {
 									onPress={() => toggleCheckboxStatus(category.status)}
 								>
 									{selectedStatuses.includes(category.status) ? (
-										<CheckedIcon />
-									) : (
+										mode === "light" ? (
+											<CheckedIcon />
+										) : (
+											<CheckedIconDark />
+										)
+									) : mode === "light" ? (
 										<UncheckedIcon />
+									) : (
+										<UncheckedIconDark />
 									)}
 									<Text
 										style={[
@@ -192,7 +200,9 @@ const HomeFilterModal = (props: HomeFilterModalProps) => {
 							/>
 						</View>
 						<View style={styles.categoryItemModalSection}>
-							<Text style={styles.categoryItemModalTitle}>
+							<Text
+								style={[styles.categoryItemModalTitle, { color: colors.text }]}
+							>
 								{t("categories")}
 							</Text>
 							{props.categories?.map((category, index) => (
@@ -207,19 +217,39 @@ const HomeFilterModal = (props: HomeFilterModalProps) => {
 									onPress={() => toggleCheckboxCategories(String(category.id))}
 								>
 									{selectedCategories.includes(`${category.id}`) ? (
-										<CheckedIcon />
-									) : (
+										mode === "light" ? (
+											<CheckedIcon />
+										) : (
+											<CheckedIconDark />
+										)
+									) : mode === "light" ? (
 										<UncheckedIcon />
+									) : (
+										<UncheckedIconDark />
 									)}
-									<Text style={styles.categoryItemModalItemTitle}>
+									<Text
+										style={[
+											styles.categoryItemModalItemTitle,
+											{ color: colors.text }
+										]}
+									>
 										{category.name}
 									</Text>
 								</TouchableOpacity>
 							))}
-							<View style={styles.categoryItemModalDivider} />
+							<View
+								style={[
+									styles.categoryItemModalDivider,
+									{ backgroundColor: colors.divider }
+								]}
+							/>
 						</View>
 						<View style={styles.categoryItemModalSection}>
-							<Text style={styles.categoryItemModalTitle}>{t("regions")}</Text>
+							<Text
+								style={[styles.categoryItemModalTitle, { color: colors.text }]}
+							>
+								{t("regions")}
+							</Text>
 							{regions?.map((region, index) => (
 								<TouchableOpacity
 									key={region.id}
@@ -231,17 +261,27 @@ const HomeFilterModal = (props: HomeFilterModalProps) => {
 									]}
 									onPress={() => toggleCheckboxRegions(String(region.id))}
 								>
-									{selectedRegions.includes(`${region.id}`) ? (
-										<CheckedIcon />
-									) : (
+									{selectedCategories.includes(`${region.id}`) ? (
+										mode === "light" ? (
+											<CheckedIcon />
+										) : (
+											<CheckedIconDark />
+										)
+									) : mode === "light" ? (
 										<UncheckedIcon />
+									) : (
+										<UncheckedIconDark />
 									)}
-									<Text style={styles.categoryItemModalItemTitle}>
+									<Text
+										style={[
+											styles.categoryItemModalItemTitle,
+											{ color: colors.text }
+										]}
+									>
 										{region.name}
 									</Text>
 								</TouchableOpacity>
 							))}
-							<View style={styles.categoryItemModalDivider} />
 						</View>
 					</View>
 				</ScrollView>

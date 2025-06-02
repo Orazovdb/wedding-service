@@ -1,6 +1,8 @@
 import { Colors } from "@/constants/Colors";
 import { servicesService } from "@/shared/api/services/services.service";
 import { Services } from "@/shared/api/types";
+import { useAppTheme } from "@/shared/hooks/use-app-theme";
+import CategoryIconDark from "@/shared/icons/category-icon-dark.svg";
 import CategoryIcon from "@/shared/icons/category-icon.svg";
 import LocationIcon from "@/shared/icons/location-icon.svg";
 import GoldenIcon from "@/shared/icons/status-golden.svg";
@@ -31,6 +33,7 @@ export const HomeServices = ({
 	data?: props;
 	onToggleFollow: () => void;
 }) => {
+	const { colors, mode } = useAppTheme();
 	const { t } = useTranslation();
 
 	const router = useRouter();
@@ -44,7 +47,9 @@ export const HomeServices = ({
 	return data?.categories?.map(categoryItem => (
 		<View style={styles.services} key={categoryItem.id}>
 			<View style={styles.servicesTitleBlock}>
-				<Text style={styles.servicesTitle}>{categoryItem.name}</Text>
+				<Text style={[styles.servicesTitle, { color: colors.text }]}>
+					{categoryItem.name}
+				</Text>
 				<TouchableOpacity
 					onPress={() =>
 						router.push({
@@ -55,10 +60,17 @@ export const HomeServices = ({
 							}
 						})
 					}
-					style={styles.servicesCategoryButton}
+					style={[
+						styles.servicesCategoryButton,
+						{ backgroundColor: colors.bgSeeMoreBtn }
+					]}
 				>
-					<CategoryIcon />
-					<Text style={styles.servicesCategoryButtonText}>{t("seeAll")}</Text>
+					{mode === "light" ? <CategoryIcon /> : <CategoryIconDark />}
+					<Text
+						style={[styles.servicesCategoryButtonText, { color: colors.text }]}
+					>
+						{t("seeAll")}
+					</Text>
 				</TouchableOpacity>
 			</View>
 			<FlatList
@@ -86,7 +98,11 @@ export const HomeServices = ({
 									? styles.categoryItemPremium
 									: item.status === "golden"
 									? styles.categoryItemGold
-									: ""
+									: "",
+								{
+									backgroundColor: colors.bgServiceItem,
+									shadowColor: colors.bgSeeMoreBtn
+								}
 							]}
 						>
 							{item.status !== "normal" && (
@@ -130,22 +146,43 @@ export const HomeServices = ({
 										item.name.split(" ");
 									return (
 										<>
-											<Text style={styles.categoryUsername}>{firstWord}</Text>
-											<Text style={styles.categoryUserSurName}>
+											<Text
+												style={[
+													styles.categoryUsername,
+													{ color: colors.text }
+												]}
+											>
+												{firstWord}
+											</Text>
+											<Text
+												style={[
+													styles.categoryUserSurName,
+													{ color: colors.text }
+												]}
+											>
 												{secondWord}
 											</Text>
 										</>
 									);
 								})()
 							) : (
-								<Text style={styles.categoryUsername}>
+								<Text style={[styles.categoryUsername, { color: colors.text }]}>
 									service-provider_{item.id}
 								</Text>
 							)}
 
-							<View style={styles.serviceDivider} />
-							<Text style={styles.categoryName}>{categoryItem.name}</Text>
-							<Text style={styles.serviceName}>{item.name}</Text>
+							<View
+								style={[
+									styles.serviceDivider,
+									{ backgroundColor: colors.text }
+								]}
+							/>
+							<Text style={[styles.categoryName, { color: colors.text }]}>
+								{categoryItem.name}
+							</Text>
+							<Text style={[styles.serviceName, { color: colors.text }]}>
+								{item.name}
+							</Text>
 							<View style={styles.serviceLocationWrapper}>
 								<LocationIcon />
 								{(() => {
@@ -174,12 +211,16 @@ export const HomeServices = ({
 									onPress={() => toggleFollow(item.id)}
 									style={[
 										styles.subscribeButton,
+										mode === "dark"
+											? { backgroundColor: colors.secondary }
+											: { backgroundColor: colors.white },
 										item.status === "golden" && styles.subscribeButtonGold
 									]}
 								>
 									<Text
 										style={[
 											styles.subscribeButtonText,
+											{ color: colors.text },
 											item.status === "golden" && styles.subscribeButtonGoldText
 										]}
 									>
@@ -216,8 +257,7 @@ export const styles = StyleSheet.create({
 		flexDirection: "row",
 		alignItems: "center",
 		gap: 2,
-		padding: 2,
-		backgroundColor: "#0000001A"
+		padding: 2
 	},
 	servicesCategoryButtonText: {
 		fontSize: 12,
@@ -233,16 +273,14 @@ export const styles = StyleSheet.create({
 		paddingTop: 2,
 		paddingBottom: 8,
 		paddingVertical: 12,
-		backgroundColor: "white",
-		shadowColor: "#000",
-		shadowOffset: { width: 0, height: 1.51 },
-		shadowOpacity: 0.25,
+		shadowOffset: { width: 0, height: 4 },
+		shadowOpacity: 0.8,
 		shadowRadius: 3.02,
-		elevation: 2,
+		elevation: 3,
 		borderBottomWidth: 1,
-		borderBottomColor: "#00000040",
-		borderTopWidth: 1,
-		borderTopColor: "#00000040",
+		borderBottomColor: "#FFFFFF40",
+		borderTopWidth: 2,
+		borderTopColor: "#FFFFFF40",
 		alignItems: "center",
 		borderRadius: 4,
 		gap: 0,
@@ -307,7 +345,6 @@ export const styles = StyleSheet.create({
 	serviceDivider: {
 		width: "50%",
 		height: 1,
-		backgroundColor: Colors.dark.secondary,
 		marginBottom: 6
 	},
 	categoryName: {
@@ -324,7 +361,7 @@ export const styles = StyleSheet.create({
 	},
 	serviceLocationWrapper: {
 		flexDirection: "row",
-		justifyContent: 'center',
+		justifyContent: "center",
 		alignItems: "center",
 		gap: 4,
 		paddingVertical: 3,
@@ -341,10 +378,9 @@ export const styles = StyleSheet.create({
 		fontSize: 10,
 		fontFamily: "Lexend-Light",
 		color: Colors.light.secondary,
-		textAlign: "center",
+		textAlign: "center"
 	},
 	serviceButtons: {
-		// flexDirection: "row",
 		gap: 4,
 		width: "100%",
 		paddingHorizontal: 12
@@ -374,7 +410,7 @@ export const styles = StyleSheet.create({
 	},
 	subscribeButtonText: {
 		fontSize: 10,
-		color: Colors.light.secondary,
+
 		fontFamily: "Lexend-Regular",
 		textAlign: "center",
 		wordWrap: "wrap"

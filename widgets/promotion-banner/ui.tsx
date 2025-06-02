@@ -30,7 +30,7 @@ export const SubscribersSubscribeSlider = () => {
 	}, [activeIndex, items]);
 
 	const slideClicked = (item: { id: number; image: any }) => {
-		// Placeholder for slide click action
+		
 	};
 
 	const renderItem = ({
