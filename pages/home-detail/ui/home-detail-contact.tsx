@@ -1,6 +1,8 @@
 import { Colors } from "@/constants/Colors";
 import { HumanServicesByIdData } from "@/shared/api/types";
+import { useAppTheme } from "@/shared/hooks/use-app-theme";
 import IconCall from "@/shared/icons/call-icon.svg";
+import IconDownloadDark from "@/shared/icons/download-icon-dark.svg";
 import IconDownload from "@/shared/icons/download-icon.svg";
 import * as Linking from "expo-linking";
 import { useRouter } from "expo-router";
@@ -13,6 +15,8 @@ export const HomeDetailContact = ({
 }: {
 	data: HumanServicesByIdData | undefined;
 }) => {
+	const { colors, mode } = useAppTheme();
+
 	const handleCall = (phone?: string) => {
 		if (!phone) return;
 		const formattedPhoneNumber = `tel:+993${phone}`;
@@ -50,10 +54,12 @@ export const HomeDetailContact = ({
 			</TouchableOpacity>
 			<TouchableOpacity
 				onPress={() => handleDownload(data?.service.catalog)}
-				style={styles.catalogButton}
+				style={[styles.catalogButton, { borderColor: colors.text }]}
 			>
-				<Text style={styles.catalogButtonText}>{t("catalog")}</Text>
-				<IconDownload />
+				<Text style={[styles.catalogButtonText, { color: colors.text }]}>
+					{t("catalog")}
+				</Text>
+				{mode === "light" ? <IconDownload /> : <IconDownloadDark />}
 			</TouchableOpacity>
 		</View>
 	);
@@ -89,7 +95,6 @@ const styles = StyleSheet.create({
 	catalogButton: {
 		borderRadius: 4,
 		borderWidth: 1,
-		borderColor: Colors.dark.secondary,
 		flexDirection: "row",
 		alignItems: "center",
 		gap: 4,
@@ -98,7 +103,6 @@ const styles = StyleSheet.create({
 	},
 	catalogButtonText: {
 		fontSize: 12,
-		fontFamily: "Lexend-Regular",
-		color: Colors.dark.secondary
+		fontFamily: "Lexend-Regular"
 	}
 });

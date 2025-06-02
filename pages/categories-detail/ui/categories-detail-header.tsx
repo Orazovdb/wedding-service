@@ -1,6 +1,9 @@
 import SearchIcon from "@/components/ui/SearchIcon";
 import { categoriesService } from "@/shared/api/services/categories.service";
 import { CategoriesWithChildren, HumanServices } from "@/shared/api/types";
+import { useAppTheme } from "@/shared/hooks/use-app-theme";
+import i18n from "@/shared/i18n";
+import ArrowLeftDark from "@/shared/icons/arrow-left-dark.svg";
 import ArrowLeft from "@/shared/icons/arrow-left.svg";
 import { useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
@@ -14,7 +17,6 @@ import {
 } from "react-native";
 import { Colors } from "react-native/Libraries/NewAppScreen";
 import { FilterModal } from "./categories-filter";
-import i18n from '@/shared/i18n'
 
 interface Props {
 	category_id: string | string[];
@@ -33,12 +35,15 @@ interface Props {
 	clearTrigger: boolean;
 	isModalVisible: boolean;
 	setIsModalVisible: (isModalVisible: boolean) => void;
+	search: string;
+	setSearch: (val: string) => void;
 }
 
 export const CategoriesDetailHeader = (props: Props) => {
-	const currentLang = i18n.language
+	const currentLang = i18n.language;
 	const router = useRouter();
-	const [search, setSearch] = useState("");
+	const { search, setSearch } = props;
+	const { colors, mode } = useAppTheme();
 
 	const [dataCategories, setDataCategories] =
 		useState<CategoriesWithChildren[]>();
@@ -60,34 +65,43 @@ export const CategoriesDetailHeader = (props: Props) => {
 		<View style={styles.header}>
 			<View style={styles.categoryBlock}>
 				<TouchableOpacity onPress={() => router.back()}>
-					<ArrowLeft />
+					{mode === "light" ? <ArrowLeft /> : <ArrowLeftDark />}
 				</TouchableOpacity>
-				<Text style={styles.categoryName}>
+				<Text style={[styles.categoryName, { color: colors.text }]}>
 					{
 						props.data?.categories.find(
 							item => String(item.id) === String(props.category_id)
 						)?.name
 					}{" "}
-					/{" "}
+					{props.sub_category_id !== "all" ? "/" : null}{" "}
 					{
 						props.data?.categories.find(
 							item => String(item.id) === String(props.sub_category_id)
 						)?.name
 					}
 				</Text>
-				<View style={styles.categoryService}>
-					<View style={styles.categoryServiceDot} />
-					<Text style={styles.categoryServiceName}>{props.totalCount}</Text>
+				<View
+					style={[
+						styles.categoryService,
+						{ backgroundColor: colors.textTotalCount }
+					]}
+				>
+					<View
+						style={[
+							styles.categoryServiceDot,
+							{ backgroundColor: colors.textReverse }
+						]}
+					/>
+					<Text
+						style={[styles.categoryServiceName, { color: colors.textReverse }]}
+					>
+						{props.totalCount}
+					</Text>
 				</View>
 			</View>
 			<View style={styles.searchBlock}>
-				<View
-					style={[
-						styles.inputContainer,
-						{ borderColor: Colors.light.secondary }
-					]}
-				>
-					<SearchIcon width={20} height={20} color="#000000" />
+				<View style={[styles.inputContainer, { borderColor: colors.text }]}>
+					<SearchIcon width={20} height={20} color={colors.text} />
 					<TextInput
 						placeholder=""
 						value={search}
@@ -116,17 +130,24 @@ export const CategoriesDetailHeader = (props: Props) => {
 						<TouchableOpacity
 							style={[
 								styles.categoryItem,
+								{
+									backgroundColor: colors.textReverse,
+									borderColor: colors.text,
+									borderWidth: 1
+								},
 								props.sub_category_id === String(item.id)
-									? styles.categoryItemActive
+									? {
+											backgroundColor: colors.text
+									  }
 									: null
 							]}
 							onPress={() => props.onSelectSubCategory(String(item.id))}
 						>
 							<Text
 								style={[
-									styles.categoryItemText,
+									{ color: colors.text },
 									props.sub_category_id === String(item.id)
-										? styles.categoryItemTextActive
+										? { color: colors.textReverse }
 										: null
 								]}
 							>
@@ -159,13 +180,11 @@ export const styles = StyleSheet.create({
 	},
 	categoryName: {
 		fontFamily: "Lexend-SemiBold",
-		fontSize: 16,
-		color: "#000"
+		fontSize: 16
 	},
 	categoryService: {
 		flexDirection: "row",
 		alignItems: "center",
-		backgroundColor: "#0000001A",
 		borderRadius: 6,
 		paddingVertical: 2,
 		paddingHorizontal: 6,
@@ -174,8 +193,7 @@ export const styles = StyleSheet.create({
 	categoryServiceDot: {
 		width: 8,
 		height: 8,
-		borderRadius: 8 / 2,
-		backgroundColor: "#000"
+		borderRadius: 8 / 2
 	},
 	categoryServiceName: { fontFamily: "Lexend-Regular", fontSize: 14 },
 
@@ -191,7 +209,6 @@ export const styles = StyleSheet.create({
 		alignItems: "center",
 		borderWidth: 1,
 		borderRadius: 8,
-		backgroundColor: "white",
 		paddingHorizontal: 10,
 		marginTop: 14,
 		marginBottom: 12,
@@ -210,11 +227,9 @@ export const styles = StyleSheet.create({
 		paddingLeft: 20
 	},
 	categoryItem: {
-		backgroundColor: "#FFF",
 		height: 33,
 		minWidth: 77,
 		borderRadius: 4,
-		borderColor: "#000",
 		borderWidth: 1,
 		alignItems: "center",
 		justifyContent: "center",

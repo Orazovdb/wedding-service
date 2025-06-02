@@ -1,6 +1,7 @@
 import { Colors } from "@/constants/Colors";
 import { servicesService } from "@/shared/api/services/services.service";
 import { HumanServicesByIdData, SimilarServices } from "@/shared/api/types";
+import { useAppTheme } from "@/shared/hooks/use-app-theme";
 import LocationIcon from "@/shared/icons/location-icon.svg";
 import GoldenIcon from "@/shared/icons/status-golden.svg";
 import NewIcon from "@/shared/icons/status-new.svg";
@@ -27,6 +28,8 @@ export const HomeDetailSameServices = ({
 	data: HumanServicesByIdData | undefined;
 	onToggleFollow: () => void;
 }) => {
+	const { colors, mode } = useAppTheme();
+
 	const router = useRouter();
 
 	const categoryFlatListRef = useRef<FlatList<any>>(null);
@@ -40,7 +43,9 @@ export const HomeDetailSameServices = ({
 
 	return (
 		<View style={styles.sameServices}>
-			<Text style={styles.title}>{t("sameServices")}</Text>
+			<Text style={[styles.title, { color: colors.text }]}>
+				{t("sameServices")}
+			</Text>
 			<FlatList
 				ref={categoryFlatListRef}
 				data={data?.similar}
@@ -59,13 +64,18 @@ export const HomeDetailSameServices = ({
 									}
 								})
 							}
+							activeOpacity={0.6}
 							style={[
 								styles.categoryItem,
 								item.status === "premium"
 									? styles.categoryItemPremium
 									: item.status === "golden"
 									? styles.categoryItemGold
-									: ""
+									: "",
+								{
+									backgroundColor: colors.bgServiceItem,
+									shadowColor: colors.bgSeeMoreBtn
+								}
 							]}
 						>
 							{item.status !== "normal" && (
@@ -85,7 +95,7 @@ export const HomeDetailSameServices = ({
 										{item.status === "premium"
 											? t("premium")
 											: item.status === "golden"
-											? t("gold")
+											? t("golden")
 											: item.status === "new"
 											? t("new")
 											: ""}
@@ -109,23 +119,43 @@ export const HomeDetailSameServices = ({
 										item.name.split(" ");
 									return (
 										<>
-											<Text style={styles.categoryUsername}>{firstWord}</Text>
-											<Text style={styles.categoryUserSurName}>
+											<Text
+												style={[
+													styles.categoryUsername,
+													{ color: colors.text }
+												]}
+											>
+												{firstWord}
+											</Text>
+											<Text
+												style={[
+													styles.categoryUserSurName,
+													{ color: colors.text }
+												]}
+											>
 												{secondWord}
 											</Text>
 										</>
 									);
 								})()
 							) : (
-								<Text style={styles.categoryUsername}>
-									service-provider_{item?.id}
+								<Text style={[styles.categoryUsername, { color: colors.text }]}>
+									service-provider_{item.id}
 								</Text>
 							)}
-							<View style={styles.serviceDivider} />
-							<Text style={styles.categoryName}>
-								{item.categories[0]?.name}
+
+							<View
+								style={[
+									styles.serviceDivider,
+									{ backgroundColor: colors.text }
+								]}
+							/>
+							<Text style={[styles.categoryName, { color: colors.text }]}>
+								{item.categories[0].name}
 							</Text>
-							<Text style={styles.serviceName}>{item?.name}</Text>
+							<Text style={[styles.serviceName, { color: colors.text }]}>
+								{item.name}
+							</Text>
 							<View style={styles.serviceLocationWrapper}>
 								<LocationIcon />
 								{(() => {
@@ -134,7 +164,8 @@ export const HomeDetailSameServices = ({
 									return (
 										<>
 											<Text style={styles.serviceLocation}>
-												{firstWord} {secondWord}, {item.region.province}
+												{firstWord} {secondWord.slice(0, 1)}.,{" "}
+												{item.region.province.slice(0, 4)}
 											</Text>
 										</>
 									);
@@ -153,12 +184,16 @@ export const HomeDetailSameServices = ({
 									onPress={() => toggleFollow(item.id)}
 									style={[
 										styles.subscribeButton,
+										mode === "dark"
+											? { backgroundColor: "", borderColor: colors.text }
+											: { backgroundColor: colors.white },
 										item.status === "golden" && styles.subscribeButtonGold
 									]}
 								>
 									<Text
 										style={[
 											styles.subscribeButtonText,
+											{ color: colors.text },
 											item.status === "golden" && styles.subscribeButtonGoldText
 										]}
 									>

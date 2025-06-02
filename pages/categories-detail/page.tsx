@@ -1,6 +1,7 @@
 import { categoriesService } from "@/shared/api/services/categories.service";
 import { servicesService } from "@/shared/api/services/services.service";
 import { CategoriesWithChildren, HumanServicesData } from "@/shared/api/types";
+import { useAppTheme } from "@/shared/hooks/use-app-theme";
 import i18n from "@/shared/i18n";
 import { useLocalSearchParams } from "expo-router";
 import React, { useCallback, useEffect, useState } from "react";
@@ -10,6 +11,7 @@ import { CategoryServices } from "./ui/category-services";
 
 export const CategoriesDetailScreen = () => {
 	const currentLang = i18n.language;
+	const { colors, mode } = useAppTheme();
 
 	const { categoryDetail, id } = useLocalSearchParams<{
 		categoryDetail: string;
@@ -23,7 +25,6 @@ export const CategoriesDetailScreen = () => {
 	const [search, setSearch] = useState("");
 	const [page, setPage] = useState(1);
 	const [hasMore, setHasMore] = useState(true);
-	const [loadingMore, setLoadingMore] = useState(false);
 	const [dataServices, setDataServices] = useState<HumanServicesData>();
 	const [dataCategories, setDataCategories] = useState<
 		CategoriesWithChildren[]
@@ -45,7 +46,11 @@ export const CategoriesDetailScreen = () => {
 	useEffect(() => {
 		if (!selectedCategory) return;
 		categoriesService
-			.getCategories({ parent: 0, category_id: selectedCategory, lang: currentLang })
+			.getCategories({
+				parent: 0,
+				category_id: selectedCategory,
+				lang: currentLang
+			})
 			.then(data => {
 				setDataCategories(data);
 				console.log("Fetched dataCategories:", data);
@@ -129,12 +134,30 @@ export const CategoriesDetailScreen = () => {
 		[search]
 	);
 
+	const onToggleFollow = async () => {
+		if (!selectedCategory || !selectedSubCategory) return;
+
+		await servicesService
+			.getServices({
+				category_ids: selectedCategory,
+				subcategory_ids:
+					selectedSubCategory === "all" ? undefined : selectedSubCategory,
+				statuses: statuses.join(",") || undefined,
+				provinces: regions.join(",") || undefined,
+				name: search || undefined,
+				page,
+				limit: 100,
+				lang: currentLang
+			})
+			.then(setDataServices);
+	};
+
 	if (!selectedCategory || !selectedSubCategory) {
 		return <Text>Loading category data...</Text>;
 	}
 
 	return (
-		<View style={styles.safeArea}>
+		<View style={[styles.safeArea, { backgroundColor: colors.bgPage }]}>
 			<View style={styles.page}>
 				<CategoriesDetailHeader
 					category_id={selectedCategory}
@@ -149,9 +172,16 @@ export const CategoriesDetailScreen = () => {
 					setIsFiltered={setIsFiltered}
 					isFiltered={isFiltered}
 					clearTrigger={clearTrigger}
+					search={search}
+					setSearch={setSearch}
 				/>
 				{dataServices && (
-					<CategoryServices page={page} setPage={setPage} data={dataServices} />
+					<CategoryServices
+						page={page}
+						setPage={setPage}
+						data={dataServices}
+						onToggleFollow={onToggleFollow}
+					/>
 				)}
 			</View>
 		</View>
@@ -160,8 +190,7 @@ export const CategoriesDetailScreen = () => {
 
 export const styles = StyleSheet.create({
 	safeArea: {
-		flex: 1,
-		backgroundColor: "#fff"
+		flex: 1
 	},
 	page: {
 		flex: 1,

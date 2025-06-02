@@ -1,6 +1,9 @@
 import { Colors } from "@/constants/Colors";
 import { HumanServicesByIdData } from "@/shared/api/types";
+import { useAppTheme } from "@/shared/hooks/use-app-theme";
+import IconAvatarDark from "@/shared/icons/avatar-icon-dark.svg";
 import IconAvatar from "@/shared/icons/avatar-icon.svg";
+import IconFlagDark from "@/shared/icons/flag-icon-dark.svg";
 import IconFlag from "@/shared/icons/flag-icon.svg";
 import { useRouter } from "expo-router";
 import React from "react";
@@ -16,6 +19,7 @@ export const HomeDetailProfile = ({
 }) => {
 	const router = useRouter();
 	const { t } = useTranslation();
+	const { colors, mode } = useAppTheme();
 
 	return (
 		<View style={styles.profile}>
@@ -24,7 +28,9 @@ export const HomeDetailProfile = ({
 					<Image source={{ uri: data?.service?.logo }} style={styles.avatar} />
 				)}
 				<View style={styles.profileNameWrapper}>
-					<Text style={styles.profileName}>{data?.service?.name}</Text>
+					<Text style={[styles.profileName, { color: colors.text }]}>
+						{data?.service?.name}
+					</Text>
 					<TouchableOpacity
 						onPress={() =>
 							router.push(`/categories/${data?.service?.categories[0].id}/all`)
@@ -36,7 +42,7 @@ export const HomeDetailProfile = ({
 							style={styles.profileCategoryIcon}
 						/>
 
-						<Text style={styles.profileCategoryText}>
+						<Text style={[styles.profileCategoryText, { color: colors.text }]}>
 							{data?.service?.categories[0]?.name}
 						</Text>
 					</TouchableOpacity>
@@ -45,13 +51,13 @@ export const HomeDetailProfile = ({
 			</View>
 			<View style={styles.subscribersBlock}>
 				<View style={styles.location}>
-					<IconFlag />
+					{mode === "light" ? <IconFlag /> : <IconFlagDark />}
 					{(() => {
 						const name = data?.service?.region?.name ?? "";
 						const [firstWord = "", secondWord = ""] = name.split(" ");
 						return (
 							<>
-								<Text style={styles.locationText}>
+								<Text style={[styles.locationText, { color: colors.text }]}>
 									{firstWord} {secondWord},{" "}
 									{data?.service?.region?.province.slice(0, 4)}
 								</Text>
@@ -59,9 +65,11 @@ export const HomeDetailProfile = ({
 						);
 					})()}
 				</View>
-				<View style={styles.subscribeCount}>
-					<IconAvatar />
-					<Text style={styles.subscribeCountText}>
+				<View style={[styles.subscribeCount, { backgroundColor: colors.text }]}>
+					{mode === "light" ? <IconAvatar /> : <IconAvatarDark />}
+					<Text
+						style={[styles.subscribeCountText, { color: colors.textReverse }]}
+					>
 						{data?.service?.followers_count} {t("subscriber")}
 					</Text>
 				</View>
@@ -69,7 +77,9 @@ export const HomeDetailProfile = ({
 					onPress={() => onToggleFollow()}
 					style={styles.subscribeButton}
 				>
-					<Text style={styles.subscribeButtonText}>{t("subscribe")}</Text>
+					<Text style={[styles.subscribeButtonText, { color: colors.text }]}>
+						{t("subscribe")}
+					</Text>
 				</TouchableOpacity>
 			</View>
 		</View>
@@ -144,7 +154,7 @@ export const styles = StyleSheet.create({
 	},
 	locationText: {
 		fontFamily: "Lexend-Light",
-		color: Colors.dark.secondary,
+
 		fontSize: 14
 	},
 	subscribeButtons: {},
@@ -152,7 +162,6 @@ export const styles = StyleSheet.create({
 		flexDirection: "row",
 		alignItems: "center",
 		gap: 3,
-		backgroundColor: Colors.dark.secondary,
 		borderRadius: 6,
 		paddingVertical: 6,
 		paddingHorizontal: 12,

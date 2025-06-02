@@ -1,6 +1,6 @@
-import { Colors } from "@/constants/Colors";
 import { servicesService } from "@/shared/api/services/services.service";
 import { HumanServicesByIdData } from "@/shared/api/types";
+import { useAppTheme } from "@/shared/hooks/use-app-theme";
 import i18n from "@/shared/i18n";
 import ArrowLeftBigIcon from "@/shared/icons/arrow-left-big.svg";
 import { useLocalSearchParams, useRouter } from "expo-router";
@@ -22,6 +22,7 @@ const { width } = Dimensions.get("window");
 
 export const HomeDynamicScreen = () => {
 	const currentLang = i18n.language;
+	const { colors, mode } = useAppTheme();
 
 	const { id } = useLocalSearchParams();
 	const [data, setData] = useState<HumanServicesByIdData>();
@@ -61,7 +62,7 @@ export const HomeDynamicScreen = () => {
 	};
 
 	return (
-		<ScrollView style={styles.container}>
+		<ScrollView style={[styles.container, { backgroundColor: colors.bgPage }]}>
 			{data?.service.videos.length || data?.service.images.length ? (
 				<HomeDetailBanner data={data} />
 			) : null}
@@ -88,8 +89,7 @@ export const HomeDynamicScreen = () => {
 
 export const styles = StyleSheet.create({
 	container: {
-		flex: 1,
-		backgroundColor: Colors.light.white
+		flex: 1
 	},
 	sliderContainer: {
 		position: "relative",

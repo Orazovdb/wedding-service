@@ -1,5 +1,6 @@
 import { Colors } from "@/constants/Colors";
 import { HumanServicesByIdData } from "@/shared/api/types";
+import { useAppTheme } from "@/shared/hooks/use-app-theme";
 import IconAlarm from "@/shared/icons/alarm-icon.svg";
 import IconHeadphones from "@/shared/icons/headphones.svg";
 import React from "react";
@@ -13,16 +14,20 @@ export const HomeDetailFeedback = ({
 	data: HumanServicesByIdData | undefined;
 }) => {
 	const { t } = useTranslation();
+	const { colors, mode } = useAppTheme();
+
 	return (
 		<View style={styles.feedback}>
 			<ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
 				{data?.service.pricing[0] !== "" ? (
-					<View style={styles.feedbackItem}>
+					<View style={[styles.feedbackItem, { borderColor: colors.text }]}>
 						<View style={styles.titleGroup}>
 							<View style={styles.iconFeedback}>
 								<IconFeedBack />
 							</View>
-							<Text style={styles.title}>{t("evaluation")}</Text>
+							<Text style={[styles.title, { color: colors.text }]}>
+								{t("evaluation")}
+							</Text>
 						</View>
 						{data?.service.pricing.map((price, index) => (
 							<View
@@ -34,19 +39,28 @@ export const HomeDetailFeedback = ({
 									}
 								]}
 							>
-								<View style={styles.possibilityDot} />
-								<Text style={styles.possibilityText}>{price}</Text>
+								<View
+									style={[
+										styles.possibilityDot,
+										{ backgroundColor: colors.text }
+									]}
+								/>
+								<Text style={[styles.possibilityText, { color: colors.text }]}>
+									{price}
+								</Text>
 							</View>
 						))}
 					</View>
 				) : null}
 				{data?.service.booking[0] !== "" ? (
-					<View style={styles.feedbackItem}>
+					<View style={[styles.feedbackItem, { borderColor: colors.text }]}>
 						<View style={styles.titleGroup}>
 							<View style={styles.iconFeedback}>
 								<IconAlarm />
 							</View>
-							<Text style={styles.title}>{t("booking")}</Text>
+							<Text style={[styles.title, { color: colors.text }]}>
+								{t("booking")}
+							</Text>
 						</View>
 						{data?.service.booking.map((alarm, index) => (
 							<View
@@ -58,19 +72,28 @@ export const HomeDetailFeedback = ({
 									}
 								]}
 							>
-								<View style={styles.possibilityDot} />
-								<Text style={styles.possibilityText}>{alarm}</Text>
+								<View
+									style={[
+										styles.possibilityDot,
+										{ backgroundColor: colors.text }
+									]}
+								/>
+								<Text style={[styles.possibilityText, { color: colors.text }]}>
+									{alarm}
+								</Text>
 							</View>
 						))}
 					</View>
 				) : null}
 				{data?.service.contacts[0] !== "" ? (
-					<View style={styles.feedbackItem}>
+					<View style={[styles.feedbackItem, { borderColor: colors.text }]}>
 						<View style={styles.titleGroup}>
 							<View style={styles.iconFeedback}>
 								<IconHeadphones />
 							</View>
-							<Text style={styles.title}>{t("contact")}</Text>
+							<Text style={[styles.title, { color: colors.text }]}>
+								{t("contact")}
+							</Text>
 						</View>
 						{data?.service.contacts.map((contact, index) => (
 							<View
@@ -82,8 +105,15 @@ export const HomeDetailFeedback = ({
 									}
 								]}
 							>
-								<View style={styles.possibilityDot} />
-								<Text style={styles.possibilityText}>{contact}</Text>
+								<View
+									style={[
+										styles.possibilityDot,
+										{ backgroundColor: colors.text }
+									]}
+								/>
+								<Text style={[styles.possibilityText, { color: colors.text }]}>
+									{contact}
+								</Text>
 							</View>
 						))}
 					</View>
@@ -103,7 +133,6 @@ export const styles = StyleSheet.create({
 		padding: 6,
 		borderRadius: 6,
 		borderWidth: 1,
-		borderColor: Colors.dark.secondary,
 		marginRight: 16,
 		width: 144
 	},
@@ -134,8 +163,7 @@ export const styles = StyleSheet.create({
 	possibilityDot: {
 		width: 5,
 		height: 5,
-		borderRadius: 5 / 2,
-		backgroundColor: Colors.dark.secondary
+		borderRadius: 5 / 2
 	},
 	possibilityText: {
 		fontFamily: "Lexend-Light",

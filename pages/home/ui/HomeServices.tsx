@@ -212,7 +212,7 @@ export const HomeServices = ({
 									style={[
 										styles.subscribeButton,
 										mode === "dark"
-											? { backgroundColor: colors.secondary }
+											? { backgroundColor: "", borderColor: colors.text }
 											: { backgroundColor: colors.white },
 										item.status === "golden" && styles.subscribeButtonGold
 									]}

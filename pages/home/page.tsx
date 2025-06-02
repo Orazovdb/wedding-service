@@ -24,10 +24,8 @@ import {
 } from "@/shared/api/types";
 import { useAppTheme } from "@/shared/hooks/use-app-theme";
 import i18n from "@/shared/i18n";
-import {
-	default as IconArrowLeft,
-	default as IconArrowLeftDark
-} from "@/shared/icons/arrow-left-big-black.svg";
+import { default as IconArrowLeftDark } from "@/shared/icons/arrow-left-big-black-dark.svg";
+import { default as IconArrowLeft } from "@/shared/icons/arrow-left-big-black.svg";
 import LocationIcon from "@/shared/icons/location-icon.svg";
 import GoldenIcon from "@/shared/icons/status-golden.svg";
 import NewIcon from "@/shared/icons/status-new.svg";
@@ -327,8 +325,7 @@ export const HomeScreen = () => {
 							placeholder=""
 							value={search}
 							onChangeText={setSearch}
-							style={[styles.input]}
-							placeholderTextColor="#999"
+							style={[styles.input, { color: colors.text }]}
 						/>
 						<FilterModal.Button
 							isModalVisible={isModalVisible}

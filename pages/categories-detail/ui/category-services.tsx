@@ -1,10 +1,13 @@
 import { Colors } from "@/constants/Colors";
+import { servicesService } from "@/shared/api/services/services.service";
 import { HumanServices, HumanServicesData } from "@/shared/api/types";
+import { useAppTheme } from "@/shared/hooks/use-app-theme";
 import LocationIcon from "@/shared/icons/location-icon.svg";
 import GoldenIcon from "@/shared/icons/status-golden.svg";
 import NewIcon from "@/shared/icons/status-new.svg";
 import PremiumIcon from "@/shared/icons/status-premium.svg";
 import { useRouter } from "expo-router";
+import { t } from "i18next";
 import React, { useRef } from "react";
 import {
 	Dimensions,
@@ -24,10 +27,12 @@ interface Props {
 	page: number;
 	setPage: (page: number) => void;
 	data: HumanServicesData;
+	onToggleFollow: () => void;
 }
 
 export const CategoryServices = (props: Props) => {
 	const insets = useSafeAreaInsets();
+	const { colors, mode } = useAppTheme();
 	const PAGE_HEIGHT =
 		Dimensions.get("window").height - insets.top - insets.bottom - 180;
 	const itemHeight = PAGE_HEIGHT / 3;
@@ -51,88 +56,123 @@ export const CategoryServices = (props: Props) => {
 		}
 	}).current;
 
+	const toggleFollow = async (service_id: number) => {
+		await servicesService.toggleFollowService({ service_id });
+		props.onToggleFollow();
+	};
+
 	const renderPage = ({ item }: { item: HumanServices[] }) => (
 		<View style={[styles.pageContainer, { minHeight: PAGE_HEIGHT }]}>
-			{item.map(user => (
+			{item.map(item => (
 				<TouchableOpacity
-					onPress={() => router.push(`/home/${user.id}`)}
-					key={user.id}
-					style={[styles.categoryList]}
+					onPress={() =>
+						router.push({
+							pathname: `/home/[id]`,
+							params: {
+								id: item.id
+							}
+						})
+					}
+					activeOpacity={0.6}
+					key={item.id}
+					style={styles.categoryList}
 				>
 					<View
 						style={[
 							styles.categoryItem,
 							{ height: itemHeight - 20 },
-							user.status === "premium"
+							item.status === "premium"
 								? styles.categoryItemPremium
-								: user.status === "golden"
+								: item.status === "golden"
 								? styles.categoryItemGold
-								: null
+								: "",
+							{
+								backgroundColor: colors.bgServiceItem,
+								shadowColor: colors.bgSeeMoreBtn
+							}
 						]}
 					>
-						{user.status !== "normal" && (
+						{item.status !== "normal" && (
 							<View
 								style={[
 									styles.categoryItemStatus,
-									user.status === "premium"
+									item.status === "premium"
 										? styles.categoryItemStatusPremium
-										: user.status === "golden"
+										: item.status === "golden"
 										? styles.categoryItemStatusGold
-										: user.status === "new"
+										: item.status === "new"
 										? styles.categoryItemStatusNew
-										: null
+										: ""
 								]}
 							>
 								<Text style={styles.categoryItemStatusText}>
-									{user.status === "premium"
-										? "premium"
-										: user.status === "golden"
-										? "golden"
-										: user.status === "new"
-										? "täze"
+									{item.status === "premium"
+										? t("premium")
+										: item.status === "golden"
+										? t("golden")
+										: item.status === "new"
+										? t("new")
 										: ""}
 								</Text>
-								{user.status === "premium" ? (
+								{item.status === "premium" ? (
 									<PremiumIcon />
-								) : user.status === "golden" ? (
+								) : item.status === "golden" ? (
 									<GoldenIcon />
-								) : user.status === "new" ? (
+								) : item.status === "new" ? (
 									<NewIcon />
 								) : null}
 							</View>
 						)}
 						<Image
-							source={{ uri: user.logo }}
+							source={{ uri: item.logo }}
 							style={styles.categoryProfileImg}
 						/>
-						{user.name ? (
+						{item.name ? (
 							(() => {
-								const [firstWord = "", secondWord = ""] = user.name.split(" ");
+								const [firstWord = "", secondWord = ""] = item.name.split(" ");
 								return (
 									<>
-										<Text style={styles.categoryUsername}>{firstWord}</Text>
-										<Text style={styles.categoryUserSurName}>{secondWord}</Text>
+										<Text
+											style={[styles.categoryUsername, { color: colors.text }]}
+										>
+											{firstWord}
+										</Text>
+										<Text
+											style={[
+												styles.categoryUserSurName,
+												{ color: colors.text }
+											]}
+										>
+											{secondWord}
+										</Text>
 									</>
 								);
 							})()
 						) : (
-							<Text style={styles.categoryUsername}>
-								service-provider_{user.id}
+							<Text style={[styles.categoryUsername, { color: colors.text }]}>
+								service-provider_{item.id}
 							</Text>
 						)}
-						<View style={styles.serviceDivider} />
-						<Text style={styles.categoryName}>{user.categories[0].name}</Text>
-						<Text style={styles.serviceName}>{user.name}</Text>
+
+						<View
+							style={[styles.serviceDivider, { backgroundColor: colors.text }]}
+						/>
+						<Text style={[styles.categoryName, { color: colors.text }]}>
+							{item.categories[0].name}
+						</Text>
+						<Text style={[styles.serviceName, { color: colors.text }]}>
+							{item.name}
+						</Text>
 						<View style={styles.serviceLocationWrapper}>
 							<LocationIcon />
 							{(() => {
 								const [firstWord = "", secondWord = ""] =
-									user.region.name.split(" ");
+									item.region.name.split(" ");
 								return (
 									<>
 										<Text style={styles.serviceLocation}>
 											{firstWord} {secondWord.slice(0, 1)}.,{" "}
-											{user.region.province}
+											{item.region.province.slice(0, 4)}
 										</Text>
 									</>
 								);
@@ -141,31 +181,30 @@ export const CategoryServices = (props: Props) => {
 						<View style={styles.serviceButtons}>
 							<View style={styles.subscriptionsButton}>
 								<Text style={styles.subscriptionsButtonText}>
-									{user.followers_count}
+									{item.followers_count}
 								</Text>
-								<Text style={styles.subscriptionsButtonText}>agza</Text>
+								<Text style={styles.subscriptionsButtonText}>
+									{t("subscriber")}
+								</Text>
 							</View>
 							<TouchableOpacity
+								onPress={() => toggleFollow(item.id)}
 								style={[
 									styles.subscribeButton,
-									user.status === "golden" && styles.subscribeButtonGold
+									mode === "dark"
+										? { backgroundColor: "", borderColor: colors.text }
+										: { backgroundColor: colors.white },
+									item.status === "golden" && styles.subscribeButtonGold
 								]}
 							>
 								<Text
 									style={[
 										styles.subscribeButtonText,
-										user.status === "golden" && styles.subscribeButtonGoldText
+										{ color: colors.text },
+										item.status === "golden" && styles.subscribeButtonGoldText
 									]}
 								>
-									Agza
-								</Text>
-								<Text
-									style={[
-										styles.subscribeButtonText,
-										user.status === "golden" && styles.subscribeButtonGoldText
-									]}
-								>
-									bol
+									{t("subscribe")}
 								</Text>
 							</TouchableOpacity>
 						</View>
@@ -191,7 +230,8 @@ export const CategoryServices = (props: Props) => {
 							key={index}
 							style={[
 								styles.paginationDot,
-								index === props.page && styles.paginationDotActive
+								{ backgroundColor: colors.bgDot2 },
+								index === props.page && { backgroundColor: colors.text }
 							]}
 						/>
 					))}
@@ -253,11 +293,7 @@ const styles = StyleSheet.create({
 	paginationDot: {
 		width: 15,
 		height: 15,
-		borderRadius: 15 / 2,
-		backgroundColor: "#00000033"
-	},
-	paginationDotActive: {
-		backgroundColor: Colors.light.secondary
+		borderRadius: 15 / 2
 	},
 	pageContainer: {
 		paddingHorizontal: 40,
@@ -367,7 +403,7 @@ const styles = StyleSheet.create({
 		paddingHorizontal: 4,
 		borderRadius: 5,
 		backgroundColor: Colors.dark.primary,
-		marginBottom: Platform.OS === "ios" ? 6 : 10,
+		marginBottom: Platform.OS === "ios" ? 6 : 10
 	},
 	serviceLocation: {
 		fontSize: 10,
@@ -375,11 +411,10 @@ const styles = StyleSheet.create({
 		color: Colors.light.secondary
 	},
 	serviceButtons: {
-		flexDirection: "row",
-		justifyContent: "space-between",
+		gap: 8,
 		width: "100%",
 		paddingHorizontal: 12,
-		marginTop: 'auto'
+		marginTop: "auto"
 	},
 	subscriptionsButton: {
 		paddingVertical: 6.5,
@@ -397,8 +432,7 @@ const styles = StyleSheet.create({
 		paddingVertical: 3.5,
 		paddingHorizontal: 4.5,
 		borderRadius: 3,
-		borderWidth: 1,
-		borderColor: "#000"
+		borderWidth: 1
 	},
 	subscribeButtonGold: {
 		backgroundColor: "#D4AF37",
