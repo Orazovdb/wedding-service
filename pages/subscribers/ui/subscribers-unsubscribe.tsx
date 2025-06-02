@@ -1,3 +1,4 @@
+import { HumanServicesByIdData } from "@/shared/api/types";
 import IconArrowRightMin from "@/shared/icons/arrow-right-min.svg";
 import IconClose from "@/shared/icons/close-confirm-icon.svg";
 import IconInfo from "@/shared/icons/info-icon.svg";
@@ -10,6 +11,7 @@ type Props = {
 	handleOpenModal?: () => void;
 	handleCloseModal: () => void;
 	handleConfirm: () => void;
+	data: HumanServicesByIdData | undefined;
 };
 
 const UnsubscribeButton = (props: Props) => {
@@ -28,8 +30,10 @@ const UnsubscribeButton = (props: Props) => {
 const UnsubscribeModal = ({
 	isModalVisible,
 	handleCloseModal,
-	handleConfirm
+	handleConfirm,
+	data
 }: Props) => {
+	const { t } = useTranslation();
 	return (
 		<Modal
 			transparent
@@ -42,13 +46,13 @@ const UnsubscribeModal = ({
 					<View style={styles.modalTitleWrapper}>
 						<IconInfo />
 						<Text style={styles.modalText}>
-							Siz hakykatdan hem{" "}
+							{t("reallyWant")}{" "}
 							<Text style={{ fontFamily: "Lexend-Medium" }}>
-								“Mergen Bezegçi”
+								“{data?.service?.name}”
 							</Text>{" "}
-							hyzmatçysyny{" "}
+							{t("user")}{" "}
 							<Text style={{ fontFamily: "Lexend-Medium" }}>
-								agzalygyňyzdan aýyrmakçymy?
+								{t("toUnsubscribe")}
 							</Text>
 						</Text>
 						<TouchableOpacity onPress={handleCloseModal}>
@@ -60,13 +64,13 @@ const UnsubscribeModal = ({
 							onPress={() => handleCloseModal()}
 							style={styles.cancelButton}
 						>
-							<Text style={styles.cancelText}>goý bolsun et</Text>
+							<Text style={styles.cancelText}>{t("cancel")}</Text>
 						</TouchableOpacity>
 						<TouchableOpacity
 							onPress={handleConfirm}
 							style={styles.confirmButton}
 						>
-							<Text style={styles.confirmText}>Hawa</Text>
+							<Text style={styles.confirmText}>{t("confirm")}</Text>
 						</TouchableOpacity>
 					</View>
 				</View>
@@ -105,14 +109,15 @@ const styles = StyleSheet.create({
 		paddingVertical: 13,
 		paddingHorizontal: 18,
 		borderRadius: 20,
-		width: "72%",
+		width: "75%",
 		alignItems: "center"
 	},
 	modalTitleWrapper: {
 		flexDirection: "row",
 		alignItems: "flex-start",
 		gap: 4,
-		marginBottom: 40
+		marginBottom: 40,
+		marginHorizontal: 10
 	},
 	modalText: {
 		fontSize: 14,

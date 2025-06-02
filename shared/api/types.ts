@@ -158,6 +158,7 @@ export type SimilarServices = {
 			id: number;
 			name: string;
 			parent_id: number | null
+			icon: string
 		}
 	];
 	region: {

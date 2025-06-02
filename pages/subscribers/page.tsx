@@ -1,21 +1,26 @@
-import { Colors } from "@/constants/Colors"
-import { categoriesService } from "@/shared/api/services/categories.service"
-import { servicesService } from "@/shared/api/services/services.service"
+import { Colors } from "@/constants/Colors";
+import { categoriesService } from "@/shared/api/services/categories.service";
+import { servicesService } from "@/shared/api/services/services.service";
 import {
 	CategoriesWithChildren,
 	FollowersData,
 	HumanServicesByIdData
-} from "@/shared/api/types"
-import React, { useEffect, useState } from "react"
-import { useTranslation } from "react-i18next"
-import { ScrollView, StyleSheet, Text, View } from "react-native"
-import { SubscribersFilterModal } from "./ui/subscribers-filter"
-import { SubscribersInfo } from "./ui/subscribers-info"
-import { SubscribersRecommendCategories } from "./ui/subscribers-recommend-categories"
-import { SubscribersSubscribeSlider } from "./ui/subscribers-subscribe-slider"
+} from "@/shared/api/types";
+import { useAppTheme } from "@/shared/hooks/use-app-theme";
+import i18n from "@/shared/i18n";
+import React, { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
+import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { SubscribersFilterModal } from "./ui/subscribers-filter";
+import { SubscribersInfo } from "./ui/subscribers-info";
+import { SubscribersRecommendCategories } from "./ui/subscribers-recommend-categories";
+import { SubscribersSubscribeSlider } from "./ui/subscribers-subscribe-slider";
 
 export const SubscribersScreen = () => {
 	const { t } = useTranslation();
+	const currentLocale = i18n.language;
+	const { colors, mode } = useAppTheme();
+
 	const [isModalVisible, setIsModalVisible] = useState(false);
 	const [selectedSubscribeId, setSelectedSubscribeId] = useState<string>("");
 	const [selectedCategoryId, setSelectedCategoryId] = useState<string>("");
@@ -39,18 +44,23 @@ export const SubscribersScreen = () => {
 	const [hasMore, setHasMore] = useState(true);
 
 	useEffect(() => {
-		categoriesService.getCategories({ parent: 1 }).then(setDataCategories);
+		categoriesService
+			.getCategories({ parent: 1, lang: currentLocale })
+			.then(setDataCategories);
 	}, []);
 
 	useEffect(() => {
 		const fetchData = async () => {
-			const result = await servicesService.getServicesById(selectedSubscribeId);
+			const result = await servicesService.getServicesById(
+				selectedSubscribeId,
+				currentLocale
+			);
 			setDataService(result);
 		};
 
 		fetchData();
 
-		console.log(indexProfileSlider);
+		console.log(selectedSubscribeId);
 	}, [selectedSubscribeId]);
 
 	useEffect(() => {
@@ -61,7 +71,8 @@ export const SubscribersScreen = () => {
 				category_ids: categories.join(",") || undefined,
 				statuses: statuses.join(",") || undefined,
 				provinces: regions.join(",") || undefined,
-				page: 1
+				page: 1,
+				lang: currentLocale
 			});
 			setDataSubscribers(result);
 		};
@@ -73,12 +84,25 @@ export const SubscribersScreen = () => {
 		setIsModalVisible(true);
 	};
 
-	const handleModalClose = () => {
-		setIsModalVisible(false);
-	};
-
-	const handleConfirmUnsubscribe = () => {
+	const handleConfirmUnsubscribe = async () => {
 		setIsUnsubscribeModalVisible(false);
+
+		await servicesService.toggleFollowService({
+			service_id: Number(selectedSubscribeId)
+		});
+
+		const fetchData = async () => {
+			const result = await servicesService.getFollowers({
+				category_ids: categories.join(",") || undefined,
+				statuses: statuses.join(",") || undefined,
+				provinces: regions.join(",") || undefined,
+				page: 1,
+				lang: currentLocale
+			});
+			setDataSubscribers(result);
+		};
+
+		fetchData();
 	};
 
 	const handleOpenUnsubscribeModal = () => {
@@ -99,7 +123,8 @@ export const SubscribersScreen = () => {
 			category_ids: empty,
 			statuses: empty,
 			provinces: empty,
-			page: 1
+			page: 1,
+			lang: currentLocale
 		});
 		setDataSubscribers(result);
 	};
@@ -124,7 +149,8 @@ export const SubscribersScreen = () => {
 			category_ids: selectedCategories.join(",") || undefined,
 			statuses: selectedStatuses.join(",") || undefined,
 			provinces: selectedRegions.join(",") || undefined,
-			page: 1
+			page: 1,
+			lang: currentLocale
 		});
 		setDataSubscribers(result);
 		setIsModalVisible(false);
@@ -132,14 +158,16 @@ export const SubscribersScreen = () => {
 	};
 
 	return (
-		<ScrollView style={styles.safeArea}>
+		<ScrollView style={[styles.safeArea, { backgroundColor: colors.bgPage }]}>
 			<View style={styles.page}>
-				<View style={styles.header}>
+				<View style={[styles.header, { backgroundColor: colors.bgSubscriber }]}>
 					<View style={styles.subscribersRow}>
-						<Text style={styles.subscribersTitle}>
+						<Text style={[styles.subscribersTitle, { color: colors.text }]}>
 							{dataSubscribes?.data.length}
 						</Text>
-						<Text style={styles.subscribersText}>{t("subscribers")}</Text>
+						<Text style={[styles.subscribersText, { color: colors.text }]}>
+							{t("subscribers")}
+						</Text>
 					</View>
 					<SubscribersFilterModal.Button
 						isModalVisible={isModalVisible}
@@ -172,6 +200,7 @@ export const SubscribersScreen = () => {
 						<Text
 							style={[
 								styles.subscribersCountText,
+								{ color: colors.text },
 								styles.subscribersCountTextActive
 							]}
 						>
@@ -205,16 +234,13 @@ export const SubscribersScreen = () => {
 
 const styles = StyleSheet.create({
 	safeArea: {
-		flex: 1,
-		backgroundColor: Colors.light.white
+		flex: 1
 	},
 	page: {
 		paddingVertical: 20,
 		paddingBottom: 100
 	},
 	header: {
-		backgroundColor: "#0000001A",
-		borderBottomColor: Colors.light.secondary,
 		flexDirection: "row",
 		justifyContent: "space-between",
 		alignItems: "center",
@@ -258,7 +284,6 @@ const styles = StyleSheet.create({
 		color: "#000000"
 	},
 	subscribersCountText: {
-		color: "#0000004D",
 		fontFamily: "Lexend-Medium",
 		fontSize: 16,
 		textAlign: "center"

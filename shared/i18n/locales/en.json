@@ -37,5 +37,10 @@
 	"all": "All",
 	"addService": "Add service?",
 	"address": "Address",
-	"subscribed": "Subscribed"
+	"subscribed": "Subscribed",
+	"reallyWant": "Are you really want",
+	"user": "user",
+	"toUnsubscribe": "remove from subscriptions?",
+	"cancel": "Cancel", 
+	"confirm": "Confirm"
 }

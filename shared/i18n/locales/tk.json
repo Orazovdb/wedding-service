@@ -36,5 +36,10 @@
 	"all": "Ählisi",
 	"addService": "Hyzmat berjekmi?",
 	"address": "Salgy",
-	"subscribed": "Agzala bolundy"
+	"subscribed": "Agzala bolundy",
+	"reallyWant": "Siz hakykatdan hem",
+	"user": "hyzmatçyny",
+	"toUnsubscribe": "agzalygyňyzdan aýyrmakçymy?",
+	"cancel": "Goý bolsun", 
+	"confirm": "Hawa"
 }

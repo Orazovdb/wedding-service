@@ -1,10 +1,11 @@
 import { HumanServicesByIdData } from "@/shared/api/types";
-import IconRestaurant from "@/shared/icons/restaurant-icon.svg";
+import { useAppTheme } from "@/shared/hooks/use-app-theme";
 import { useRouter } from "expo-router";
 import React from "react";
 import { useTranslation } from "react-i18next";
 import {
 	FlatList,
+	Image,
 	StyleSheet,
 	Text,
 	TouchableOpacity,
@@ -18,14 +19,15 @@ interface Props {
 
 export const SubscribersRecommendCategories = (props: Props) => {
 	const { t } = useTranslation();
+	const { colors, mode } = useAppTheme();
 	const router = useRouter();
 	return (
 		<View style={styles.recommendCategories}>
-			<Text style={styles.recommendCategoriesTitle}>
+			<Text style={[styles.recommendCategoriesTitle, { color: colors.text }]}>
 				{t("recommendedServices")}
 			</Text>
 			<FlatList
-				data={props.data && props.data?.similar}
+				data={props.data?.similar?.[0]?.categories ?? []}
 				keyExtractor={item => item?.id.toString()}
 				horizontal={true}
 				showsHorizontalScrollIndicator={false}
@@ -39,10 +41,11 @@ export const SubscribersRecommendCategories = (props: Props) => {
 						]}
 						onPress={() => router.push(`/categories/${item?.id}/all`)}
 					>
-						<IconRestaurant />
+						{/* <Image source={{ uri: item.icon }} style={styles.categoryIcon} /> */}
 						<Text
 							style={[
 								styles.categoryItemText,
+								{ color: colors.text },
 								Number(props.category_id) === item?.id
 									? styles.categoryItemTextActive
 									: null
@@ -90,5 +93,6 @@ export const styles = StyleSheet.create({
 		fontFamily: "Lexend-Light",
 		fontSize: 14
 	},
-	categoryItemTextActive: {}
+	categoryItemTextActive: {},
+	categoryIcon: { width: 18, height: 18 }
 });

@@ -1,8 +1,12 @@
 import { Colors } from "@/constants/Colors";
 import { CategoriesWithChildren, statusServices } from "@/shared/api/types";
+import { useAppTheme } from "@/shared/hooks/use-app-theme";
+import CheckedIconDark from "@/shared/icons/checked-dark.svg";
 import CheckedIcon from "@/shared/icons/checked.svg";
+import CloseIconDark from "@/shared/icons/close-icon-dark.svg";
 import CloseIcon from "@/shared/icons/close-icon.svg";
 import IconFilter from "@/shared/icons/filter-subscribers-icon.svg";
+import UncheckedIconDark from "@/shared/icons/unchecked-dark.svg";
 import UncheckedIcon from "@/shared/icons/unchecked.svg";
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -68,6 +72,8 @@ const SubscribersFilterButton = (props: SubscribersFilterProps) => {
 
 const SubscribersDetailFilter = (props: SubscribersFilterProps) => {
 	const { t } = useTranslation();
+	const { colors, mode } = useAppTheme();
+
 	const [selectedStatuses, setSelectedStatuses] = useState<string[]>([]);
 	const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
 	const [selectedRegions, setSelectedRegions] = useState<string[]>([]);
@@ -128,15 +134,24 @@ const SubscribersDetailFilter = (props: SubscribersFilterProps) => {
 			onRequestClose={closeFilter}
 		>
 			<View style={styles.modalContainer}>
-				<ScrollView contentContainerStyle={styles.modalContent}>
+				<ScrollView
+					contentContainerStyle={[
+						styles.modalContent,
+						{ backgroundColor: colors.bgPage }
+					]}
+				>
 					<TouchableOpacity style={styles.closeButton} onPress={closeFilter}>
-						<CloseIcon />
-						<Text style={styles.closeButtonText}>{t("filter")}</Text>
+						{mode === "light" ? <CloseIcon /> : <CloseIconDark />}
+						<Text style={[styles.closeButtonText, { color: colors.text }]}>
+							{t("filter")}
+						</Text>
 					</TouchableOpacity>
 
 					<View style={styles.categoryItemModal}>
 						<View style={styles.categoryItemModalSection}>
-							<Text style={styles.categoryItemModalTitle}>
+							<Text
+								style={[styles.categoryItemModalTitle, { color: colors.text }]}
+							>
 								{t("subscribers")}
 							</Text>
 							{statusFilter?.map((category, index) => (
@@ -151,11 +166,22 @@ const SubscribersDetailFilter = (props: SubscribersFilterProps) => {
 									onPress={() => toggleCheckboxStatus(category.status)}
 								>
 									{selectedStatuses.includes(category.status) ? (
-										<CheckedIcon />
-									) : (
+										mode === "light" ? (
+											<CheckedIcon />
+										) : (
+											<CheckedIconDark />
+										)
+									) : mode === "light" ? (
 										<UncheckedIcon />
+									) : (
+										<UncheckedIconDark />
 									)}
-									<Text style={styles.categoryItemModalItemTitle}>
+									<Text
+										style={[
+											styles.categoryItemModalItemTitle,
+											{ color: colors.text }
+										]}
+									>
 										{category.title}
 									</Text>
 								</TouchableOpacity>
@@ -163,7 +189,9 @@ const SubscribersDetailFilter = (props: SubscribersFilterProps) => {
 							<View style={styles.categoryItemModalDivider} />
 						</View>
 						<View style={styles.categoryItemModalSection}>
-							<Text style={styles.categoryItemModalTitle}>
+							<Text
+								style={[styles.categoryItemModalTitle, { color: colors.text }]}
+							>
 								{t("categories")}
 							</Text>
 							{props.categories?.map((category, index) => (
@@ -178,11 +206,22 @@ const SubscribersDetailFilter = (props: SubscribersFilterProps) => {
 									onPress={() => toggleCheckboxCategories(String(category.id))}
 								>
 									{selectedCategories.includes(`${category.id}`) ? (
-										<CheckedIcon />
-									) : (
+										mode === "light" ? (
+											<CheckedIcon />
+										) : (
+											<CheckedIconDark />
+										)
+									) : mode === "light" ? (
 										<UncheckedIcon />
+									) : (
+										<UncheckedIconDark />
 									)}
-									<Text style={styles.categoryItemModalItemTitle}>
+									<Text
+										style={[
+											styles.categoryItemModalItemTitle,
+											{ color: colors.text }
+										]}
+									>
 										{category.name}
 									</Text>
 								</TouchableOpacity>
@@ -190,7 +229,11 @@ const SubscribersDetailFilter = (props: SubscribersFilterProps) => {
 							<View style={styles.categoryItemModalDivider} />
 						</View>
 						<View style={styles.categoryItemModalSection}>
-							<Text style={styles.categoryItemModalTitle}>{t("regions")}</Text>
+							<Text
+								style={[styles.categoryItemModalTitle, { color: colors.text }]}
+							>
+								{t("regions")}
+							</Text>
 							{regions?.map((region, index) => (
 								<TouchableOpacity
 									key={region.id}
@@ -203,11 +246,22 @@ const SubscribersDetailFilter = (props: SubscribersFilterProps) => {
 									onPress={() => toggleCheckboxRegions(String(region.id))}
 								>
 									{selectedRegions.includes(`${region.id}`) ? (
-										<CheckedIcon />
-									) : (
+										mode === "light" ? (
+											<CheckedIcon />
+										) : (
+											<CheckedIconDark />
+										)
+									) : mode === "light" ? (
 										<UncheckedIcon />
+									) : (
+										<UncheckedIconDark />
 									)}
-									<Text style={styles.categoryItemModalItemTitle}>
+									<Text
+										style={[
+											styles.categoryItemModalItemTitle,
+											{ color: colors.text }
+										]}
+									>
 										{region.name}
 									</Text>
 								</TouchableOpacity>
@@ -243,14 +297,12 @@ export const styles = StyleSheet.create({
 	},
 	modalContainer: {
 		flex: 1,
-		backgroundColor: Colors.light.white,
 		justifyContent: "center",
 		alignItems: "center"
 	},
 	modalContent: {
 		width: width,
 		height: height,
-		backgroundColor: "white",
 		padding: 20,
 		paddingTop: Platform.OS === "ios" ? 60 : 0,
 		alignItems: "center"

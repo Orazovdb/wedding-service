@@ -32,6 +32,10 @@ const secondary170 = "#0000001A";
 const secondary180 = "#FFFFFFCC";
 const secondary190 = "#00000033";
 const secondary200 = "#FFFFFF33";
+const secondary210 = '#00000066'
+const secondary220 = '#FFFFFF4D'
+const secondary230 = '#0000000D'
+
 
 
 
@@ -59,6 +63,9 @@ export const Colors = {
 		bgCategoryItem: secondary140,
 		textTotalCount: secondary170,
 		bgDot2: secondary190,
+		bgSubscriber: secondary140,
+		text2: secondary210,
+		bgContact: secondary230,
 
 		swatch: swatch,
 		premium: premium,
@@ -97,6 +104,9 @@ export const Colors = {
 		bgCategoryItem: secondary160,
 		textTotalCount: secondary180,
 		bgDot2: secondary200,
+		bgSubscriber: secondary200,
+		text2: secondary220,
+		bgContact: secondary200,
 
 
 		swatch: swatch,

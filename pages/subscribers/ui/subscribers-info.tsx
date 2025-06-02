@@ -1,4 +1,5 @@
 import { HumanServicesByIdData } from "@/shared/api/types";
+import { useAppTheme } from "@/shared/hooks/use-app-theme";
 import IconAvatarCircle from "@/shared/icons/avatar-circle.svg";
 import { useRouter } from "expo-router";
 import React from "react";
@@ -18,26 +19,37 @@ type Props = {
 
 export const SubscribersInfo = (props: Props) => {
 	const { t } = useTranslation();
+	const { colors, mode } = useAppTheme();
+
 	const router = useRouter();
 	return (
 		<View style={styles.box}>
 			<View style={styles.header}>
-				<Text style={styles.userName}>{props.data?.service?.name}</Text>
+				<Text style={[styles.userName, { color: colors.text }]}>
+					{props.data?.service?.name}
+				</Text>
 				<SubscribersUnsubscribe.Button
 					handleConfirm={props.handleConfirm}
 					isModalVisible={props.isModalVisible}
 					handleOpenModal={props.handleOpenModal}
 					handleCloseModal={props.handleCloseModal}
+					data={props.data}
 				/>
 			</View>
 			<View style={styles.categories}>
-				<View style={styles.categoryItem}>
-					<Text style={styles.categoryType}>{t("category")}</Text>
-					<Text style={styles.categoryTitle}>
+				<View
+					style={[styles.categoryItem, { backgroundColor: colors.bgContact }]}
+				>
+					<Text style={[styles.categoryType, { color: colors.text2 }]}>
+						{t("category")}
+					</Text>
+					<Text style={[styles.categoryTitle, { color: colors.text }]}>
 						{props.data?.service?.categories[0]?.name}
 					</Text>
-					<View style={styles.categoryDivider} />
-					<Text style={styles.categoryService}>
+					<View
+						style={[styles.categoryDivider, { backgroundColor: colors.text2 }]}
+					/>
+					<Text style={[styles.categoryService, { color: colors.text }]}>
 						{
 							props.data?.service?.categories.filter(
 								item => item?.parent_id !== null
@@ -45,18 +57,33 @@ export const SubscribersInfo = (props: Props) => {
 						}
 					</Text>
 				</View>
-				<View style={styles.categoryItem}>
-					<Text style={styles.categoryType}>{t("subscribed")}</Text>
-					<Text style={styles.categoryTitle}>
+				<View
+					style={[styles.categoryItem, { backgroundColor: colors.bgContact }]}
+				>
+					<Text style={[styles.categoryType, { color: colors.text2 }]}>
+						{t("subscribed")}
+					</Text>
+					<Text style={[styles.categoryTitle, { color: colors.text }]}>
 						{props.data?.service?.region?.name}
 					</Text>
 				</View>
-				<View style={styles.categoryItem}>
-					<Text style={styles.categoryType}>{t("subscriber")}</Text>
-					<Text style={[styles.categoryTitle, { fontFamily: "Lexend-Medium" }]}>
+				<View
+					style={[styles.categoryItem, { backgroundColor: colors.bgContact }]}
+				>
+					<Text style={[styles.categoryType, { color: colors.text2 }]}>
+						{t("subscriber")}
+					</Text>
+					<Text
+						style={[
+							styles.categoryTitle,
+							{ fontFamily: "Lexend-Medium", color: colors.text }
+						]}
+					>
 						{props.data?.service?.followers_count} {t("subscriber")}
 					</Text>
-					<View style={styles.categoryDivider} />
+					<View
+						style={[styles.categoryDivider, { backgroundColor: colors.text2 }]}
+					/>
 					<View style={styles.categorySubscribed}>
 						<View style={styles.categorySubscribedDot} />
 						<Text style={styles.categorySubscribedText}>{t("subscribed")}</Text>
@@ -75,6 +102,7 @@ export const SubscribersInfo = (props: Props) => {
 				handleCloseModal={() => props.handleCloseModal()}
 				handleConfirm={props.handleConfirm}
 				isModalVisible={props.isModalVisible}
+				data={props.data}
 			/>
 		</View>
 	);
@@ -115,19 +143,16 @@ export const styles = StyleSheet.create({
 	categoryItem: {
 		flexBasis: "30%",
 		borderRadius: 10,
-		backgroundColor: "#0000000D",
 		paddingVertical: 6,
 		paddingHorizontal: 8
 	},
 	categoryType: {
-		color: "#00000066",
 		fontFamily: "Lexend-Regular",
 		fontSize: 8,
 		marginBottom: 8
 	},
 	categoryTitle: {
 		fontSize: 11,
-		color: "#000000",
 		fontFamily: "Lexend-Regular",
 		marginBottom: 6,
 		textAlign: "center",
@@ -137,8 +162,7 @@ export const styles = StyleSheet.create({
 		marginBottom: 6,
 		marginHorizontal: "auto",
 		width: "30%",
-		height: 1,
-		backgroundColor: "#00000066"
+		height: 1
 	},
 	categoryService: {
 		fontSize: 11,
