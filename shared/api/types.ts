@@ -58,7 +58,7 @@ export enum parentCategories {
 export type CategoriesWithChildrenArgs = {
 	parent?: parentCategories;
 	category_id?: string;
-	lang: string
+	lang: string;
 };
 
 export type CategoriesWithChildren = {
@@ -80,7 +80,7 @@ export type HumanServicesArgs = {
 	statuses: statusServices | string | undefined;
 	page: number | undefined;
 	limit?: number;
-	lang: string
+	lang: string;
 };
 
 export type HumanServices = {
@@ -157,8 +157,8 @@ export type SimilarServices = {
 		{
 			id: number;
 			name: string;
-			parent_id: number | null
-			icon: string
+			parent_id: number | null;
+			icon: string;
 		}
 	];
 	region: {
@@ -180,7 +180,7 @@ export type FollowersArgs = {
 	statuses: statusServices | string | undefined;
 	page: number | undefined;
 	limit?: number;
-	lang: string
+	lang: string;
 };
 
 export type Followers = {
@@ -200,4 +200,8 @@ export type FollowersData = {
 		total: number;
 		limit?: number;
 	};
+};
+
+export type Profile = {
+	data: { id: number; name: string; phone: string };
 };

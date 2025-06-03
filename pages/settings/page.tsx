@@ -1,4 +1,6 @@
-import { Colors } from "@/constants/Colors";
+import { profileService } from "@/shared/api/services/profile.service";
+import { Profile } from "@/shared/api/types";
+import { useAppTheme } from "@/shared/hooks/use-app-theme";
 import i18n from "@/shared/i18n";
 import IconAd from "@/shared/icons/settings/ad-icon.svg";
 import IconLogout from "@/shared/icons/settings/logout-icon.svg";
@@ -21,11 +23,22 @@ import { ThemeTabs } from "./ui/theme-tabs";
 
 export const SettingsScreen = () => {
 	const { t } = useTranslation();
+	const { colors } = useAppTheme();
+
 	const [selectedLang, setSelectedLang] = useState(1);
 	const { mode, setMode } = useThemeMode();
 	const [selectedTheme, setSelectedTheme] = useState(1);
+	const [profile, setProfile] = useState<Profile>();
 
 	const { logout } = useAuth();
+
+	useEffect(() => {
+		const fetchData = async () => {
+			const response = await profileService.getProfile();
+			setProfile(response);
+		};
+		fetchData();
+	}, []);
 
 	const handleChangeTab = (id: number) => {
 		setSelectedLang(id);
@@ -66,7 +79,7 @@ export const SettingsScreen = () => {
 	};
 
 	return (
-		<ScrollView style={styles.scrollView}>
+		<ScrollView style={[styles.scrollView, { backgroundColor: colors.bgPage }]}>
 			<View style={styles.page}>
 				<ProfileAvatar />
 				<LanguageTabs
@@ -81,14 +94,18 @@ export const SettingsScreen = () => {
 					<View style={styles.routeItemWrapper}>
 						<TouchableOpacity style={styles.routeItem}>
 							<IconRocket />
-							<Text style={styles.routeItemText}>Biz hakynda</Text>
+							<Text style={[styles.routeItemText, { color: colors.text }]}>
+								Biz hakynda
+							</Text>
 						</TouchableOpacity>
 						<View style={styles.routeDivider} />
 					</View>
 					<View style={styles.routeItemWrapper}>
 						<TouchableOpacity style={styles.routeItem}>
 							<IconAd />
-							<Text style={styles.routeItemText}>Mahabat hyzmatlary</Text>
+							<Text style={[styles.routeItemText, { color: colors.text }]}>
+								Mahabat hyzmatlary
+							</Text>
 						</TouchableOpacity>
 						<View style={styles.routeDivider} />
 					</View>
@@ -99,11 +116,12 @@ export const SettingsScreen = () => {
 				</TouchableOpacity>
 				<View style={styles.gratitude}>
 					<View style={styles.content}>
-						<Text style={styles.gratitudeText}>
-							Programmamyzy ýükläp ullananyňyz we biziň bilen işleşeniňiz üçin
-							Sagboluň. Hormatlamak bilen,
+						<Text style={[styles.gratitudeText, { color: colors.text }]}>
+							{t("recommendApp")}
 						</Text>
-						<Text style={styles.gratitudeTitle}>Toý hyzmatlary</Text>
+						<Text style={[styles.gratitudeTitle, { color: colors.text }]}>
+							{profile?.data.name}
+						</Text>
 					</View>
 					<Image
 						source={require("@/shared/images/settings-person.png")}
@@ -118,7 +136,6 @@ export const SettingsScreen = () => {
 export const styles = StyleSheet.create({
 	scrollView: {
 		flex: 1,
-		backgroundColor: Colors.light.white,
 		paddingVertical: 30,
 		paddingHorizontal: 34
 	},

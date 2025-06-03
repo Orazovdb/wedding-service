@@ -1,6 +1,10 @@
+import { useAppTheme } from "@/shared/hooks/use-app-theme";
+import IconDarkDark from "@/shared/icons/settings/dark-icon-dark.svg";
 import IconDark from "@/shared/icons/settings/dark-icon.svg";
 import IconDevice from "@/shared/icons/settings/device-icon.svg";
+import IconLightDark from "@/shared/icons/settings/light-icon-dark.svg";
 import IconLight from "@/shared/icons/settings/light-icon.svg";
+import IconSystemDark from "@/shared/icons/settings/system-icon-dark.svg";
 import IconSystem from "@/shared/icons/settings/system-icon.svg";
 import React from "react";
 import { useTranslation } from "react-i18next";
@@ -11,26 +15,48 @@ type props = {
 	onChangeTab: (value: number) => void;
 };
 
-const data = [
-	{
-		id: "1",
-		icon: <IconLight />,
-		title: "Light"
-	},
-	{
-		id: "2",
-		icon: <IconDark />,
-		title: "Dark"
-	},
-	{
-		id: "3",
-		icon: <IconSystem />,
-		title: "System"
-	}
-];
-
 export const ThemeTabs = ({ selectedTab = 1, onChangeTab }: props) => {
 	const { t } = useTranslation();
+	const { colors, mode } = useAppTheme();
+
+	const data = [
+		{
+			id: "1",
+			icon:
+				mode === "light" ? (
+					<IconLight />
+				) : selectedTab === 1 ? (
+					<IconLight />
+				) : (
+					<IconLightDark />
+				),
+			title: "Light"
+		},
+		{
+			id: "2",
+			icon:
+				mode === "light" ? (
+					<IconDark />
+				) : selectedTab === 2 ? (
+					<IconDark />
+				) : (
+					<IconDarkDark />
+				),
+			title: "Dark"
+		},
+		{
+			id: "3",
+			icon:
+				mode === "light" ? (
+					<IconSystem />
+				) : selectedTab === 3 ? (
+					<IconSystem />
+				) : (
+					<IconSystemDark />
+				),
+			title: "System"
+		}
+	];
 
 	return (
 		<View style={styles.ThemeTabs}>
@@ -39,19 +65,36 @@ export const ThemeTabs = ({ selectedTab = 1, onChangeTab }: props) => {
 				<Text style={styles.title}>{t("theme")}</Text>
 			</View>
 			<View style={styles.tabs}>
-				{data.map(tab => (
-					<TouchableOpacity
-						key={tab.id}
-						onPress={() => onChangeTab(Number(tab.id))}
-						style={[
-							styles.tab,
-							selectedTab === Number(tab.id) ? styles.tabActive : null
-						]}
-					>
-						{tab.icon}
-						<Text style={styles.tabText}>{tab.title}</Text>
-					</TouchableOpacity>
-				))}
+				{data.map(tab => {
+					const isActive = selectedTab === Number(tab.id);
+					return (
+						<TouchableOpacity
+							key={tab.id}
+							onPress={() => onChangeTab(Number(tab.id))}
+							style={[
+								styles.tab,
+								{ backgroundColor: colors.textReverse },
+								isActive ? styles.tabActive : null
+							]}
+						>
+							{tab.icon}
+							<Text
+								style={[
+									styles.tabText,
+									{
+										color: isActive
+											? mode === "light"
+												? colors.text
+												: colors.textReverse
+											: colors.text
+									}
+								]}
+							>
+								{tab.title}
+							</Text>
+						</TouchableOpacity>
+					);
+				})}
 			</View>
 			<View style={styles.divider} />
 		</View>

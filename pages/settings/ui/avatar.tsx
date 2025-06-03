@@ -1,19 +1,26 @@
+import { useAppTheme } from "@/shared/hooks/use-app-theme";
 import IconPen from "@/shared/icons/settings/pen-icon.svg";
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 export const ProfileAvatar = () => {
 	const { t } = useTranslation();
+	const { colors } = useAppTheme();
+
 	return (
 		<View style={styles.avatarBlock}>
 			<View style={styles.avatarContent}>
 				<View style={styles.avatarName}>
-					<Text style={styles.avatarNameText}>Durdy</Text>
+					<Text style={[styles.avatarNameText, { color: colors.text }]}>
+						Durdy
+					</Text>
 					<TouchableOpacity style={styles.avatarEditButton}>
 						<IconPen />
 					</TouchableOpacity>
 				</View>
-				<Text style={styles.avatarNameText}>Annanyýazow</Text>
+				<Text style={[styles.avatarNameText, { color: colors.text }]}>
+					Annanyýazow
+				</Text>
 				<TouchableOpacity style={styles.serviceButton}>
 					<Text style={styles.serviceButtonText}>{t("addService")}</Text>
 				</TouchableOpacity>

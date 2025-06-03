@@ -26,7 +26,7 @@
 	"unSubscribe": "Unsubscribe",
 	"goProfile": "Go profile",
 	"recommendedServices": "Recommended categories",
-	"language": "Dil",
+	"language": "Language",
 	"theme": "Theme",
 	"logout": "Logout",
 	"evaluation": "Evaluation",
@@ -41,6 +41,7 @@
 	"reallyWant": "Are you really want",
 	"user": "user",
 	"toUnsubscribe": "remove from subscriptions?",
-	"cancel": "Cancel", 
-	"confirm": "Confirm"
+	"cancel": "Cancel",
+	"confirm": "Confirm",
+	"recommendApp": "Thank you for downloading and using our program and working with us. Sincerely"
 }
