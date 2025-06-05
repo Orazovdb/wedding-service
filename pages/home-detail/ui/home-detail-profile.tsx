@@ -78,7 +78,9 @@ export const HomeDetailProfile = ({
 					style={styles.subscribeButton}
 				>
 					<Text style={[styles.subscribeButtonText, { color: colors.text }]}>
-						{t("subscribe")}
+						{data?.service?.is_followed
+							? `${t("unSubscribe")}`
+							: `${t("subscribe")}`}
 					</Text>
 				</TouchableOpacity>
 			</View>

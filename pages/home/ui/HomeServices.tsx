@@ -207,26 +207,51 @@ export const HomeServices = ({
 										{t("subscriber")}
 									</Text>
 								</View>
-								<TouchableOpacity
-									onPress={() => toggleFollow(item.id)}
-									style={[
-										styles.subscribeButton,
-										mode === "dark"
-											? { backgroundColor: "", borderColor: colors.text }
-											: { backgroundColor: colors.white },
-										item.status === "golden" && styles.subscribeButtonGold
-									]}
-								>
-									<Text
+								{item.is_followed ? (
+									<TouchableOpacity
+										onPress={() => toggleFollow(item.id)}
 										style={[
-											styles.subscribeButtonText,
-											{ color: colors.text },
-											item.status === "golden" && styles.subscribeButtonGoldText
+											styles.subscribeButton,
+											mode === "dark"
+												? { backgroundColor: "#000", borderColor: colors.text }
+												: { backgroundColor: colors.white },
+											item.status === "golden" && styles.subscribeButtonGold
 										]}
 									>
-										{t("subscribe")}
-									</Text>
-								</TouchableOpacity>
+										<Text
+											style={[
+												styles.subscribeButtonText,
+												{ color: colors.text },
+												item.status === "golden" &&
+													styles.subscribeButtonGoldText
+											]}
+										>
+											{t("unSubscribe")}
+										</Text>
+									</TouchableOpacity>
+								) : (
+									<TouchableOpacity
+										onPress={() => toggleFollow(item.id)}
+										style={[
+											styles.subscribeButton,
+											mode === "dark"
+												? { backgroundColor: "", borderColor: colors.text }
+												: { backgroundColor: colors.white },
+											item.status === "golden" && styles.subscribeButtonGold
+										]}
+									>
+										<Text
+											style={[
+												styles.subscribeButtonText,
+												{ color: colors.text },
+												item.status === "golden" &&
+													styles.subscribeButtonGoldText
+											]}
+										>
+											{t("subscribe")}
+										</Text>
+									</TouchableOpacity>
+								)}
 							</View>
 						</TouchableOpacity>
 					</View>
@@ -389,7 +414,10 @@ export const styles = StyleSheet.create({
 		paddingVertical: 2.5,
 		paddingHorizontal: 4.5,
 		backgroundColor: Colors.light.secondary,
-		borderRadius: 3
+		borderRadius: 3,
+		flexDirection: "row",
+		justifyContent: "center",
+		gap: 6
 	},
 	subscriptionsButtonText: {
 		fontSize: 10,

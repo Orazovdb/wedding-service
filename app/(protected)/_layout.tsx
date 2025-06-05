@@ -82,6 +82,10 @@ export default function ProtectedLayout() {
 					name="categories/[categoryDetail]/[id]"
 					options={{ animation: "slide_from_right", presentation: "card" }}
 				/>
+				<Stack.Screen
+					name="settings/settings-info"
+					options={{ animation: "slide_from_right", presentation: "card" }}
+				/>
 
 				<Stack.Screen
 					name="pdf-viewer"

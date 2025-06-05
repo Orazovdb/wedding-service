@@ -78,10 +78,15 @@ export const SettingsScreen = () => {
 		setMode(theme);
 	};
 
+	const refetch = async () => {
+		const response = await profileService.getProfile();
+		setProfile(response);
+	};
+
 	return (
 		<ScrollView style={[styles.scrollView, { backgroundColor: colors.bgPage }]}>
 			<View style={styles.page}>
-				<ProfileAvatar />
+				<ProfileAvatar data={profile} refetch={refetch} />
 				<LanguageTabs
 					selectedTab={selectedLang}
 					onChangeTab={handleChangeTab}

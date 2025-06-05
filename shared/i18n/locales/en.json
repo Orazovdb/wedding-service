@@ -43,5 +43,6 @@
 	"toUnsubscribe": "remove from subscriptions?",
 	"cancel": "Cancel",
 	"confirm": "Confirm",
-	"recommendApp": "Thank you for downloading and using our program and working with us. Sincerely"
+	"recommendApp": "Thank you for downloading and using our program and working with us. Sincerely",
+	"noData": "No matching service provider found!"
 }

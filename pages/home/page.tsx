@@ -27,6 +27,7 @@ import i18n from "@/shared/i18n";
 import { default as IconArrowLeftDark } from "@/shared/icons/arrow-left-big-black-dark.svg";
 import { default as IconArrowLeft } from "@/shared/icons/arrow-left-big-black.svg";
 import LocationIcon from "@/shared/icons/location-icon.svg";
+import IconNoData from "@/shared/icons/no-data.svg";
 import GoldenIcon from "@/shared/icons/status-golden.svg";
 import NewIcon from "@/shared/icons/status-new.svg";
 import PremiumIcon from "@/shared/icons/status-premium.svg";
@@ -339,21 +340,32 @@ export const HomeScreen = () => {
 					</View>
 				</View>
 				{isFiltered ? (
-					<FlatList
-						data={dataServices?.data || []}
-						keyExtractor={(item, index) => `${item.id}_${index}`}
-						renderItem={renderItem}
-						numColumns={2}
-						columnWrapperStyle={{
-							justifyContent: "space-between",
-							paddingHorizontal: 20
-						}}
-						onEndReached={loadMoreData}
-						onEndReachedThreshold={0.1}
-						ListFooterComponent={<View style={{ height: 1 }} />}
-						contentContainerStyle={{ paddingBottom: 30 }}
-						style={{ flex: 1 }}
-					/>
+					dataServices && dataServices?.data.length > 0 ? (
+						<FlatList
+							data={dataServices?.data || []}
+							keyExtractor={(item, index) => `${item.id}_${index}`}
+							renderItem={renderItem}
+							numColumns={2}
+							columnWrapperStyle={{
+								justifyContent: "space-between",
+								paddingHorizontal: 20
+							}}
+							onEndReached={loadMoreData}
+							onEndReachedThreshold={0.1}
+							ListFooterComponent={<View style={{ height: 1 }} />}
+							contentContainerStyle={{ paddingBottom: 30 }}
+							style={{ flex: 1 }}
+						/>
+					) : (
+						<View style={styles.noData}>
+							<View style={styles.noDataIcon}>
+								<IconNoData />
+							</View>
+							<Text style={[styles.noDataText, { color: colors.text }]}>
+								{t("noData")}
+							</Text>
+						</View>
+					)
 				) : (
 					<ScrollView style={styles.home}>
 						<HomeMainBanner data={data} />
@@ -378,8 +390,22 @@ export const HomeScreen = () => {
 };
 
 const styles = StyleSheet.create({
+	noData: {
+		flex: 1,
+		justifyContent: "center",
+		marginHorizontal: "auto"
+	},
+	noDataIcon: {
+		marginHorizontal: "auto"
+	},
+	noDataText: {
+		fontSize: 16,
+		fontFamily: "Lexend-Regular",
+		marginTop: 12,
+		textAlign: "center"
+	},
 	safeArea: { flex: 1 },
-	scrollContainer: { flexGrow: 1, paddingBottom: 50 },
+	scrollContainer: { flexGrow: 1, paddingBottom: 50, width: "100%" },
 	home: {
 		width: width,
 		flex: 1

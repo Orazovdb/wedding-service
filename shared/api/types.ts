@@ -33,6 +33,7 @@ export type Services = {
 	status: statusServices;
 	logo: string;
 	followers_count: number;
+	is_followed: boolean
 	region: {
 		id: number;
 		name: string;
@@ -89,6 +90,7 @@ export type HumanServices = {
 	status: statusServices;
 	followers_count: number;
 	logo: string;
+	is_followed: boolean
 	categories: [
 		{
 			id: number;
@@ -124,6 +126,7 @@ export type HumanServicesById = {
 	booking: string[];
 	contacts: string[];
 	followers_count: number;
+	is_followed: boolean
 	categories: {
 		id: number;
 		name: string;
@@ -153,6 +156,7 @@ export type SimilarServices = {
 	status: statusServices;
 	logo: string;
 	followers_count: string;
+	is_followed: boolean
 	categories: [
 		{
 			id: number;
@@ -205,3 +209,7 @@ export type FollowersData = {
 export type Profile = {
 	data: { id: number; name: string; phone: string };
 };
+
+export type ProfileUpdate = {
+	name: string
+}

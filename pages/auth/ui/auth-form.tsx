@@ -53,13 +53,16 @@ export const AuthForm = ({
 							}
 						}}
 						render={({ field: { onChange, value } }) => (
-							<TextInput
-								placeholder="Telefon belginiz"
-								value={value}
-								onChangeText={onChange}
-								keyboardType="number-pad"
-								style={styles.input}
-							/>
+							<View style={styles.inputWrapper}>
+								<Text>+993</Text>
+								<TextInput
+									placeholder="6* ** ** **"
+									value={value}
+									onChangeText={onChange}
+									keyboardType="number-pad"
+									style={styles.input}
+								/>
+							</View>
 						)}
 					/>
 					{errors.phone && (
@@ -83,13 +86,17 @@ const styles = StyleSheet.create({
 		marginTop: 64,
 		marginBottom: 88
 	},
-	input: {
+	inputWrapper: {
 		borderWidth: 1,
 		borderColor: `${Colors.light}`,
 		borderRadius: 4,
 		paddingVertical: 7.5,
 		paddingHorizontal: 6,
-		marginBottom: 12,
+		flexDirection: "row",
+		gap: 4,
+		marginBottom: 12
+	},
+	input: {
 		width: "100%"
 	},
 	accText: {

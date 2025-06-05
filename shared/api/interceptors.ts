@@ -34,6 +34,17 @@ axiosWithAuth.interceptors.request.use(
 	error => Promise.reject(error)
 );
 
+axiosWithFile.interceptors.request.use(
+	async config => {
+		const accessToken = await getAccessToken();
+		if (config?.headers && accessToken) {
+			config.headers.Authorization = accessToken;
+		}
+		return config;
+	},
+	error => Promise.reject(error)
+);
+
 export {
 	axiosClassic,
 	axiosWithAuth,

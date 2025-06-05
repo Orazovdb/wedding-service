@@ -3,8 +3,10 @@ import { servicesService } from "@/shared/api/services/services.service";
 import { CategoriesWithChildren, HumanServicesData } from "@/shared/api/types";
 import { useAppTheme } from "@/shared/hooks/use-app-theme";
 import i18n from "@/shared/i18n";
+import IconNoData from "@/shared/icons/no-data.svg";
 import { useLocalSearchParams } from "expo-router";
 import React, { useCallback, useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { StyleSheet, Text, View } from "react-native";
 import { CategoriesDetailHeader } from "./ui/categories-detail-header";
 import { CategoryServices } from "./ui/category-services";
@@ -12,6 +14,7 @@ import { CategoryServices } from "./ui/category-services";
 export const CategoriesDetailScreen = () => {
 	const currentLang = i18n.language;
 	const { colors, mode } = useAppTheme();
+	const { t } = useTranslation();
 
 	const { categoryDetail, id } = useLocalSearchParams<{
 		categoryDetail: string;
@@ -175,14 +178,24 @@ export const CategoriesDetailScreen = () => {
 					search={search}
 					setSearch={setSearch}
 				/>
-				{dataServices && (
-					<CategoryServices
-						page={page}
-						setPage={setPage}
-						data={dataServices}
-						onToggleFollow={onToggleFollow}
-					/>
-				)}
+				{dataServices &&
+					(dataServices.data.length > 0 ? (
+						<CategoryServices
+							page={page}
+							setPage={setPage}
+							data={dataServices}
+							onToggleFollow={onToggleFollow}
+						/>
+					) : (
+						<View style={styles.noData}>
+							<View style={styles.noDataIcon}>
+								<IconNoData />
+							</View>
+							<Text style={[styles.noDataText, { color: colors.text }]}>
+								{t("noData")}
+							</Text>
+						</View>
+					))}
 			</View>
 		</View>
 	);
@@ -196,5 +209,19 @@ export const styles = StyleSheet.create({
 		flex: 1,
 		height: "100%",
 		paddingTop: 10
+	},
+	noData: {
+		flex: 1,
+		justifyContent: "center",
+		marginHorizontal: "auto"
+	},
+	noDataIcon: {
+		marginHorizontal: "auto"
+	},
+	noDataText: {
+		fontSize: 16,
+		fontFamily: "Lexend-Regular",
+		marginTop: 12,
+		textAlign: "center"
 	}
 });

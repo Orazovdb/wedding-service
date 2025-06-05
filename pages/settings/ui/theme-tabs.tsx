@@ -62,7 +62,7 @@ export const ThemeTabs = ({ selectedTab = 1, onChangeTab }: props) => {
 		<View style={styles.ThemeTabs}>
 			<View style={styles.titleRow}>
 				<IconDevice />
-				<Text style={styles.title}>{t("theme")}</Text>
+				<Text style={[styles.title, { color: colors.text }]}>{t("theme")}</Text>
 			</View>
 			<View style={styles.tabs}>
 				{data.map(tab => {
@@ -114,7 +114,6 @@ export const styles = StyleSheet.create({
 	},
 	title: {
 		fontSize: 16,
-		color: "#000000",
 		fontFamily: "Lexend-Regular"
 	},
 	tabs: {

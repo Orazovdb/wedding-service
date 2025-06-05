@@ -30,7 +30,7 @@ export const AuthScreen = () => {
 	const colorScheme = useColorScheme();
 	const scrollX = useRef(new Animated.Value(0)).current;
 	const [currentIndex, setCurrentIndex] = useState(0);
-	const [isOtp, setIsOtp] = useState(true);
+	const [isOtp, setIsOtp] = useState(false);
 	const { login, isLoggedIn } = useAuth();
 	const [otp, setOtp] = useState<string[]>(["", "", "", "", ""]);
 
@@ -81,8 +81,8 @@ export const AuthScreen = () => {
 		try {
 			login({
 				otp: otp.join(""),
-				// phone: phone
-				phone: '62090252'
+				phone: phone
+				// phone: "62090252"
 			});
 		} catch (error) {
 			console.error("Verify failed:", error);
