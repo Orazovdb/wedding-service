@@ -1,7 +1,9 @@
 import {
 	getAccessToken,
 	removeFromStorage,
-	saveTokenStorage
+	removeIsServiceProvider,
+	saveTokenStorage,
+	setIsServiceProvider
 } from "@/shared/api/services/auth-token.service";
 import { authService } from "@/shared/api/services/auth.service";
 import { Verify } from "@/shared/api/types";
@@ -26,7 +28,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 			const token = await getAccessToken();
 			if (token) {
 				setIsLoggedIn(true);
-				console.log(token);
 			} else {
 				setIsLoggedIn(false);
 			}
@@ -39,6 +40,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 			const response = await authService.accountVerify(data);
 			if (response.data.access_token) {
 				await saveTokenStorage(response.data.access_token);
+				await setIsServiceProvider(response.data.is_service_provider);
 				setIsLoggedIn(true);
 				router.push("/home");
 			} else {
@@ -52,7 +54,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 	const logout = () => {
 		setIsLoggedIn(false);
 		removeFromStorage();
-
+		removeIsServiceProvider();
 		InteractionManager.runAfterInteractions(() => {
 			router.replace("/login");
 		});

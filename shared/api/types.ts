@@ -13,6 +13,7 @@ export type VerifyUserResponse = {
 		name: string;
 		phone: string;
 		access_token: string;
+		is_service_provider: boolean;
 	};
 };
 
@@ -33,7 +34,7 @@ export type Services = {
 	status: statusServices;
 	logo: string;
 	followers_count: number;
-	is_followed: boolean
+	is_followed: boolean;
 	region: {
 		id: number;
 		name: string;
@@ -90,7 +91,7 @@ export type HumanServices = {
 	status: statusServices;
 	followers_count: number;
 	logo: string;
-	is_followed: boolean
+	is_followed: boolean;
 	categories: [
 		{
 			id: number;
@@ -126,7 +127,7 @@ export type HumanServicesById = {
 	booking: string[];
 	contacts: string[];
 	followers_count: number;
-	is_followed: boolean
+	is_followed: boolean;
 	categories: {
 		id: number;
 		name: string;
@@ -156,7 +157,7 @@ export type SimilarServices = {
 	status: statusServices;
 	logo: string;
 	followers_count: string;
-	is_followed: boolean
+	is_followed: boolean;
 	categories: [
 		{
 			id: number;
@@ -211,5 +212,29 @@ export type Profile = {
 };
 
 export type ProfileUpdate = {
-	name: string
-}
+	name: string;
+};
+
+export type Settings = {
+	data: {
+		keyword: string;
+		about_us: string;
+		phone: string;
+		email: string;
+	};
+};
+
+export type ProvidedServices = {
+	data: [
+		{
+			id: number;
+			name: string;
+			status: string;
+			is_followed: boolean;
+			service_provider: {
+				id: number;
+				name: string;
+			};
+		}
+	];
+};

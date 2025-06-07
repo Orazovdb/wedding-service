@@ -1,16 +1,19 @@
+import { getIsServiceProvider } from "@/shared/api/services/auth-token.service";
 import { profileService } from "@/shared/api/services/profile.service";
-import { Profile } from "@/shared/api/types";
+import { settingsService } from "@/shared/api/services/settings.service";
+import { Profile, ProvidedServices } from "@/shared/api/types";
 import { useAppTheme } from "@/shared/hooks/use-app-theme";
 import i18n from "@/shared/i18n";
 import IconAd from "@/shared/icons/settings/ad-icon.svg";
 import IconLogout from "@/shared/icons/settings/logout-icon.svg";
-import IconRocket from "@/shared/icons/settings/rocket-icon.svg";
 import { useAuth } from "@/shared/store/AuthContext";
 import { useThemeMode } from "@/shared/store/ThemeContext";
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
+	Alert,
 	Image,
+	Linking,
 	ScrollView,
 	StyleSheet,
 	Text,
@@ -24,11 +27,14 @@ import { ThemeTabs } from "./ui/theme-tabs";
 export const SettingsScreen = () => {
 	const { t } = useTranslation();
 	const { colors } = useAppTheme();
+	const currentLang = i18n.language;
+	const [isProvided, setIsProvided] = useState<boolean | null>(null);
 
 	const [selectedLang, setSelectedLang] = useState(1);
 	const { mode, setMode } = useThemeMode();
 	const [selectedTheme, setSelectedTheme] = useState(1);
 	const [profile, setProfile] = useState<Profile>();
+	const [providedServices, setProvidedServices] = useState<ProvidedServices>();
 
 	const { logout } = useAuth();
 
@@ -36,6 +42,17 @@ export const SettingsScreen = () => {
 		const fetchData = async () => {
 			const response = await profileService.getProfile();
 			setProfile(response);
+		};
+
+		fetchData();
+	}, []);
+
+	useEffect(() => {
+		const fetchData = async () => {
+			const response = await settingsService.getProvidedServices({
+				params: { lang: currentLang }
+			});
+			setProvidedServices(response);
 		};
 		fetchData();
 	}, []);
@@ -83,10 +100,39 @@ export const SettingsScreen = () => {
 		setProfile(response);
 	};
 
+	const handleCall = (phone?: string) => {
+		if (!phone) return;
+		const formattedPhoneNumber = `tel:+993${phone}`;
+		Linking.canOpenURL(formattedPhoneNumber)
+			.then(supported => {
+				if (!supported) {
+					Alert.alert(
+						"Telefon açylyp bilinmedi",
+						`Telefon belgisi: +993${phone}`
+					);
+				} else {
+					Linking.openURL(formattedPhoneNumber);
+				}
+			})
+			.catch(err => console.error("Call error:", err));
+	};
+
+	useEffect(() => {
+		const load = async () => {
+			const isProvided = await getIsServiceProvider();
+			setIsProvided(isProvided);
+		};
+		load();
+	}, []);
+
 	return (
 		<ScrollView style={[styles.scrollView, { backgroundColor: colors.bgPage }]}>
 			<View style={styles.page}>
-				<ProfileAvatar data={profile} refetch={refetch} />
+				<ProfileAvatar
+					data={profile}
+					refetch={refetch}
+					isProvided={isProvided}
+				/>
 				<LanguageTabs
 					selectedTab={selectedLang}
 					onChangeTab={handleChangeTab}
@@ -96,7 +142,7 @@ export const SettingsScreen = () => {
 					onChangeTab={handleChangeThemeTab}
 				/>
 				<View style={styles.routes}>
-					<View style={styles.routeItemWrapper}>
+					{/* <View style={styles.routeItemWrapper}>
 						<TouchableOpacity style={styles.routeItem}>
 							<IconRocket />
 							<Text style={[styles.routeItemText, { color: colors.text }]}>
@@ -104,12 +150,15 @@ export const SettingsScreen = () => {
 							</Text>
 						</TouchableOpacity>
 						<View style={styles.routeDivider} />
-					</View>
+					</View> */}
 					<View style={styles.routeItemWrapper}>
-						<TouchableOpacity style={styles.routeItem}>
+						<TouchableOpacity
+							onPress={() => handleCall(profile?.data.phone)}
+							style={styles.routeItem}
+						>
 							<IconAd />
 							<Text style={[styles.routeItemText, { color: colors.text }]}>
-								Mahabat hyzmatlary
+								{t("adService")}
 							</Text>
 						</TouchableOpacity>
 						<View style={styles.routeDivider} />
