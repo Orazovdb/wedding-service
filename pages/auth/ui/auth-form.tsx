@@ -9,6 +9,7 @@ import {
 	UseFormRegister,
 	UseFormSetValue
 } from "react-hook-form";
+import { useTranslation } from "react-i18next";
 import { StyleSheet, Text, TextInput, View } from "react-native";
 
 type Props = {
@@ -27,29 +28,31 @@ export const AuthForm = ({
 	handleClick,
 	control
 }: Props) => {
+	const { t } = useTranslation();
+
 	useEffect(() => {
 		register("phone", {
-			required: "Telefon belgiňiz boş bolmaly däl",
+			required: t("phoneNotEmpty"),
 			pattern: {
 				value: /^[6]\d{7}$/,
-				message: "Telefon belgi 8 sany san we 6 bilen başlamaly"
+				message: t("phoneMinWords")
 			}
 		});
 	}, [register]);
 
 	return (
 		<View>
-			<Text style={styles.loginFormTitle}>Ulgam doredin</Text>
+			<Text style={styles.loginFormTitle}>{t("loginAccount")}</Text>
 			<View style={styles.loginInputs}>
 				<View style={{ marginBottom: 10 }}>
 					<Controller
 						control={control}
 						name="phone"
 						rules={{
-							required: "Telefon belgiňiz boş bolmaly däl",
+							required: t("phoneNotEmpty"),
 							pattern: {
 								value: /^[6]\d{7}$/,
-								message: "Telefon belgi 8 sany san we 6 bilen başlamaly"
+								message: t("phoneMinWords")
 							}
 						}}
 						render={({ field: { onChange, value } }) => (
@@ -70,7 +73,7 @@ export const AuthForm = ({
 					)}
 				</View>
 			</View>
-			<CustomButton title="Ulgama gir" onPress={() => handleClick({ phone })} />
+			<CustomButton title={t("send")} onPress={() => handleClick({ phone })} />
 		</View>
 	);
 };

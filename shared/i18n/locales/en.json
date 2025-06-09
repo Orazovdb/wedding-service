@@ -50,5 +50,11 @@
 	"manageService": "Manage services",
 	"addImage": "Upload photo",
 	"description": "Description",
-	"save": "Save"
+	"save": "Save",
+	"otpText": "Enter the verification code sent to your phone number.",
+	"loginAccount": "Login to account",
+	"phoneNotEmpty": "Your phone number must not be empty",
+	"phoneMinWords": "Phone number must contain at least 8 digits and start with 6",
+	"send": "Send",
+	"login": "Login"
 }

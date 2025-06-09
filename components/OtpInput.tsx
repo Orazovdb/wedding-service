@@ -1,4 +1,4 @@
-import React, { useRef } from "react"
+import React, { useRef } from "react";
 import {
 	Keyboard,
 	NativeSyntheticEvent,
@@ -7,13 +7,19 @@ import {
 	TextInput,
 	TextInputKeyPressEventData,
 	View
-} from "react-native"
+} from "react-native";
+
 interface OTPGridInputProps {
 	otp: string[];
 	setOtp: React.Dispatch<React.SetStateAction<string[]>>;
+	isError?: boolean;
 }
 
-export default function OTPGridInput({ otp, setOtp }: OTPGridInputProps) {
+export default function OTPGridInput({
+	otp,
+	setOtp,
+	isError
+}: OTPGridInputProps) {
 	const inputRefs = Array(5)
 		.fill(null)
 		.map(() => useRef<TextInput>(null));
@@ -55,7 +61,13 @@ export default function OTPGridInput({ otp, setOtp }: OTPGridInputProps) {
 				<TextInput
 					key={index}
 					ref={inputRefs[index]}
-					style={styles.input}
+					style={[
+						styles.input,
+						{
+							borderColor: isError ? "red" : "#000000",
+							color: isError ? "red" : "#000000"
+						}
+					]}
 					value={digit}
 					onChangeText={text => handleChange(text, index)}
 					onKeyPress={event => handleKeyPress(event, index)}

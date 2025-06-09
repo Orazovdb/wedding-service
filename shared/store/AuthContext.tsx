@@ -47,8 +47,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 			} else {
 				router.replace("/login");
 			}
-		} catch (e) {
+		} catch (e: any) {
 			console.error("Login error:", e);
+			throw e;
 		}
 	};
 

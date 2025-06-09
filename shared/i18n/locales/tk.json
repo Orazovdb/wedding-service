@@ -49,5 +49,11 @@
 	"manageService": "Hyzmatlary dolandyr",
 	"addImage": "Surat ýükle",
 	"description": "Beýany",
-	"save": "Ýatda sakla"
+	"save": "Ýatda sakla",
+	"otpText": "Telefon belginize iberilen tassyklaýyş kodyny giriziň",
+	"loginAccount": "Ulgama giriň",
+	"phoneNotEmpty": "Telefon belgiňiz boş bolmaly däl",
+	"phoneMinWords": "Telefon belgi 8 sany san we 6 bilen başlamaly",
+	"send": "Ugratmak",
+	"login": "Ulgama gir"
 }

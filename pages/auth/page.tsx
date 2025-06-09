@@ -77,15 +77,15 @@ export const AuthScreen = () => {
 		}
 	};
 
+	const [isOtpError, setIsOtpError] = useState(false);
+
 	const handleVerify = async () => {
 		try {
-			login({
-				otp: otp.join(""),
-				phone: phone
-				// phone: "62090252"
-			});
-		} catch (error) {
-			console.error("Verify failed:", error);
+			await login({ otp: otp.join(""), phone });
+		} catch (error: any) {
+			if (error?.response?.status === 422) {
+				setIsOtpError(true);
+			}
 		}
 	};
 
@@ -118,7 +118,7 @@ export const AuthScreen = () => {
 								<View style={styles.loginContainer}>
 									<View style={styles.loginTitleBox}>
 										<View style={styles.loginLogo} />
-										<Text style={styles.loginTitle}>Toy hyzmatlary</Text>
+										<Text style={styles.loginTitle}>TMTOY</Text>
 									</View>
 									<View style={styles.loginDivider} />
 									{!isOtp ? (
@@ -136,6 +136,7 @@ export const AuthScreen = () => {
 											phone={phone}
 											otp={otp}
 											setOtp={setOtp}
+											isError={isOtpError}
 										/>
 									)}
 								</View>
@@ -204,17 +205,17 @@ const styles = StyleSheet.create({
 		fontSize: 32,
 		lineHeight: 40,
 		color: "#000",
-		maxWidth: "80%",
+		maxWidth: "100%",
 		margin: "auto",
 		textAlign: "center",
 		marginTop: 30
 	},
 
 	loginContainer: {
-		marginTop: 60,
+		marginTop: 40,
 		width: "100%",
-		paddingLeft: 42,
-		paddingRight: 42
+		paddingLeft: 32,
+		paddingRight: 32
 	},
 
 	input: {
@@ -233,8 +234,8 @@ const styles = StyleSheet.create({
 		flexDirection: "row",
 		alignItems: "center",
 		gap: 17,
-		maxWidth: "60%",
-		marginBottom: 52
+		maxWidth: "80%",
+		marginBottom: 32
 	},
 	loginLogo: {
 		backgroundColor: "#D9D9D9",
@@ -254,7 +255,7 @@ const styles = StyleSheet.create({
 		height: 1,
 		backgroundColor: "#C9C8C8",
 		margin: "auto",
-		marginBottom: 32
+		marginBottom: 22
 	},
 
 	loginForm: {},
@@ -267,7 +268,7 @@ const styles = StyleSheet.create({
 	},
 
 	loginInputs: {
-		marginTop: 64,
+		marginTop: 34,
 		marginBottom: 88
 	},
 
