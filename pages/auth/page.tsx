@@ -85,6 +85,10 @@ export const AuthScreen = () => {
 		} catch (error: any) {
 			if (error?.response?.status === 422) {
 				setIsOtpError(true);
+				setTimeout(() => {
+					setIsOtpError(false);
+					setOtp(["", "", "", "", ""]);
+				}, 3000);
 			}
 		}
 	};
