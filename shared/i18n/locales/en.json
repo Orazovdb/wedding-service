@@ -47,5 +47,8 @@
 	"noData": "No matching service provider found!",
 	"adService": "Ad service",
 	"service": "Service",
-	"manageService": "Manage services"
+	"manageService": "Manage services",
+	"addImage": "Upload photo",
+	"description": "Description",
+	"save": "Save"
 }

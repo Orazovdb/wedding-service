@@ -59,7 +59,10 @@ export const ProvidedServicesScreen = () => {
 				</View>
 				<View style={styles.services}>
 					{data?.data.map(item => (
-						<View
+						<TouchableOpacity
+							onPress={() =>
+								router.push(`/settings/provided-services/${item.id}`)
+							}
 							key={item.id}
 							style={[
 								styles.service,
@@ -92,7 +95,7 @@ export const ProvidedServicesScreen = () => {
 									{item.name}
 								</Text>
 							</View>
-						</View>
+						</TouchableOpacity>
 					))}
 				</View>
 			</View>

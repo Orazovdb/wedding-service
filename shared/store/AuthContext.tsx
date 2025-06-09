@@ -28,6 +28,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 			const token = await getAccessToken();
 			if (token) {
 				setIsLoggedIn(true);
+				console.log(token);
 			} else {
 				setIsLoggedIn(false);
 			}

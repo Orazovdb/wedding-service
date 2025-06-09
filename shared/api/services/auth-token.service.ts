@@ -20,7 +20,6 @@ export const removeFromStorage = async (): Promise<void> => {
 	await SecureStore.deleteItemAsync(EnumTokens.ACCESS_TOKEN);
 };
 
-
 export const setIsServiceProvider = async (value: boolean) => {
 	await AsyncStorage.setItem("is_service_provider", JSON.stringify(value));
 };
