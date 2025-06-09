@@ -66,6 +66,7 @@
     "@react-native/babel-preset": "^0.78.2",
     "@types/i18next": "^13.0.0",
     "@types/jest": "^29.5.14",
+    "@types/node": "^22.15.30",
     "@types/react": "~19.0.10",
     "@types/react-test-renderer": "^19.0.0",
     "babel-preset-expo": "~13.0.0",

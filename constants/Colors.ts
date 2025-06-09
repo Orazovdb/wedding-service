@@ -32,14 +32,12 @@ const secondary170 = "#0000001A";
 const secondary180 = "#FFFFFFCC";
 const secondary190 = "#00000033";
 const secondary200 = "#FFFFFF33";
-const secondary210 = '#00000066'
-const secondary220 = '#FFFFFF4D'
-const secondary230 = '#0000000D'
-
-
-
-
-
+const secondary210 = "#00000066";
+const secondary220 = "#FFFFFF4D";
+const secondary230 = "#0000000D";
+const secondary240 = "#C8C8C8";
+const secondary250 = "#868686";
+const secondary260 = "#0000004D"
 
 const brand = "#5BB271";
 const discount = "#FF2D55";
@@ -66,6 +64,9 @@ export const Colors = {
 		bgSubscriber: secondary140,
 		text2: secondary210,
 		bgContact: secondary230,
+		bgService: secondary230,
+		bgServiceBorder: secondary240,
+		categoryTitle: secondary260,
 
 		swatch: swatch,
 		premium: premium,
@@ -107,6 +108,9 @@ export const Colors = {
 		bgSubscriber: secondary200,
 		text2: secondary220,
 		bgContact: secondary200,
+		bgService: secondary160,
+		bgServiceBorder: secondary250,
+		categoryTitle: secondary220,
 
 
 		swatch: swatch,

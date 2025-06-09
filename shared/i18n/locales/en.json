@@ -45,5 +45,7 @@
 	"confirm": "Confirm",
 	"recommendApp": "Thank you for downloading and using our program and working with us. Sincerely",
 	"noData": "No matching service provider found!",
-	"adService": "Ad service"
+	"adService": "Ad service",
+	"service": "Service",
+	"manageService": "Manage services"
 }

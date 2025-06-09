@@ -1,7 +1,8 @@
 import { profileService } from "@/shared/api/services/profile.service";
-import { Profile } from "@/shared/api/types";
+import { Profile, ProvidedServices } from "@/shared/api/types";
 import { useAppTheme } from "@/shared/hooks/use-app-theme";
 import IconPen from "@/shared/icons/settings/pen-icon.svg";
+import IconService from "@/shared/icons/settings/service-icon.svg";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -16,11 +17,13 @@ import {
 export const ProfileAvatar = ({
 	data,
 	refetch,
-	isProvided
+	isProvided,
+	providedServices
 }: {
 	data: Profile | undefined;
 	refetch: () => void;
 	isProvided: boolean | null;
+	providedServices: ProvidedServices | undefined;
 }) => {
 	const { t } = useTranslation();
 	const { colors } = useAppTheme();
@@ -70,12 +73,24 @@ export const ProfileAvatar = ({
 					</TouchableOpacity>
 				</View>
 			</View>
-			<TouchableOpacity
-				onPress={() => router.push("/settings/settings-info")}
-				style={styles.serviceButton}
-			>
-				<Text style={styles.serviceButtonText}>{t("addService")}</Text>
-			</TouchableOpacity>
+			{isProvided ? (
+				<TouchableOpacity
+					onPress={() => router.push("/settings/provided-services")}
+					style={styles.serviceButton}
+				>
+					<IconService />
+					<Text style={styles.serviceButtonText}>
+						{providedServices?.data.length} {t("service")}
+					</Text>
+				</TouchableOpacity>
+			) : (
+				<TouchableOpacity
+					onPress={() => router.push("/settings/settings-info")}
+					style={styles.serviceButton}
+				>
+					<Text style={styles.serviceButtonText}>{t("addService")}</Text>
+				</TouchableOpacity>
+			)}
 		</View>
 	);
 };
@@ -110,8 +125,7 @@ export const styles = StyleSheet.create({
 	avatarName: {
 		flexDirection: "row",
 		alignItems: "center",
-		gap: 8,
-		flex: 1
+		gap: 8
 	},
 	avatarNameText: {
 		fontSize: 24,
@@ -129,10 +143,11 @@ export const styles = StyleSheet.create({
 	serviceButton: {
 		borderRadius: 6,
 		backgroundColor: "#C0FFB9",
-		maxWidth: "100%",
 		height: 25,
 		padding: 3,
-		marginTop: 20
+		marginTop: 20,
+		flexDirection: "row",
+		gap: 8
 	},
 	serviceButtonText: {
 		fontSize: 14,

@@ -132,6 +132,7 @@ export const SettingsScreen = () => {
 					data={profile}
 					refetch={refetch}
 					isProvided={isProvided}
+					providedServices={providedServices}
 				/>
 				<LanguageTabs
 					selectedTab={selectedLang}

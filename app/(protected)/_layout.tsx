@@ -21,6 +21,7 @@ import SubscribersIcon from "@/assets/images/navigations/subscribers.svg";
 import { useAppTheme } from "@/shared/hooks/use-app-theme";
 import { useAuth } from "@/shared/store/AuthContext";
 import { useThemeMode } from "@/shared/store/ThemeContext";
+import { StatusBar } from "expo-status-bar";
 import { JSX } from "react";
 
 const navItems: {
@@ -66,7 +67,13 @@ export default function ProtectedLayout() {
 	if (!isLoggedIn) return <Redirect href="/login" />;
 
 	return (
-		<SafeAreaView style={[styles.safeArea, { backgroundColor: colors.white }]}>
+		<SafeAreaView style={[styles.safeArea, { backgroundColor: colors.bgPage }]}>
+			{mode === "light" ? (
+				<StatusBar style="dark" translucent={false} />
+			) : (
+				<StatusBar style="light" translucent={false} />
+			)}
+
 			<Stack
 				screenOptions={{
 					headerShown: false,
@@ -84,6 +91,11 @@ export default function ProtectedLayout() {
 				/>
 				<Stack.Screen
 					name="settings/settings-info"
+					options={{ animation: "slide_from_right", presentation: "card" }}
+				/>
+
+				<Stack.Screen
+					name="settings/provided-services"
 					options={{ animation: "slide_from_right", presentation: "card" }}
 				/>
 
