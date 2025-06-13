@@ -134,7 +134,8 @@ export const styles = StyleSheet.create({
 		borderRadius: 6,
 		borderWidth: 1,
 		marginRight: 16,
-		width: 144
+		width: 144,
+		minHeight: 144
 	},
 	titleGroup: {
 		flexDirection: "row",

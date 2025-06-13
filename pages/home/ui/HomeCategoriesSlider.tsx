@@ -148,9 +148,9 @@ export const styles = StyleSheet.create({
 		marginBottom: 4
 	},
 	previewImage: {
-		borderRadius: width / 15 / 2,
-		width: width / 15,
-		height: width / 15
+		borderRadius: width / 11.2 / 2,
+		width: width / 11.2,
+		height: width / 11.2
 	},
 	arrow: { fontSize: 24, fontWeight: "bold", paddingHorizontal: 10 },
 	arrowLeft: {

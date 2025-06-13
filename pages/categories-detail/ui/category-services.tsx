@@ -1,14 +1,16 @@
 import { Colors } from "@/constants/Colors";
 import { servicesService } from "@/shared/api/services/services.service";
-import { HumanServices, HumanServicesData } from "@/shared/api/types";
+import { HumanServices } from "@/shared/api/types";
 import { useAppTheme } from "@/shared/hooks/use-app-theme";
+import IconAvatarTwiceDark from "@/shared/icons/avatar-twice-dark.svg";
+import IconAvatarTwice from "@/shared/icons/avatar-twice.svg";
 import LocationIcon from "@/shared/icons/location-icon.svg";
 import GoldenIcon from "@/shared/icons/status-golden.svg";
 import NewIcon from "@/shared/icons/status-new.svg";
 import PremiumIcon from "@/shared/icons/status-premium.svg";
 import { useRouter } from "expo-router";
 import { t } from "i18next";
-import React, { useRef } from "react";
+import React, { useCallback } from "react";
 import {
 	Dimensions,
 	FlatList,
@@ -21,311 +23,179 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-const { height, width } = Dimensions.get("window");
+const { width, height } = Dimensions.get("window");
 
 interface Props {
 	page: number;
 	setPage: (page: number) => void;
-	data: HumanServicesData;
+	data: any; // HumanServicesData
 	onToggleFollow: () => void;
 }
 
-export const CategoryServices = (props: Props) => {
-	const insets = useSafeAreaInsets();
+export const CategoryServices = ({
+	page,
+	setPage,
+	data,
+	onToggleFollow
+}: Props) => {
 	const { colors, mode } = useAppTheme();
-	const PAGE_HEIGHT =
-		Dimensions.get("window").height - insets.top - insets.bottom - 180;
-	const itemHeight = PAGE_HEIGHT / 3;
-
-	const ITEMS_PER_PAGE = 6;
+	const insets = useSafeAreaInsets();
 	const router = useRouter();
-	const flatListRef = useRef<FlatList<any>>(null);
 
-	const totalItems = props.data.meta.total;
-	const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE);
-
-	const pagedData = Array.from({ length: totalPages }, (_, index) => {
-		const start = index * ITEMS_PER_PAGE;
-		const end = Math.min(start + ITEMS_PER_PAGE, totalItems);
-		return props.data.data.slice(start, end);
-	});
-
-	const onViewableItemsChanged = useRef(({ viewableItems }: any) => {
-		if (viewableItems.length > 0) {
-			props.setPage(viewableItems[0].index);
-		}
-	}).current;
+	const loadMore = useCallback(() => {
+		if (!data.meta) return;
+		const totalPages = Math.ceil(data.meta.total / data.meta.limit);
+		if (page < totalPages) setPage(page + 1);
+	}, [page, data.meta]);
 
 	const toggleFollow = async (service_id: number) => {
 		await servicesService.toggleFollowService({ service_id });
-		props.onToggleFollow();
+		onToggleFollow();
 	};
 
-	const renderPage = ({ item }: { item: HumanServices[] }) => (
-		<View style={[styles.pageContainer, { minHeight: PAGE_HEIGHT }]}>
-			{item.map(item => (
-				<TouchableOpacity
-					onPress={() =>
-						router.push({
-							pathname: `/home/[id]`,
-							params: {
-								id: item.id
-							}
-						})
+	const renderItem = ({ item }: { item: HumanServices }) => (
+		<TouchableOpacity
+			onPress={() =>
+				router.push({ pathname: `/home/[id]`, params: { id: item.id } })
+			}
+			activeOpacity={0.6}
+			key={item.id}
+			style={styles.categoryList}
+		>
+			<View
+				style={[
+					styles.categoryItem,
+					item.status === "premium"
+						? styles.categoryItemPremium
+						: item.status === "golden"
+						? styles.categoryItemGold
+						: {},
+					{
+						backgroundColor:
+							item.status === "golden"
+								? styles.categoryItemGold.backgroundColor
+								: item.status === "premium"
+								? styles.categoryItemPremium.backgroundColor
+								: colors.bgServiceItem,
+						shadowColor: colors.text
 					}
-					activeOpacity={0.6}
-					key={item.id}
-					style={styles.categoryList}
-				>
+				]}
+			>
+				{item.status !== "normal" && (
 					<View
 						style={[
-							styles.categoryItem,
-							{ height: itemHeight - 20 },
+							styles.categoryItemStatus,
 							item.status === "premium"
-								? styles.categoryItemPremium
+								? styles.categoryItemStatusPremium
 								: item.status === "golden"
-								? styles.categoryItemGold
-								: "",
-							{
-								backgroundColor: colors.bgServiceItem,
-								shadowColor: colors.bgSeeMoreBtn
-							}
+								? styles.categoryItemStatusGold
+								: item.status === "new"
+								? styles.categoryItemStatusNew
+								: {}
 						]}
 					>
-						{item.status !== "normal" && (
-							<View
-								style={[
-									styles.categoryItemStatus,
-									item.status === "premium"
-										? styles.categoryItemStatusPremium
-										: item.status === "golden"
-										? styles.categoryItemStatusGold
-										: item.status === "new"
-										? styles.categoryItemStatusNew
-										: ""
-								]}
-							>
-								<Text style={styles.categoryItemStatusText}>
-									{item.status === "premium"
-										? t("premium")
-										: item.status === "golden"
-										? t("golden")
-										: item.status === "new"
-										? t("new")
-										: ""}
-								</Text>
-								{item.status === "premium" ? (
-									<PremiumIcon />
-								) : item.status === "golden" ? (
-									<GoldenIcon />
-								) : item.status === "new" ? (
-									<NewIcon />
-								) : null}
-							</View>
-						)}
-						<Image
-							source={{ uri: item.logo }}
-							style={styles.categoryProfileImg}
-						/>
-						{item.name ? (
-							(() => {
-								const [firstWord = "", secondWord = ""] = item.name.split(" ");
-								return (
-									<>
-										<Text
-											style={[styles.categoryUsername, { color: colors.text }]}
-										>
-											{firstWord}
-										</Text>
-										<Text
-											style={[
-												styles.categoryUserSurName,
-												{ color: colors.text }
-											]}
-										>
-											{secondWord}
-										</Text>
-									</>
-								);
-							})()
-						) : (
-							<Text style={[styles.categoryUsername, { color: colors.text }]}>
-								service-provider_{item.id}
-							</Text>
-						)}
-
-						<View
-							style={[styles.serviceDivider, { backgroundColor: colors.text }]}
-						/>
-						<Text style={[styles.categoryName, { color: colors.text }]}>
-							{item.categories[0].name}
-						</Text>
-						<Text style={[styles.serviceName, { color: colors.text }]}>
-							{item.name}
-						</Text>
-						<View style={styles.serviceLocationWrapper}>
-							<LocationIcon />
-							{(() => {
-								const [firstWord = "", secondWord = ""] =
-									item.region.name.split(" ");
-								return (
-									<>
-										<Text style={styles.serviceLocation}>
-											{firstWord} {secondWord.slice(0, 1)}.,{" "}
-											{item.region.province.slice(0, 4)}
-										</Text>
-									</>
-								);
-							})()}
-						</View>
-						<View style={styles.serviceButtons}>
-							<View style={styles.subscriptionsButton}>
-								<Text style={styles.subscriptionsButtonText}>
-									{item.followers_count}
-								</Text>
-								<Text style={styles.subscriptionsButtonText}>
-									{t("subscriber")}
-								</Text>
-							</View>
-							{item.is_followed ? (
-								<TouchableOpacity
-									onPress={() => toggleFollow(item.id)}
-									style={[
-										styles.subscribeButton,
-										mode === "dark"
-											? { backgroundColor: "#000", borderColor: colors.text }
-											: { backgroundColor: colors.white },
-										item.status === "golden" && styles.subscribeButtonGold
-									]}
-								>
-									<Text
-										style={[
-											styles.subscribeButtonText,
-											{ color: colors.text },
-											item.status === "golden" && styles.subscribeButtonGoldText
-										]}
-									>
-										{t("unSubscribe")}
-									</Text>
-								</TouchableOpacity>
-							) : (
-								<TouchableOpacity
-									onPress={() => toggleFollow(item.id)}
-									style={[
-										styles.subscribeButton,
-										mode === "dark"
-											? { backgroundColor: "", borderColor: colors.text }
-											: { backgroundColor: colors.white },
-										item.status === "golden" && styles.subscribeButtonGold
-									]}
-								>
-									<Text
-										style={[
-											styles.subscribeButtonText,
-											{ color: colors.text },
-											item.status === "golden" && styles.subscribeButtonGoldText
-										]}
-									>
-										{t("subscribe")}
-									</Text>
-								</TouchableOpacity>
-							)}
-						</View>
+						<Text style={styles.categoryItemStatusText}>{t(item.status)}</Text>
+						{item.status === "premium" ? (
+							<PremiumIcon />
+						) : item.status === "golden" ? (
+							<GoldenIcon />
+						) : item.status === "new" ? (
+							<NewIcon />
+						) : null}
 					</View>
-				</TouchableOpacity>
-			))}
-		</View>
+				)}
+
+				<Image source={{ uri: item.logo }} style={styles.categoryProfileImg} />
+
+				<Text style={[styles.categoryUsername, { color: colors.text }]}>
+					{item.name?.split(" ")[0] || `service-provider_${item.id}`}
+				</Text>
+				<Text style={[styles.categoryUserSurName, { color: colors.text }]}>
+					{item.name?.split(" ")[1] || ""}
+				</Text>
+
+				<View
+					style={[styles.serviceDivider, { backgroundColor: colors.text }]}
+				/>
+
+				<Text style={[styles.categoryName, { color: colors.text }]}>
+					{item.categories[0].name}
+				</Text>
+				<Text style={[styles.serviceName, { color: colors.text }]}>
+					{item.name}
+				</Text>
+
+				<View style={styles.serviceLocationWrapper}>
+					<LocationIcon />
+					<Text style={styles.serviceLocation}>{item.region.province}</Text>
+				</View>
+
+				<View style={styles.serviceButtons}>
+					<View style={styles.subscriptionsButton}>
+						{mode === "light" ? <IconAvatarTwice /> : <IconAvatarTwiceDark />}
+						<Text
+							style={[styles.subscriptionsButtonText, { color: colors.text }]}
+						>
+							{item.followers_count}
+						</Text>
+						<Text
+							style={[
+								styles.subscriptionsButtonSubscriberText,
+								{ color: colors.text }
+							]}
+						>
+							{t("subscriber")}
+						</Text>
+					</View>
+					<TouchableOpacity
+						onPress={() => toggleFollow(item.id)}
+						style={[
+							styles.subscribeButton,
+							mode === "dark"
+								? { backgroundColor: "#000" }
+								: { backgroundColor: "#000" },
+							item.status === "golden" && styles.subscribeButtonGold,
+							item.is_followed && { backgroundColor: "#0000004D" }
+						]}
+					>
+						<Text
+							style={[
+								styles.subscribeButtonText,
+								{ color: colors.white },
+								item.status === "golden" && styles.subscribeButtonGoldText
+							]}
+						>
+							{t(item.is_followed ? "subscribed" : "subscribe")}
+						</Text>
+					</TouchableOpacity>
+				</View>
+			</View>
+		</TouchableOpacity>
 	);
 
 	return (
-		<View
-			style={{
-				flexDirection: "row",
-				alignItems: "center",
-				flex: 1,
-				paddingBottom: 50
-			}}
-		>
-			{pagedData.length > 1 && (
-				<View style={styles.paginationContainer}>
-					{pagedData.map((_, index) => (
-						<View
-							key={index}
-							style={[
-								styles.paginationDot,
-								{ backgroundColor: colors.bgDot2 },
-								index === props.page && { backgroundColor: colors.text }
-							]}
-						/>
-					))}
-				</View>
-			)}
-			<FlatList
-				ref={flatListRef}
-				data={pagedData}
-				keyExtractor={(_, index) => index.toString()}
-				renderItem={renderPage}
-				pagingEnabled
-				showsVerticalScrollIndicator={false}
-				snapToInterval={PAGE_HEIGHT}
-				decelerationRate="fast"
-				onViewableItemsChanged={onViewableItemsChanged}
-				viewabilityConfig={{
-					viewAreaCoveragePercentThreshold: 50
-				}}
-			/>
-		</View>
+		<FlatList
+			contentContainerStyle={styles.flatList}
+			data={data.data}
+			keyExtractor={item => item.id.toString()}
+			renderItem={renderItem}
+			onEndReached={loadMore}
+			onEndReachedThreshold={0.6}
+			showsVerticalScrollIndicator={false}
+		/>
 	);
 };
 
 const styles = StyleSheet.create({
-	services: {
-		width: "100%",
-		marginBottom: 20
-	},
-	servicesTitleBlock: {
+	flatList: {
+		paddingHorizontal: 20,
+		paddingBottom: 80,
 		flexDirection: "row",
-		alignItems: "center",
-		justifyContent: "space-between",
-		marginBottom: 16
-	},
-	servicesTitle: {
-		fontSize: 16,
-		fontWeight: "600"
-	},
-	servicesCategoryButton: {
-		flexDirection: "row",
-		alignItems: "center",
-		gap: 2,
-		padding: 2,
-		backgroundColor: "#0000001A"
-	},
-	servicesCategoryButtonText: {
-		fontSize: 12,
-		fontWeight: "400"
-	},
-	paginationContainer: {
-		position: "absolute",
-		left: 6,
-		top: height / 3.8,
-		zIndex: 10,
-		justifyContent: "center",
-		alignItems: "center",
-		gap: 10
-	},
-	paginationDot: {
-		width: 15,
-		height: 15,
-		borderRadius: 15 / 2
-	},
-	pageContainer: {
-		paddingHorizontal: 40,
 		flexWrap: "wrap",
-		flexDirection: "row",
 		justifyContent: "space-between"
 	},
 	categoryList: {
-		width: width / 2 - 40,
+		width: width / 2 - 20,
 		paddingHorizontal: 7,
 		paddingVertical: 7
 	},
@@ -333,20 +203,22 @@ const styles = StyleSheet.create({
 		paddingTop: 2,
 		paddingBottom: 8,
 		paddingVertical: 12,
-		backgroundColor: "white",
+		alignItems: "center",
+		borderRadius: 4,
+		position: "relative",
+
+		// iOS shadow
 		shadowColor: "#000",
 		shadowOffset: { width: 0, height: 1.51 },
 		shadowOpacity: 0.25,
 		shadowRadius: 3.02,
-		elevation: 2,
-		borderBottomWidth: 1,
-		borderBottomColor: "#00000040",
-		borderTopWidth: 1,
-		borderTopColor: "#00000040",
-		alignItems: "center",
-		borderRadius: 4,
-		position: "relative"
+
+		// Android shadow
+		elevation: 3,
+
+		backgroundColor: "#fff" // REQUIRED for elevation to be visible
 	},
+
 	categoryItemPremium: {
 		backgroundColor: "#2FD2FF33",
 		elevation: 0
@@ -398,25 +270,25 @@ const styles = StyleSheet.create({
 		fontSize: 12,
 		fontFamily: "Lexend-Regular",
 		lineHeight: 13,
-		marginBottom: 4
+		marginBottom: 6
 	},
 	serviceDivider: {
 		width: "50%",
 		height: 1,
 		backgroundColor: Colors.dark.secondary,
-		marginBottom: 4
+		marginBottom: 6
 	},
 	categoryName: {
 		fontSize: 10,
 		fontFamily: "Lexend-ExtraLight",
 		color: Colors.light.secondary,
-		marginBottom: Platform.OS === "ios" ? 2 : 4
+		marginBottom: Platform.OS === "ios" ? 6 : 8
 	},
 	serviceName: {
 		fontSize: 10,
 		fontFamily: "Lexend-Regular",
 		color: Colors.light.secondary,
-		marginBottom: Platform.OS === "ios" ? 2 : 4
+		marginBottom: Platform.OS === "ios" ? 6 : 8
 	},
 	serviceLocationWrapper: {
 		flexDirection: "row",
@@ -426,7 +298,7 @@ const styles = StyleSheet.create({
 		paddingHorizontal: 4,
 		borderRadius: 5,
 		backgroundColor: Colors.dark.primary,
-		marginBottom: Platform.OS === "ios" ? 6 : 10
+		marginBottom: Platform.OS === "ios" ? 8 : 12
 	},
 	serviceLocation: {
 		fontSize: 10,
@@ -436,29 +308,30 @@ const styles = StyleSheet.create({
 	serviceButtons: {
 		gap: 8,
 		width: "100%",
-		paddingHorizontal: 12,
-		marginTop: "auto"
+		paddingHorizontal: 12
 	},
 	subscriptionsButton: {
-		paddingVertical: 6.5,
-		paddingHorizontal: 4.5,
-		backgroundColor: Colors.light.secondary,
-		borderRadius: 3,
 		flexDirection: "row",
 		justifyContent: "center",
-		gap: 6
+		alignContent: "flex-end",
+		gap: 6,
+		marginBottom: 4
 	},
 	subscriptionsButtonText: {
-		fontSize: 10,
-		color: "#FFF1F1",
+		fontSize: 14,
+		fontFamily: "Lexend-Medium"
+	},
+	subscriptionsButtonSubscriberText: {
+		fontSize: 9,
 		fontFamily: "Lexend-Regular",
-		textAlign: "center"
+		marginTop: 6
 	},
 	subscribeButton: {
-		paddingVertical: 3.5,
+		paddingVertical: 3.2,
 		paddingHorizontal: 4.5,
-		borderRadius: 3,
-		borderWidth: 1
+		borderRadius: 6,
+		width: "84%",
+		marginHorizontal: "auto"
 	},
 	subscribeButtonGold: {
 		backgroundColor: "#D4AF37",

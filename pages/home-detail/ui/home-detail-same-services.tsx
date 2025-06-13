@@ -158,18 +158,9 @@ export const HomeDetailSameServices = ({
 							</Text>
 							<View style={styles.serviceLocationWrapper}>
 								<LocationIcon />
-								{(() => {
-									const [firstWord = "", secondWord = ""] =
-										item.region.name.split(" ");
-									return (
-										<>
-											<Text style={styles.serviceLocation}>
-												{firstWord} {secondWord.slice(0, 1)}.,{" "}
-												{item.region.province.slice(0, 4)}
-											</Text>
-										</>
-									);
-								})()}
+								<Text style={styles.serviceLocation}>
+									{item.region.province}
+								</Text>
 							</View>
 							<View style={styles.serviceButtons}>
 								<View style={styles.subscriptionsButton}>

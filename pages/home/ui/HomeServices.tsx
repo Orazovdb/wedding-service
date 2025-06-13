@@ -44,221 +44,222 @@ export const HomeServices = ({
 	};
 
 	const categoryFlatListRef = useRef<FlatList<Services>>(null);
-	return data?.categories?.map(categoryItem => (
-		<View style={styles.services} key={categoryItem.id}>
-			<View style={styles.servicesTitleBlock}>
-				<Text style={[styles.servicesTitle, { color: colors.text }]}>
-					{categoryItem.name}
-				</Text>
-				<TouchableOpacity
-					onPress={() =>
-						router.push({
-							pathname: `/(protected)/categories/[categoryDetail]/[id]`,
-							params: {
-								categoryDetail: categoryItem.id,
-								id: "all"
-							}
-						})
-					}
-					style={[
-						styles.servicesCategoryButton,
-						{ backgroundColor: colors.bgSeeMoreBtn }
-					]}
-				>
-					{mode === "light" ? <CategoryIcon /> : <CategoryIconDark />}
-					<Text
-						style={[styles.servicesCategoryButtonText, { color: colors.text }]}
-					>
-						{t("seeAll")}
+	return data?.categories?.map(categoryItem =>
+		categoryItem.services.length > 0 ? (
+			<View style={styles.services} key={categoryItem.id}>
+				<View style={styles.servicesTitleBlock}>
+					<Text style={[styles.servicesTitle, { color: colors.text }]}>
+						{categoryItem.name}
 					</Text>
-				</TouchableOpacity>
-			</View>
-			<FlatList
-				ref={categoryFlatListRef}
-				data={categoryItem.services}
-				keyExtractor={categoryItem => String(categoryItem.id)}
-				horizontal
-				showsHorizontalScrollIndicator={false}
-				contentContainerStyle={{ alignItems: "center" }}
-				renderItem={({ item }: { item: Services }) => (
-					<View style={styles.categoryList}>
-						<TouchableOpacity
-							onPress={() =>
-								router.push({
-									pathname: `/home/[id]`,
-									params: {
-										id: item.id
-									}
-								})
-							}
-							activeOpacity={0.6}
-							style={[
-								styles.categoryItem,
-								item.status === "premium"
-									? styles.categoryItemPremium
-									: item.status === "golden"
-									? styles.categoryItemGold
-									: "",
-								{
-									backgroundColor: colors.bgServiceItem,
-									shadowColor: colors.bgSeeMoreBtn
+					<TouchableOpacity
+						onPress={() =>
+							router.push({
+								pathname: `/(protected)/categories/[categoryDetail]/[id]`,
+								params: {
+									categoryDetail: categoryItem.id,
+									id: "all"
 								}
+							})
+						}
+						style={[
+							styles.servicesCategoryButton,
+							{ backgroundColor: colors.bgSeeMoreBtn }
+						]}
+					>
+						{mode === "light" ? <CategoryIcon /> : <CategoryIconDark />}
+						<Text
+							style={[
+								styles.servicesCategoryButtonText,
+								{ color: colors.text }
 							]}
 						>
-							{item.status !== "normal" && (
+							{t("seeAll")}
+						</Text>
+					</TouchableOpacity>
+				</View>
+				<FlatList
+					ref={categoryFlatListRef}
+					data={categoryItem.services}
+					keyExtractor={categoryItem => String(categoryItem.id)}
+					horizontal
+					showsHorizontalScrollIndicator={false}
+					contentContainerStyle={{ alignItems: "center" }}
+					renderItem={({ item }: { item: Services }) => (
+						<View style={styles.categoryList}>
+							<TouchableOpacity
+								onPress={() =>
+									router.push({
+										pathname: `/home/[id]`,
+										params: {
+											id: item.id
+										}
+									})
+								}
+								activeOpacity={0.6}
+								style={[
+									styles.categoryItem,
+									item.status === "premium"
+										? styles.categoryItemPremium
+										: item.status === "golden"
+										? styles.categoryItemGold
+										: "",
+									{
+										backgroundColor: colors.bgServiceItem,
+										shadowColor: colors.bgSeeMoreBtn
+									}
+								]}
+							>
+								{item.status !== "normal" && (
+									<View
+										style={[
+											styles.categoryItemStatus,
+											item.status === "premium"
+												? styles.categoryItemStatusPremium
+												: item.status === "golden"
+												? styles.categoryItemStatusGold
+												: item.status === "new"
+												? styles.categoryItemStatusNew
+												: ""
+										]}
+									>
+										<Text style={styles.categoryItemStatusText}>
+											{item.status === "premium"
+												? t("premium")
+												: item.status === "golden"
+												? t("golden")
+												: item.status === "new"
+												? t("new")
+												: ""}
+										</Text>
+										{item.status === "premium" ? (
+											<PremiumIcon />
+										) : item.status === "golden" ? (
+											<GoldenIcon />
+										) : item.status === "new" ? (
+											<NewIcon />
+										) : null}
+									</View>
+								)}
+								<Image
+									source={{ uri: item.logo }}
+									style={styles.categoryProfileImg}
+								/>
+								{item.name ? (
+									(() => {
+										const [firstWord = "", secondWord = ""] =
+											item.name.split(" ");
+										return (
+											<>
+												<Text
+													style={[
+														styles.categoryUsername,
+														{ color: colors.text }
+													]}
+												>
+													{firstWord}
+												</Text>
+												<Text
+													style={[
+														styles.categoryUserSurName,
+														{ color: colors.text }
+													]}
+												>
+													{secondWord}
+												</Text>
+											</>
+										);
+									})()
+								) : (
+									<Text
+										style={[styles.categoryUsername, { color: colors.text }]}
+									>
+										service-provider_{item.id}
+									</Text>
+								)}
+
 								<View
 									style={[
-										styles.categoryItemStatus,
-										item.status === "premium"
-											? styles.categoryItemStatusPremium
-											: item.status === "golden"
-											? styles.categoryItemStatusGold
-											: item.status === "new"
-											? styles.categoryItemStatusNew
-											: ""
+										styles.serviceDivider,
+										{ backgroundColor: colors.text }
 									]}
-								>
-									<Text style={styles.categoryItemStatusText}>
-										{item.status === "premium"
-											? t("premium")
-											: item.status === "golden"
-											? t("golden")
-											: item.status === "new"
-											? t("new")
-											: ""}
-									</Text>
-									{item.status === "premium" ? (
-										<PremiumIcon />
-									) : item.status === "golden" ? (
-										<GoldenIcon />
-									) : item.status === "new" ? (
-										<NewIcon />
-									) : null}
-								</View>
-							)}
-							<Image
-								source={{ uri: item.logo }}
-								style={styles.categoryProfileImg}
-							/>
-							{item.name ? (
-								(() => {
-									const [firstWord = "", secondWord = ""] =
-										item.name.split(" ");
-									return (
-										<>
-											<Text
-												style={[
-													styles.categoryUsername,
-													{ color: colors.text }
-												]}
-											>
-												{firstWord}
-											</Text>
-											<Text
-												style={[
-													styles.categoryUserSurName,
-													{ color: colors.text }
-												]}
-											>
-												{secondWord}
-											</Text>
-										</>
-									);
-								})()
-							) : (
-								<Text style={[styles.categoryUsername, { color: colors.text }]}>
-									service-provider_{item.id}
+								/>
+								<Text style={[styles.categoryName, { color: colors.text }]}>
+									{categoryItem.name}
 								</Text>
-							)}
-
-							<View
-								style={[
-									styles.serviceDivider,
-									{ backgroundColor: colors.text }
-								]}
-							/>
-							<Text style={[styles.categoryName, { color: colors.text }]}>
-								{categoryItem.name}
-							</Text>
-							<Text style={[styles.serviceName, { color: colors.text }]}>
-								{item.name}
-							</Text>
-							<View style={styles.serviceLocationWrapper}>
-								<LocationIcon />
-								{(() => {
-									const [firstWord = "", secondWord = ""] =
-										item.region.name.split(" ");
-									return (
-										<>
-											<Text style={styles.serviceLocation}>
-												{firstWord} {secondWord.slice(0, 1)}.,{" "}
-												{item.region.province.slice(0, 4)}
-											</Text>
-										</>
-									);
-								})()}
-							</View>
-							<View style={styles.serviceButtons}>
-								<View style={styles.subscriptionsButton}>
-									<Text style={styles.subscriptionsButtonText}>
-										{item.followers_count}
-									</Text>
-									<Text style={styles.subscriptionsButtonText}>
-										{t("subscriber")}
+								<Text style={[styles.serviceName, { color: colors.text }]}>
+									{item.name}
+								</Text>
+								<View style={styles.serviceLocationWrapper}>
+									<LocationIcon />
+									<Text style={styles.serviceLocation}>
+										{item.region.province}
 									</Text>
 								</View>
-								{item.is_followed ? (
-									<TouchableOpacity
-										onPress={() => toggleFollow(item.id)}
-										style={[
-											styles.subscribeButton,
-											mode === "dark"
-												? { backgroundColor: "#000", borderColor: colors.text }
-												: { backgroundColor: colors.white },
-											item.status === "golden" && styles.subscribeButtonGold
-										]}
-									>
-										<Text
+								<View style={styles.serviceButtons}>
+									<View style={styles.subscriptionsButton}>
+										<Text style={styles.subscriptionsButtonText}>
+											{item.followers_count}
+										</Text>
+										<Text style={styles.subscriptionsButtonText}>
+											{t("subscriber")}
+										</Text>
+									</View>
+									{item.is_followed ? (
+										<TouchableOpacity
+											onPress={() => toggleFollow(item.id)}
 											style={[
-												styles.subscribeButtonText,
-												{ color: colors.text },
-												item.status === "golden" &&
-													styles.subscribeButtonGoldText
+												styles.subscribeButton,
+												mode === "dark"
+													? {
+															backgroundColor: "#000",
+															borderColor: colors.text
+													  }
+													: { backgroundColor: colors.white },
+												item.status === "golden" && styles.subscribeButtonGold
 											]}
 										>
-											{t("unSubscribe")}
-										</Text>
-									</TouchableOpacity>
-								) : (
-									<TouchableOpacity
-										onPress={() => toggleFollow(item.id)}
-										style={[
-											styles.subscribeButton,
-											mode === "dark"
-												? { backgroundColor: "", borderColor: colors.text }
-												: { backgroundColor: colors.white },
-											item.status === "golden" && styles.subscribeButtonGold
-										]}
-									>
-										<Text
+											<Text
+												style={[
+													styles.subscribeButtonText,
+													{ color: colors.text },
+													item.status === "golden" &&
+														styles.subscribeButtonGoldText
+												]}
+											>
+												{t("unSubscribe")}
+											</Text>
+										</TouchableOpacity>
+									) : (
+										<TouchableOpacity
+											onPress={() => toggleFollow(item.id)}
 											style={[
-												styles.subscribeButtonText,
-												{ color: colors.text },
-												item.status === "golden" &&
-													styles.subscribeButtonGoldText
+												styles.subscribeButton,
+												mode === "dark"
+													? { backgroundColor: "", borderColor: colors.text }
+													: { backgroundColor: colors.white },
+												item.status === "golden" && styles.subscribeButtonGold
 											]}
 										>
-											{t("subscribe")}
-										</Text>
-									</TouchableOpacity>
-								)}
-							</View>
-						</TouchableOpacity>
-					</View>
-				)}
-			/>
-		</View>
-	));
+											<Text
+												style={[
+													styles.subscribeButtonText,
+													{ color: colors.text },
+													item.status === "golden" &&
+														styles.subscribeButtonGoldText
+												]}
+											>
+												{t("subscribe")}
+											</Text>
+										</TouchableOpacity>
+									)}
+								</View>
+							</TouchableOpacity>
+						</View>
+					)}
+				/>
+			</View>
+		) : null
+	);
 };
 
 export const styles = StyleSheet.create({

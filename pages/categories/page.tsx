@@ -7,6 +7,7 @@ import ArrowRightIconDark from "@/shared/icons/arrow-right-dark.svg";
 import ArrowRightIcon from "@/shared/icons/arrow-right.svg";
 import NavBottomIconDark from "@/shared/icons/nav-bottom-dark.svg";
 import NavBottomIcon from "@/shared/icons/nav-bottom.svg";
+
 import { useRouter } from "expo-router";
 import React, { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -192,8 +193,8 @@ export const styles = StyleSheet.create({
 		alignItems: "center"
 	},
 	icon: {
-		width: 20,
-		height: 20,
+		width: 27,
+		height: 27,
 		borderRadius: 25 / 2
 	},
 	itemTitle: { fontSize: 14, fontFamily: "Lexend-Regular" },

@@ -89,14 +89,10 @@ export const CategoriesDetailHeader = (props: Props) => {
 					<View
 						style={[
 							styles.categoryServiceDot,
-							{ backgroundColor: colors.textReverse }
+							{ backgroundColor: colors.secondary }
 						]}
 					/>
-					<Text
-						style={[styles.categoryServiceName, { color: colors.textReverse }]}
-					>
-						{props.totalCount}
-					</Text>
+					<Text style={[styles.categoryServiceName]}>{props.totalCount}</Text>
 				</View>
 			</View>
 			<View style={styles.searchBlock}>
@@ -141,7 +137,11 @@ export const CategoriesDetailHeader = (props: Props) => {
 									  }
 									: null
 							]}
-							onPress={() => props.onSelectSubCategory(String(item.id))}
+							onPress={() => {
+								const selected =
+									String(item.id) === String(props.sub_category_id);
+								props.onSelectSubCategory(selected ? "all" : String(item.id));
+							}}
 						>
 							<Text
 								style={[

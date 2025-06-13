@@ -3,13 +3,15 @@ import { useColorScheme } from "@/hooks/useColorScheme.web";
 import { BASE_URL } from "@/shared/api/interceptors";
 import { getAccessToken } from "@/shared/api/services/auth-token.service";
 import { HumanServicesByIdData } from "@/shared/api/types";
-import { Video } from "expo-av";
+import {
+	ResizeMode as ResizeModeAv,
+	Video,
+	VideoFullscreenUpdate
+} from "expo-av";
 import { BlurView } from "expo-blur";
-import { useVideoPlayer } from "expo-video";
 import React, { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
-	ActivityIndicator,
 	Animated,
 	Dimensions,
 	FlatList,
@@ -18,6 +20,7 @@ import {
 	Modal,
 	NativeScrollEvent,
 	NativeSyntheticEvent,
+	Platform,
 	StyleSheet,
 	Text,
 	TouchableOpacity,
@@ -32,80 +35,43 @@ export const HomeDetailBanner = ({
 	data: HumanServicesByIdData | undefined;
 }) => {
 	const { t } = useTranslation();
-	const [isBuffering, setIsBuffering] = useState(true);
-	const [isVideoSlide, setIsVideoSlide] = useState(true);
-	const [isImageViewerVisible, setImageViewerVisible] = useState(false);
-	const [selectedImageIndex, setSelectedImageIndex] = useState(0);
 	const [authToken, setAuthToken] = useState<string | null>(null);
+	const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+	const [isImageViewerVisible, setImageViewerVisible] = useState(false);
+	const colorScheme: "light" | "dark" = useColorScheme() ?? "light";
+	const scrollX = useRef(new Animated.Value(0)).current;
+	const [currentIndex, setCurrentIndex] = useState(0);
+	const videoRef = useRef<Video>(null);
+	const [isVideoSlide, setIsVideoSlide] = useState(true);
 
 	useEffect(() => {
 		getAccessToken().then(setAuthToken);
 	}, []);
 
-	const colorScheme: "light" | "dark" = useColorScheme() ?? "light";
-	const scrollX = useRef(new Animated.Value(0)).current;
-	const [currentIndex, setCurrentIndex] = useState(0);
-
-	const handleScroll = Animated.event(
-		[{ nativeEvent: { contentOffset: { x: scrollX } } }],
-		{ useNativeDriver: false, listener: () => Keyboard.dismiss() }
-	);
+	const videoRefs = useRef<Record<number, Video>>({});
 
 	const handleMomentumScrollEnd = (
 		event: NativeSyntheticEvent<NativeScrollEvent>
 	) => {
-		const index = Math.round(event.nativeEvent.contentOffset.x / width);
-		setCurrentIndex(index);
+		const newIndex = Math.round(event.nativeEvent.contentOffset.x / width);
+
+		if (currentIndex === newIndex) {
+			const previousRef = videoRefs.current[currentIndex];
+			previousRef?.setPositionAsync(0);
+		}
+
+		setCurrentIndex(newIndex);
 	};
-
-	const player = useVideoPlayer(
-		{ uri: data?.service?.videos[0]?.filename },
-		player => {
-			player.muted = false;
-			player.loop = false;
-			if (!isBuffering) {
-				player.play();
-			}
-		}
-	);
-
-	useEffect(() => {
-		const timeout = setTimeout(() => {
-			setIsBuffering(false);
-		}, 500);
-		return () => clearTimeout(timeout);
-	}, []);
-
-	useEffect(() => {
-		if (!isBuffering) {
-			player.play();
-		} else {
-			player.pause();
-		}
-	}, [isBuffering, player]);
-
-	useEffect(() => {
-		if (!data?.service.videos.length) {
-			setIsVideoSlide(false);
-		}
-		console.log(
-			`${BASE_URL}/videos/stream/${data?.service?.videos[0]?.filename}`
-		);
-	}, []);
 
 	const handleChangeVideo = (value: boolean) => {
 		setIsVideoSlide(value);
 		setCurrentIndex(0);
 	};
 
-	useEffect(() => {
-		if (!data?.service?.videos?.length) return;
-
-		const currentVideo = data?.service?.videos[currentIndex];
-		if (!currentVideo?.id) return;
-	}, [data, currentIndex]);
-
-	const videoRef = useRef<Video>(null);
+	const handleScroll = Animated.event(
+		[{ nativeEvent: { contentOffset: { x: scrollX } } }],
+		{ useNativeDriver: false, listener: () => Keyboard.dismiss() }
+	);
 
 	return (
 		<View style={styles.sliderContainer}>
@@ -136,7 +102,7 @@ export const HomeDetailBanner = ({
 							<Text
 								style={[styles.tabText, !isVideoSlide && styles.tabActiveText]}
 							>
-								{t('images')} ({data?.service.images.length})
+								{t("images")} ({data?.service.images.length})
 							</Text>
 						</TouchableOpacity>
 					)}
@@ -144,92 +110,89 @@ export const HomeDetailBanner = ({
 			</View>
 			{isVideoSlide ? (
 				<>
-					{isBuffering && <ActivityIndicator size="large" color="#0000ff" />}
 					<FlatList
 						data={data?.service?.videos}
 						keyExtractor={item => item.id.toString()}
 						horizontal
 						pagingEnabled
 						showsHorizontalScrollIndicator={false}
-						onScroll={handleScroll}
 						onMomentumScrollEnd={handleMomentumScrollEnd}
 						style={styles.flatList}
-						renderItem={({ item }) => (
-							<View key={item.id} style={styles.slide}>
-								<TouchableOpacity
-									activeOpacity={0.8}
-									onPress={async () => {
-										try {
-											await videoRef.current?.presentFullscreenPlayer();
-
-											setTimeout(() => {
-												videoRef.current
-													?.playAsync()
-													.catch(err =>
-														console.error("Video play failed:", err)
-													);
-											}, 500);
-										} catch (e) {
-											console.error("Fullscreen play error:", e);
+						renderItem={({ item, index }) => (
+							<View style={styles.videoWrapper}>
+								<Video
+									ref={ref => {
+										if (ref) videoRefs.current[index] = ref;
+									}}
+									source={{
+										uri: `${BASE_URL}/videos/stream/${item.filename}`,
+										headers: { Authorization: `Bearer ${authToken}` }
+									}}
+									style={styles.video}
+									resizeMode={ResizeModeAv.CONTAIN}
+									useNativeControls
+									isLooping={false}
+									shouldPlay={false}
+									onFullscreenUpdate={event => {
+										if (
+											event.fullscreenUpdate ===
+											VideoFullscreenUpdate.PLAYER_DID_PRESENT
+										) {
+											console.log("Fullscreen entered");
+										}
+										if (
+											event.fullscreenUpdate ===
+											VideoFullscreenUpdate.PLAYER_DID_DISMISS
+										) {
+											console.log("Fullscreen exited");
 										}
 									}}
-									style={styles.image}
-								>
-									<Video
-										ref={videoRef}
-										source={{
-											uri: `${BASE_URL}/videos/stream/${item?.filename}`,
-											headers: {
-												Authorization: `${authToken}`,
-												Range: "bytes=0-100000"
+								/>
+								{Platform.OS === "ios" ? (
+									<TouchableOpacity
+										onPress={async () => {
+											try {
+												if (Platform.OS === "ios") {
+													await videoRef.current?.presentFullscreenPlayer();
+												} else {
+													await videoRef.current?.playAsync();
+												}
+											} catch (e) {
+												console.error("Video play error:", e);
 											}
 										}}
-										style={styles.image}
-										useNativeControls
-										shouldPlay={false}
-										isLooping={false}
-									/>
-
-									<View style={styles.overlayPlayButton}>
+										style={styles.overlayPlayButton}
+									>
 										<Text style={styles.playIcon}>▶</Text>
-									</View>
-								</TouchableOpacity>
+									</TouchableOpacity>
+								) : null}
 							</View>
 						)}
 					/>
+
 					{data && data?.service?.videos?.length > 1 && (
-						<>
-							<View style={styles.paginationContainer}>
-								<View style={styles.pagination}>
-									{data?.service?.videos.map((_, i) => (
-										<View
-											key={i}
-											style={[
-												styles.dot,
-												{
-													backgroundColor:
-														i === currentIndex
-															? Colors[colorScheme ?? "light"].primary
-															: Colors[colorScheme ?? "light"].white
-												}
-											]}
-										/>
-									))}
-								</View>
+						<View style={styles.paginationContainer}>
+							<View style={styles.pagination}>
+								{data.service.videos.map((_, i) => (
+									<View
+										key={i}
+										style={[
+											styles.dot,
+											{
+												backgroundColor:
+													i === currentIndex
+														? Colors[colorScheme].primary
+														: Colors[colorScheme].white
+											}
+										]}
+									/>
+								))}
 							</View>
-							<View style={styles.paginationFractionWrapper}>
-								<View style={styles.paginationFraction}>
-									<Text style={styles.paginationFractionText}>
-										{currentIndex + 1}/{data?.service?.videos.length}
-									</Text>
-								</View>
-							</View>
-						</>
+						</View>
 					)}
 				</>
 			) : (
 				<>
-					{isBuffering && <ActivityIndicator size="large" color="#000" />}
 					<FlatList
 						data={data?.service?.images}
 						keyExtractor={item => item.id.toString()}
@@ -289,7 +252,7 @@ export const HomeDetailBanner = ({
 				>
 					<FlatList
 						data={data?.service?.images}
-						keyExtractor={item => item?.id?.toString()}
+						keyExtractor={item => item.id.toString()}
 						horizontal
 						pagingEnabled
 						initialScrollIndex={selectedImageIndex}
@@ -297,7 +260,7 @@ export const HomeDetailBanner = ({
 						renderItem={({ item }) => (
 							<View style={styles.fullscreenImageWrapper}>
 								<Image
-									source={{ uri: item?.url }}
+									source={{ uri: item.url }}
 									style={styles.fullscreenImage}
 								/>
 							</View>
@@ -316,59 +279,50 @@ export const HomeDetailBanner = ({
 };
 
 export const styles = StyleSheet.create({
-	sliderContainer: {
-		position: "relative",
-		flexGrow: 1,
-		width: width
-	},
-
+	sliderContainer: { flex: 1, width },
 	tabsWrapper: {
 		position: "absolute",
 		top: 14,
 		alignSelf: "center",
 		zIndex: 10
 	},
-
 	tabs: {
-		paddingVertical: 4,
-		paddingHorizontal: 2,
-		borderRadius: 4,
 		flexDirection: "row",
 		gap: 4,
+		borderRadius: 4,
 		overflow: "hidden",
+		paddingVertical: 4,
+		paddingHorizontal: 2,
 		position: "relative"
 	},
-
 	tabsBackground: {
 		...StyleSheet.absoluteFillObject,
 		backgroundColor: "#00000033",
 		borderRadius: 4
 	},
-
-	tab: {
-		borderRadius: 4,
-		paddingHorizontal: 8
-	},
-
+	tab: { borderRadius: 4, paddingHorizontal: 8 },
+	tabText: { color: "#FFFFFF", fontSize: 12, fontFamily: "Lexend-Light" },
 	tabActive: { backgroundColor: Colors.light.primary },
-	tabActiveText: {
-		color: Colors.light.secondary
-	},
-
-	tabText: {
-		color: "#FFFFFF",
-		fontSize: 12,
-		fontFamily: "Lexend-Light",
-		backgroundColor: "transparent"
-	},
-
+	tabActiveText: { color: Colors.light.secondary },
 	flatList: { flex: 1 },
-	slide: { width: width },
-	image: {
-		width: width * 1,
+	videoWrapper: {
+		width: width,
 		height: height * 0.28,
-		resizeMode: "cover"
+		backgroundColor: "black"
 	},
+	video: { width: "100%", height: "100%", paddingBottom: 40 },
+	overlayPlayButton: {
+		position: "absolute",
+		top: "45%",
+		left: "45%",
+		backgroundColor: "rgba(0,0,0,0.6)",
+		borderRadius: 30,
+		width: 60,
+		height: 60,
+		justifyContent: "center",
+		alignItems: "center"
+	},
+	playIcon: { fontSize: 28, color: "#fff" },
 	paginationContainer: {
 		position: "absolute",
 		bottom: 14,
@@ -385,21 +339,20 @@ export const styles = StyleSheet.create({
 		minWidth: 100
 	},
 	dot: { width: 7, height: 7, borderRadius: 7 / 2, marginHorizontal: 2 },
-
-	overlayPlayButton: {
-		position: "absolute",
-		top: "45%",
-		left: "45%",
-		backgroundColor: "rgba(0,0,0,0.6)",
-		borderRadius: 30,
-		width: 60,
-		height: 60,
+	fullscreenGallery: { backgroundColor: "black" },
+	fullscreenImageWrapper: {
+		width,
+		height,
 		justifyContent: "center",
 		alignItems: "center"
 	},
-	playIcon: {
-		fontSize: 28,
-		color: "#fff"
+	fullscreenImage: { width, height, resizeMode: "contain" },
+	closeButton: { position: "absolute", top: 40, right: 20, zIndex: 10 },
+	closeText: { fontSize: 28, color: "#fff" },
+	image: {
+		width: width * 1,
+		height: height * 0.28,
+		resizeMode: "cover"
 	},
 
 	paginationFractionWrapper: {
@@ -422,29 +375,5 @@ export const styles = StyleSheet.create({
 		fontFamily: "Lexend-Regular",
 		fontSize: 12,
 		color: Colors.dark.white
-	},
-	fullscreenGallery: {
-		backgroundColor: "black"
-	},
-	fullscreenImageWrapper: {
-		width,
-		height,
-		justifyContent: "center",
-		alignItems: "center"
-	},
-	fullscreenImage: {
-		width,
-		height,
-		resizeMode: "contain"
-	},
-	closeButton: {
-		position: "absolute",
-		top: 40,
-		right: 20,
-		zIndex: 10
-	},
-	closeText: {
-		fontSize: 28,
-		color: "#fff"
 	}
 });

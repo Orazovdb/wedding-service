@@ -72,7 +72,7 @@ export default function ProtectedLayout() {
 				<StatusBar style="dark" translucent={false} />
 			) : (
 				<StatusBar style="light" translucent={false} />
-			)}
+			)}z
 
 			<Stack
 				screenOptions={{
@@ -176,7 +176,8 @@ const styles = StyleSheet.create({
 		shadowRadius: 4,
 		elevation: 5,
 		paddingHorizontal: 14,
-		paddingTop: Platform.OS === "ios" ? 6 : 0
+		paddingTop: Platform.OS === "ios" ? 6 : 0,
+		paddingBottom: 10
 	},
 	navItem: {
 		fontSize: 12,

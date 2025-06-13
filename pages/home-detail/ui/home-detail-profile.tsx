@@ -5,6 +5,8 @@ import IconAvatarDark from "@/shared/icons/avatar-icon-dark.svg";
 import IconAvatar from "@/shared/icons/avatar-icon.svg";
 import IconFlagDark from "@/shared/icons/flag-icon-dark.svg";
 import IconFlag from "@/shared/icons/flag-icon.svg";
+import IconCategoryDark from "@/shared/icons/musician-icon-dark.svg";
+import IconCategory from "@/shared/icons/musician-icon.svg";
 import { useRouter } from "expo-router";
 import React from "react";
 import { useTranslation } from "react-i18next";
@@ -37,10 +39,7 @@ export const HomeDetailProfile = ({
 						}
 						style={styles.profileCategory}
 					>
-						<Image
-							source={{ uri: data?.service.categories[0]?.icon }}
-							style={styles.profileCategoryIcon}
-						/>
+						{mode === "light" ? <IconCategory /> : <IconCategoryDark />}
 
 						<Text style={[styles.profileCategoryText, { color: colors.text }]}>
 							{data?.service?.categories[0]?.name}
@@ -52,18 +51,9 @@ export const HomeDetailProfile = ({
 			<View style={styles.subscribersBlock}>
 				<View style={styles.location}>
 					{mode === "light" ? <IconFlag /> : <IconFlagDark />}
-					{(() => {
-						const name = data?.service?.region?.name ?? "";
-						const [firstWord = "", secondWord = ""] = name.split(" ");
-						return (
-							<>
-								<Text style={[styles.locationText, { color: colors.text }]}>
-									{firstWord} {secondWord},{" "}
-									{data?.service?.region?.province.slice(0, 4)}
-								</Text>
-							</>
-						);
-					})()}
+					<Text style={[styles.locationText, { color: colors.text }]}>
+						{data?.service?.region?.province}
+					</Text>
 				</View>
 				<View style={[styles.subscribeCount, { backgroundColor: colors.text }]}>
 					{mode === "light" ? <IconAvatar /> : <IconAvatarDark />}

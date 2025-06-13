@@ -208,7 +208,8 @@ export const styles = StyleSheet.create({
 	page: {
 		flex: 1,
 		height: "100%",
-		paddingTop: 10
+		paddingTop: 10,
+		paddingBottom: 50
 	},
 	noData: {
 		flex: 1,
