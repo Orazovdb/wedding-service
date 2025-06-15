@@ -9,7 +9,8 @@ import {
 	Dimensions,
 	ScrollView,
 	StyleSheet,
-	TouchableOpacity
+	TouchableOpacity,
+	View
 } from "react-native";
 import { HomeDetailAbout } from "./ui/home-detail-about";
 import { HomeDetailBanner } from "./ui/home-detail-banner";
@@ -63,26 +64,29 @@ export const HomeDynamicScreen = () => {
 
 	return (
 		<ScrollView style={[styles.container, { backgroundColor: colors.bgPage }]}>
-			{data?.service.videos.length || data?.service.images.length ? (
-				<HomeDetailBanner data={data} />
-			) : null}
-			<TouchableOpacity onPress={() => router.back()} style={styles.backIcon}>
-				<ArrowLeftBigIcon />
-			</TouchableOpacity>
-			<HomeDetailProfile data={data} onToggleFollow={onToggleFollow} />
-			<HomeDetailAbout data={data} />
-			{data?.service.pricing[0] !== "" ||
-			data?.service.booking[0] !== "" ||
-			data?.service.contacts[0] !== "" ? (
-				<HomeDetailFeedback data={data} />
-			) : null}
-			<HomeDetailContact data={data} />
-			{data?.similar.length ? (
-				<HomeDetailSameServices
-					onToggleFollow={onToggleSimilarFollow}
-					data={data}
-				/>
-			) : null}
+			<View style={{ paddingBottom: 40 }}>
+				{" "}
+				{data?.service.videos.length || data?.service.images.length ? (
+					<HomeDetailBanner data={data} />
+				) : null}
+				<TouchableOpacity onPress={() => router.back()} style={styles.backIcon}>
+					<ArrowLeftBigIcon />
+				</TouchableOpacity>
+				<HomeDetailProfile data={data} onToggleFollow={onToggleFollow} />
+				<HomeDetailAbout data={data} />
+				{data?.service.pricing[0] !== "" ||
+				data?.service.booking[0] !== "" ||
+				data?.service.contacts[0] !== "" ? (
+					<HomeDetailFeedback data={data} />
+				) : null}
+				<HomeDetailContact data={data} />
+				{data?.similar.length ? (
+					<HomeDetailSameServices
+						onToggleFollow={onToggleSimilarFollow}
+						data={data}
+					/>
+				) : null}
+			</View>
 		</ScrollView>
 	);
 };

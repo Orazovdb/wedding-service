@@ -68,9 +68,9 @@ export const AuthForm = ({
 							</View>
 						)}
 					/>
-					{errors.phone && (
+					{errors.phone ? (
 						<Text style={styles.errorText}>{errors.phone.message}</Text>
-					)}
+					) : null}
 				</View>
 			</View>
 			<CustomButton title={t("send")} onPress={() => handleClick({ phone })} />

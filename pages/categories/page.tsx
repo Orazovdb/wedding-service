@@ -73,7 +73,9 @@ export const CategoriesScreen = () => {
 				<FlatList
 					data={dataCategories}
 					keyExtractor={item => item.id.toString()}
-					style={{ height: "100%" }}
+					style={{ flex: 1 }}
+					contentContainerStyle={{ paddingBottom: 24 }} // optional
+					showsVerticalScrollIndicator={false}
 					renderItem={({ item }) => (
 						<View style={styles.items}>
 							<View key={item.id} style={styles.dropdownItem}>
@@ -82,9 +84,16 @@ export const CategoriesScreen = () => {
 									style={styles.item}
 								>
 									<View style={styles.itemTitleWrapper}>
-										<View style={styles.iconWrapper}>
-											<Image source={{ uri: item.icon }} style={styles.icon} />
-										</View>
+										{item.icon !== "" ? (
+											<View style={styles.iconWrapper}>
+												<Image
+													source={{ uri: item.icon }}
+													style={styles.icon}
+												/>
+											</View>
+										) : (
+											<View style={styles.iconWrapper} />
+										)}
 										<Text style={[styles.itemTitle, { color: colors.text }]}>
 											{item.name}
 										</Text>
@@ -92,7 +101,7 @@ export const CategoriesScreen = () => {
 									{mode === "light" ? <NavBottomIcon /> : <NavBottomIconDark />}
 								</TouchableOpacity>
 
-								{openItemId === item.id && (
+								{openItemId === item.id ? (
 									<Animated.View
 										style={[
 											styles.subItemsContainer,
@@ -143,7 +152,7 @@ export const CategoriesScreen = () => {
 											</TouchableOpacity>
 										))}
 									</Animated.View>
-								)}
+								) : null}
 							</View>
 						</View>
 					)}
@@ -159,7 +168,8 @@ export const styles = StyleSheet.create({
 		width: width,
 		paddingHorizontal: 24,
 		paddingTop: 10,
-		paddingBottom: 50
+		paddingBottom: 50,
+		flex: 1
 	},
 	title: {
 		fontFamily: "Lexend-SemiBold",

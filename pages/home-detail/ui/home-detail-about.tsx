@@ -1,8 +1,8 @@
-import { HumanServicesByIdData } from "@/shared/api/types"
-import { useAppTheme } from "@/shared/hooks/use-app-theme"
-import React from "react"
-import { useTranslation } from "react-i18next"
-import { Image, StyleSheet, Text, View } from "react-native"
+import { HumanServicesByIdData } from "@/shared/api/types";
+import { useAppTheme } from "@/shared/hooks/use-app-theme";
+import React from "react";
+import { useTranslation } from "react-i18next";
+import { Image, StyleSheet, Text, View } from "react-native";
 
 const MAX_HEIGHT = 294;
 
@@ -35,9 +35,9 @@ export const HomeDetailAbout = ({
 		<View style={styles.about}>
 			<Text style={[styles.title, { color: colors.text }]}>{t("aboutMe")}</Text>
 			<View style={styles.row}>
-				{data?.service.logo && (
+				{data?.service.logo ? (
 					<Image source={{ uri: data.service.logo }} style={styles.image} />
-				)}
+				) : null}
 				<View style={[styles.info, !data?.service.logo && { width: "auto" }]}>
 					<View style={styles.descriptionWrapper}>
 						<Text
@@ -65,9 +65,9 @@ export const HomeDetailAbout = ({
 			) : null}
 			{extraText ? (
 				<Text style={[styles.meeting, { color: colors.text }]}>
-							{t("sincerely")}, {data?.service.name}
-						</Text>
-			): null}
+					{t("sincerely")}, {data?.service.name}
+				</Text>
+			) : null}
 		</View>
 	);
 };

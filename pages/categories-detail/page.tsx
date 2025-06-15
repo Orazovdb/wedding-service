@@ -178,8 +178,8 @@ export const CategoriesDetailScreen = () => {
 					search={search}
 					setSearch={setSearch}
 				/>
-				{dataServices &&
-					(dataServices.data.length > 0 ? (
+				{dataServices ? (
+					dataServices.data.length > 0 ? (
 						<CategoryServices
 							page={page}
 							setPage={setPage}
@@ -195,7 +195,8 @@ export const CategoriesDetailScreen = () => {
 								{t("noData")}
 							</Text>
 						</View>
-					))}
+					)
+				) : null}
 			</View>
 		</View>
 	);
@@ -208,7 +209,7 @@ export const styles = StyleSheet.create({
 	page: {
 		flex: 1,
 		height: "100%",
-		paddingTop: 10,
+		paddingTop: 30,
 		paddingBottom: 50
 	},
 	noData: {

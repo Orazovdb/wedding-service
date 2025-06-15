@@ -26,9 +26,9 @@ export const HomeDetailProfile = ({
 	return (
 		<View style={styles.profile}>
 			<View style={styles.avatarBlock}>
-				{data?.service.logo && (
+				{data?.service.logo ? (
 					<Image source={{ uri: data?.service?.logo }} style={styles.avatar} />
-				)}
+				) : null}
 				<View style={styles.profileNameWrapper}>
 					<Text style={[styles.profileName, { color: colors.text }]}>
 						{data?.service?.name}

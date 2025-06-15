@@ -13,6 +13,7 @@ import { Colors } from "@/constants/Colors";
 import { categoriesService } from "@/shared/api/services/categories.service";
 import type { CategoriesWithChildren } from "@/shared/api/types";
 import { useAppTheme } from "@/shared/hooks/use-app-theme";
+
 import i18n from "@/shared/i18n";
 import ArrowLeftDark from "@/shared/icons/arrow-left-dark.svg";
 import ArrowLeft from "@/shared/icons/arrow-left.svg";
@@ -27,12 +28,14 @@ export const HomeCategoriesSlider = () => {
 	const previewFlatListRef = useRef<FlatList<any>>(null);
 
 	const [currentIndex, setCurrentIndex] = useState(0);
+	const [data, setData] = useState<CategoriesWithChildren[]>([]);
 
-	const scrollToIndex = (index: any) => {
-		previewFlatListRef.current?.scrollToIndex({ index, animated: true });
+	const scrollToIndex = (index: number) => {
+		if (index >= 0 && index < data.length) {
+			previewFlatListRef.current?.scrollToIndex({ index, animated: true });
+			setCurrentIndex(index);
+		}
 	};
-
-	const [data, setData] = useState<CategoriesWithChildren[]>();
 
 	useEffect(() => {
 		const fetchData = async () => {
@@ -42,7 +45,6 @@ export const HomeCategoriesSlider = () => {
 			});
 			setData(result);
 		};
-
 		fetchData();
 	}, []);
 
@@ -50,7 +52,7 @@ export const HomeCategoriesSlider = () => {
 		<View style={styles.previewSliderContainer}>
 			<TouchableOpacity
 				style={styles.arrowLeft}
-				onPress={() => scrollToIndex(Math.max(currentIndex - 1, 0))}
+				onPress={() => scrollToIndex(currentIndex - 1)}
 			>
 				{mode === "light" ? <ArrowLeft /> : <ArrowLeftDark />}
 			</TouchableOpacity>
@@ -58,54 +60,45 @@ export const HomeCategoriesSlider = () => {
 			<FlatList
 				ref={previewFlatListRef}
 				data={data}
-				keyExtractor={(item: CategoriesWithChildren) => String(item.id)}
+				keyExtractor={item => String(item.id)}
 				horizontal
 				showsHorizontalScrollIndicator={false}
-				contentContainerStyle={{ alignItems: "center" }}
+				contentContainerStyle={{ paddingHorizontal: 0 }}
+				onMomentumScrollEnd={e => {
+					const index = Math.round(e.nativeEvent.contentOffset.x / (width / 5));
+					setCurrentIndex(index);
+				}}
 				renderItem={({ item }) => (
 					<TouchableOpacity
 						style={styles.previewSlide}
 						onPress={() => router.push(`/categories/${item.id}/all`)}
 					>
 						<View style={styles.previewImageWrapper}>
-							<Image source={{ uri: item.icon }} style={styles.previewImage} />
+							{item.icon ? (
+								<Image
+									source={{ uri: item.icon }}
+									style={styles.previewImage}
+								/>
+							) : (
+								<View
+									style={{
+										width: width / 11.2,
+										height: width / 11.2,
+										borderRadius: width / 11.2 / 2,
+										backgroundColor: colors.primary
+									}}
+								/>
+							)}
 						</View>
 						<Text
 							style={{
 								fontSize: 10,
 								color: colors.text,
-								fontWeight: "400"
+								fontWeight: "400",
+								textAlign: "center"
 							}}
 						>
-							{item.name ? (
-								(() => {
-									const [firstWord = "", secondWord = ""] =
-										item.name.split(" ");
-									return (
-										<>
-											<Text
-												style={{
-													fontSize: 10,
-													color: colors.text,
-													fontWeight: "400"
-												}}
-											>
-												{firstWord} {secondWord.slice(0, 5)}
-											</Text>
-										</>
-									);
-								})()
-							) : (
-								<Text
-									style={{
-										fontSize: 10,
-										color: colors.text,
-										fontWeight: "400"
-									}}
-								>
-									service-provider_{item.id}
-								</Text>
-							)}
+							{item.name || `service-provider_${item.id}`}
 						</Text>
 					</TouchableOpacity>
 				)}
@@ -113,9 +106,7 @@ export const HomeCategoriesSlider = () => {
 
 			<TouchableOpacity
 				style={styles.arrowRight}
-				onPress={() =>
-					scrollToIndex(Math.min(currentIndex + 1, data?.length || 0 - 1))
-				}
+				onPress={() => scrollToIndex(currentIndex + 1)}
 			>
 				{mode === "light" ? <ArrowLeft /> : <ArrowLeftDark />}
 			</TouchableOpacity>
@@ -130,13 +121,13 @@ export const styles = StyleSheet.create({
 		marginTop: 18,
 		marginBottom: 22,
 		position: "relative",
-		paddingHorizontal: 20
+		paddingHorizontal: 20,
 	},
 	previewSlide: {
 		borderRadius: width / 11 / 2,
-		justifyContent: "center",
 		alignItems: "center",
-		marginHorizontal: 5
+		marginHorizontal: 8,
+		width: width / 5
 	},
 	previewImageWrapper: {
 		borderRadius: width / 11.2 / 2,
@@ -145,14 +136,15 @@ export const styles = StyleSheet.create({
 		height: width / 11.2,
 		justifyContent: "center",
 		alignItems: "center",
-		marginBottom: 4
+		marginBottom: 4,
+		overflow: "hidden"
 	},
 	previewImage: {
-		borderRadius: width / 11.2 / 2,
-		width: width / 11.2,
-		height: width / 11.2
+		width: "100%",
+		height: "100%",
+		resizeMode: "cover",
+		borderRadius: width / 11.2 / 2
 	},
-	arrow: { fontSize: 24, fontWeight: "bold", paddingHorizontal: 10 },
 	arrowLeft: {
 		position: "absolute",
 		left: 4,

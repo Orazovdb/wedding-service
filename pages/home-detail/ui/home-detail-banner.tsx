@@ -46,6 +46,9 @@ export const HomeDetailBanner = ({
 
 	useEffect(() => {
 		getAccessToken().then(setAuthToken);
+		if (data?.service.videos.length === 0) {
+			setIsVideoSlide(false);
+		}
 	}, []);
 
 	const videoRefs = useRef<Record<number, Video>>({});
@@ -84,17 +87,19 @@ export const HomeDetailBanner = ({
 					/>
 					<View style={styles.tabsBackground} />
 
-					<TouchableOpacity
-						onPress={() => handleChangeVideo(true)}
-						style={[styles.tab, isVideoSlide && styles.tabActive]}
-					>
-						<Text
-							style={[styles.tabText, isVideoSlide && styles.tabActiveText]}
+					{data && data?.service.images.length > 0 ? (
+						<TouchableOpacity
+							onPress={() => handleChangeVideo(true)}
+							style={[styles.tab, isVideoSlide && styles.tabActive]}
 						>
-							{t("videos")} ({data?.service.videos.length})
-						</Text>
-					</TouchableOpacity>
-					{data && data?.service.images?.length > 0 && (
+							<Text
+								style={[styles.tabText, isVideoSlide && styles.tabActiveText]}
+							>
+								{t("videos")} ({data?.service.videos.length})
+							</Text>
+						</TouchableOpacity>
+					) : null}
+					{data && data?.service.images?.length > 0 ? (
 						<TouchableOpacity
 							onPress={() => handleChangeVideo(false)}
 							style={[styles.tab, !isVideoSlide && styles.tabActive]}
@@ -105,7 +110,7 @@ export const HomeDetailBanner = ({
 								{t("images")} ({data?.service.images.length})
 							</Text>
 						</TouchableOpacity>
-					)}
+					) : null}
 				</View>
 			</View>
 			{isVideoSlide ? (
@@ -130,7 +135,7 @@ export const HomeDetailBanner = ({
 									}}
 									style={styles.video}
 									resizeMode={ResizeModeAv.CONTAIN}
-									useNativeControls
+									useNativeControls={Platform.OS !== "ios"}
 									isLooping={false}
 									shouldPlay={false}
 									onFullscreenUpdate={event => {
@@ -148,14 +153,15 @@ export const HomeDetailBanner = ({
 										}
 									}}
 								/>
+
 								{Platform.OS === "ios" ? (
 									<TouchableOpacity
 										onPress={async () => {
 											try {
-												if (Platform.OS === "ios") {
-													await videoRef.current?.presentFullscreenPlayer();
-												} else {
-													await videoRef.current?.playAsync();
+												const ref = videoRefs.current[index];
+												if (ref) {
+													await ref.presentFullscreenPlayer();
+													// await ref.playAsync();
 												}
 											} catch (e) {
 												console.error("Video play error:", e);
@@ -170,7 +176,7 @@ export const HomeDetailBanner = ({
 						)}
 					/>
 
-					{data && data?.service?.videos?.length > 1 && (
+					{data && data?.service?.videos?.length > 1 ? (
 						<View style={styles.paginationContainer}>
 							<View style={styles.pagination}>
 								{data.service.videos.map((_, i) => (
@@ -189,7 +195,7 @@ export const HomeDetailBanner = ({
 								))}
 							</View>
 						</View>
-					)}
+					) : null}
 				</>
 			) : (
 				<>
@@ -213,7 +219,7 @@ export const HomeDetailBanner = ({
 							</TouchableOpacity>
 						)}
 					/>
-					{data && data?.service?.images?.length > 1 && (
+					{data && data?.service?.images?.length > 1 ? (
 						<>
 							<View style={styles.paginationContainer}>
 								<View style={styles.pagination}>
@@ -241,10 +247,10 @@ export const HomeDetailBanner = ({
 								</View>
 							</View>
 						</>
-					)}
+					) : null}
 				</>
 			)}
-			{isImageViewerVisible && (
+			{isImageViewerVisible ? (
 				<Modal
 					visible
 					transparent
@@ -273,7 +279,7 @@ export const HomeDetailBanner = ({
 						<Text style={styles.closeText}>✕</Text>
 					</TouchableOpacity>
 				</Modal>
-			)}
+			) : null}
 		</View>
 	);
 };

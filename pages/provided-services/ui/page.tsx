@@ -92,7 +92,7 @@ export const ProvidedServicesScreen = () => {
 								<Text
 									style={[styles.serviceCategoryName, { color: colors.text }]}
 								>
-									{item.name}
+									{item.categories[0].name}
 								</Text>
 							</View>
 						</TouchableOpacity>

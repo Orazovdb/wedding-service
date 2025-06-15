@@ -132,20 +132,24 @@ const CategoriesFilterModal = (props: props) => {
 			visible={props.isModalVisible}
 			onRequestClose={closeFilter}
 		>
-			<View style={[styles.modalContainer, { height: height }]}>
+			<View
+				style={[
+					styles.modalContainer,
+					{ height: height, backgroundColor: colors.bgPage }
+				]}
+			>
+				<TouchableOpacity style={styles.closeButton} onPress={closeFilter}>
+					{mode === "light" ? <CloseIcon /> : <CloseIconDark />}
+					<Text style={[styles.closeButtonText, { color: colors.text }]}>
+						{t("filter")}
+					</Text>
+				</TouchableOpacity>
 				<ScrollView
 					contentContainerStyle={[
 						styles.modalContent,
 						{ backgroundColor: colors.bgPage }
 					]}
 				>
-					<TouchableOpacity style={styles.closeButton} onPress={closeFilter}>
-						{mode === "light" ? <CloseIcon /> : <CloseIconDark />}
-						<Text style={[styles.closeButtonText, { color: colors.text }]}>
-							{t("filter")}
-						</Text>
-					</TouchableOpacity>
-
 					<View style={styles.categoryItemModal}>
 						<View style={styles.categoryItemModalSection}>
 							<Text
@@ -300,14 +304,15 @@ export const styles = StyleSheet.create({
 	modalContainer: {
 		flex: 1,
 		justifyContent: "center",
-		alignItems: "center"
+		alignItems: "center",
+		paddingTop: Platform.OS === "ios" ? 60 : 0
 	},
 	modalContent: {
 		width: width,
-		height: height,
 		padding: 20,
-		paddingTop: Platform.OS === "ios" ? 60 : 0,
-		alignItems: "center"
+		paddingVertical: 10,
+		alignItems: "center",
+		paddingBottom: 30
 	},
 	closeButton: {
 		alignSelf: "flex-start",
@@ -315,7 +320,8 @@ export const styles = StyleSheet.create({
 		flexDirection: "row",
 		alignItems: "center",
 		gap: 12,
-		marginBottom: 4
+		marginBottom: 4,
+		marginHorizontal: 20
 	},
 	closeButtonText: {
 		fontSize: 16,

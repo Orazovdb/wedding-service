@@ -81,7 +81,7 @@ export const CategoryServices = ({
 					}
 				]}
 			>
-				{item.status !== "normal" && (
+				{item.status !== "normal" ? (
 					<View
 						style={[
 							styles.categoryItemStatus,
@@ -103,7 +103,7 @@ export const CategoryServices = ({
 							<NewIcon />
 						) : null}
 					</View>
-				)}
+				): null}
 
 				<Image source={{ uri: item.logo }} style={styles.categoryProfileImg} />
 
@@ -125,10 +125,12 @@ export const CategoryServices = ({
 					{item.name}
 				</Text>
 
-				<View style={styles.serviceLocationWrapper}>
-					<LocationIcon />
-					<Text style={styles.serviceLocation}>{item.region.province}</Text>
-				</View>
+				{item.region ? (
+					<View style={styles.serviceLocationWrapper}>
+						<LocationIcon />
+						<Text style={styles.serviceLocation}>{item?.region?.province}</Text>
+					</View>
+				) : null}
 
 				<View style={styles.serviceButtons}>
 					<View style={styles.subscriptionsButton}>
@@ -282,13 +284,17 @@ const styles = StyleSheet.create({
 		fontSize: 10,
 		fontFamily: "Lexend-ExtraLight",
 		color: Colors.light.secondary,
-		marginBottom: Platform.OS === "ios" ? 6 : 8
+		marginBottom: Platform.OS === "ios" ? 6 : 8,
+		maxWidth: "90%",
+		textAlign: "center"
 	},
 	serviceName: {
 		fontSize: 10,
 		fontFamily: "Lexend-Regular",
 		color: Colors.light.secondary,
-		marginBottom: Platform.OS === "ios" ? 6 : 8
+		marginBottom: Platform.OS === "ios" ? 6 : 8,
+		maxWidth: "90%",
+		textAlign: "center"
 	},
 	serviceLocationWrapper: {
 		flexDirection: "row",

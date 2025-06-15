@@ -231,6 +231,13 @@ export type ProvidedServices = {
 			name: string;
 			status: string;
 			is_followed: boolean;
+			categories: [
+				{
+					id: number;
+					parent_id: null;
+					name: string;
+				}
+			];
 			service_provider: {
 				id: number;
 				name: string;

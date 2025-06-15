@@ -26,6 +26,8 @@ import { useAppTheme } from "@/shared/hooks/use-app-theme";
 import i18n from "@/shared/i18n";
 import { default as IconArrowLeftDark } from "@/shared/icons/arrow-left-big-black-dark.svg";
 import { default as IconArrowLeft } from "@/shared/icons/arrow-left-big-black.svg";
+import IconAvatarTwiceDark from "@/shared/icons/avatar-twice-dark.svg";
+import IconAvatarTwice from "@/shared/icons/avatar-twice.svg";
 import LocationIcon from "@/shared/icons/location-icon.svg";
 import IconNoData from "@/shared/icons/no-data.svg";
 import GoldenIcon from "@/shared/icons/status-golden.svg";
@@ -174,31 +176,34 @@ export const HomeScreen = () => {
 	};
 
 	const renderItem = ({ item }: { item: HumanServices }) => (
-		<View style={[styles.gridItem, { height: gridItemHeight }]}>
-			<TouchableOpacity
-				onPress={() =>
-					router.push({
-						pathname: `/home/[id]`,
-						params: {
-							id: item.id
-						}
-					})
-				}
-				activeOpacity={0.6}
+		<TouchableOpacity
+			onPress={() =>
+				router.push({ pathname: `/home/[id]`, params: { id: item.id } })
+			}
+			activeOpacity={0.6}
+			key={item.id}
+			style={styles.categoryList}
+		>
+			<View
 				style={[
 					styles.categoryItem,
 					item.status === "premium"
 						? styles.categoryItemPremium
 						: item.status === "golden"
 						? styles.categoryItemGold
-						: "",
+						: {},
 					{
-						backgroundColor: colors.bgServiceItem,
-						shadowColor: colors.bgSeeMoreBtn
+						backgroundColor:
+							item.status === "golden"
+								? styles.categoryItemGold.backgroundColor
+								: item.status === "premium"
+								? styles.categoryItemPremium.backgroundColor
+								: colors.bgServiceItem,
+						shadowColor: colors.text
 					}
 				]}
 			>
-				{item.status !== "normal" && (
+				{item.status !== "normal" ? (
 					<View
 						style={[
 							styles.categoryItemStatus,
@@ -208,18 +213,10 @@ export const HomeScreen = () => {
 								? styles.categoryItemStatusGold
 								: item.status === "new"
 								? styles.categoryItemStatusNew
-								: ""
+								: {}
 						]}
 					>
-						<Text style={styles.categoryItemStatusText}>
-							{item.status === "premium"
-								? t("premium")
-								: item.status === "golden"
-								? t("golden")
-								: item.status === "new"
-								? t("new")
-								: ""}
-						</Text>
+						<Text style={styles.categoryItemStatusText}>{t(item.status)}</Text>
 						{item.status === "premium" ? (
 							<PremiumIcon />
 						) : item.status === "golden" ? (
@@ -228,60 +225,49 @@ export const HomeScreen = () => {
 							<NewIcon />
 						) : null}
 					</View>
-				)}
+				) : null}
+
 				<Image source={{ uri: item.logo }} style={styles.categoryProfileImg} />
-				{item.name ? (
-					(() => {
-						const [firstWord = "", secondWord = ""] = item.name.split(" ");
-						return (
-							<>
-								<Text style={[styles.categoryUsername, { color: colors.text }]}>
-									{firstWord}
-								</Text>
-								<Text
-									style={[styles.categoryUserSurName, { color: colors.text }]}
-								>
-									{secondWord}
-								</Text>
-							</>
-						);
-					})()
-				) : (
-					<Text style={[styles.categoryUsername, { color: colors.text }]}>
-						service-provider_{item.id}
-					</Text>
-				)}
+
+				<Text style={[styles.categoryUsername, { color: colors.text }]}>
+					{item.name?.split(" ")[0] || `service-provider_${item.id}`}
+				</Text>
+				<Text style={[styles.categoryUserSurName, { color: colors.text }]}>
+					{item.name?.split(" ")[1] || ""}
+				</Text>
 
 				<View
 					style={[styles.serviceDivider, { backgroundColor: colors.text }]}
 				/>
+
 				<Text style={[styles.categoryName, { color: colors.text }]}>
 					{item.categories[0].name}
 				</Text>
 				<Text style={[styles.serviceName, { color: colors.text }]}>
 					{item.name}
 				</Text>
-				<View style={styles.serviceLocationWrapper}>
-					<LocationIcon />
-					{(() => {
-						const [firstWord = "", secondWord = ""] =
-							item.region.name.split(" ");
-						return (
-							<>
-								<Text style={styles.serviceLocation}>
-									{firstWord} {secondWord.slice(0, 1)}.,{" "}
-									{item.region.province.slice(0, 4)}
-								</Text>
-							</>
-						);
-					})()}
-				</View>
+
+				{item.region ? (
+					<View style={styles.serviceLocationWrapper}>
+						<LocationIcon />
+						<Text style={styles.serviceLocation}>{item?.region?.province}</Text>
+					</View>
+				) : null}
+
 				<View style={styles.serviceButtons}>
 					<View style={styles.subscriptionsButton}>
-						<Text style={styles.subscriptionsButtonText}>
+						{mode === "light" ? <IconAvatarTwice /> : <IconAvatarTwiceDark />}
+						<Text
+							style={[styles.subscriptionsButtonText, { color: colors.text }]}
+						>
 							{item.followers_count}
 						</Text>
-						<Text style={styles.subscriptionsButtonText}>
+						<Text
+							style={[
+								styles.subscriptionsButtonSubscriberText,
+								{ color: colors.text }
+							]}
+						>
 							{t("subscriber")}
 						</Text>
 					</View>
@@ -290,35 +276,36 @@ export const HomeScreen = () => {
 						style={[
 							styles.subscribeButton,
 							mode === "dark"
-								? { backgroundColor: colors.secondary }
-								: { backgroundColor: colors.white },
-							item.status === "golden" && styles.subscribeButtonGold
+								? { backgroundColor: "#000" }
+								: { backgroundColor: "#000" },
+							item.status === "golden" && styles.subscribeButtonGold,
+							item.is_followed && { backgroundColor: "#0000004D" }
 						]}
 					>
 						<Text
 							style={[
 								styles.subscribeButtonText,
-								{ color: colors.text },
+								{ color: colors.white },
 								item.status === "golden" && styles.subscribeButtonGoldText
 							]}
 						>
-							{t("subscribe")}
+							{t(item.is_followed ? "subscribed" : "subscribe")}
 						</Text>
 					</TouchableOpacity>
 				</View>
-			</TouchableOpacity>
-		</View>
+			</View>
+		</TouchableOpacity>
 	);
 
 	return (
 		<SafeAreaView style={[styles.safeArea, { backgroundColor: colors.bgPage }]}>
 			<View style={styles.scrollContainer}>
 				<View style={styles.searchBox}>
-					{isFiltered && (
+					{isFiltered ? (
 						<TouchableOpacity onPress={clearFilter}>
 							{mode === "light" ? <IconArrowLeft /> : <IconArrowLeftDark />}
 						</TouchableOpacity>
-					)}
+					) : null}
 
 					<View style={[styles.inputContainer, { borderColor: colors.text }]}>
 						<SearchIcon width={20} height={20} color={colors.text} />
@@ -405,7 +392,7 @@ const styles = StyleSheet.create({
 		textAlign: "center"
 	},
 	safeArea: { flex: 1 },
-	scrollContainer: { flexGrow: 1, paddingBottom: 50, width: "100%" },
+	scrollContainer: { flexGrow: 1, paddingBottom: 70, width: "100%" },
 	home: {
 		width: width,
 		flex: 1
@@ -434,25 +421,31 @@ const styles = StyleSheet.create({
 		paddingVertical: 6,
 		marginLeft: 8
 	},
-	gridItem: { width: width / 2 - 30, marginBottom: 20 },
+	categoryList: {
+		width: width / 2 - 20,
+		paddingHorizontal: 7,
+		paddingVertical: 7
+	},
 	categoryItem: {
 		paddingTop: 2,
 		paddingBottom: 8,
 		paddingVertical: 12,
-		backgroundColor: "white",
+		alignItems: "center",
+		borderRadius: 4,
+		position: "relative",
+
+		// iOS shadow
 		shadowColor: "#000",
 		shadowOffset: { width: 0, height: 1.51 },
 		shadowOpacity: 0.25,
 		shadowRadius: 3.02,
-		elevation: 2,
-		borderBottomWidth: 1,
-		borderBottomColor: "#00000040",
-		borderTopWidth: 1,
-		borderTopColor: "#00000040",
-		alignItems: "center",
-		borderRadius: 4,
-		position: "relative"
+
+		// Android shadow
+		elevation: 3,
+
+		backgroundColor: "#fff" // REQUIRED for elevation to be visible
 	},
+
 	categoryItemPremium: {
 		backgroundColor: "#2FD2FF33",
 		elevation: 0
@@ -493,9 +486,7 @@ const styles = StyleSheet.create({
 	categoryProfileImg: {
 		width: 40,
 		height: 40,
-		borderRadius: 22.5,
-		marginBottom: 4,
-		backgroundColor: "#5BB271"
+		borderRadius: 22.5
 	},
 	categoryUsername: {
 		fontSize: 12,
@@ -506,25 +497,29 @@ const styles = StyleSheet.create({
 		fontSize: 12,
 		fontFamily: "Lexend-Regular",
 		lineHeight: 13,
-		marginBottom: 4
+		marginBottom: 6
 	},
 	serviceDivider: {
-		width: "40%",
+		width: "50%",
 		height: 1,
 		backgroundColor: Colors.dark.secondary,
-		marginBottom: 4
+		marginBottom: 6
 	},
 	categoryName: {
 		fontSize: 10,
 		fontFamily: "Lexend-ExtraLight",
 		color: Colors.light.secondary,
-		marginBottom: Platform.OS === "ios" ? 6 : 8
+		marginBottom: Platform.OS === "ios" ? 6 : 8,
+		maxWidth: "90%",
+		textAlign: "center"
 	},
 	serviceName: {
 		fontSize: 10,
 		fontFamily: "Lexend-Regular",
 		color: Colors.light.secondary,
-		marginBottom: Platform.OS === "ios" ? 2 : 4
+		marginBottom: Platform.OS === "ios" ? 6 : 8,
+		maxWidth: "90%",
+		textAlign: "center"
 	},
 	serviceLocationWrapper: {
 		flexDirection: "row",
@@ -534,39 +529,40 @@ const styles = StyleSheet.create({
 		paddingHorizontal: 4,
 		borderRadius: 5,
 		backgroundColor: Colors.dark.primary,
-		marginBottom: Platform.OS === "ios" ? 26 : 30
+		marginBottom: Platform.OS === "ios" ? 8 : 12
 	},
 	serviceLocation: {
 		fontSize: 10,
 		fontFamily: "Lexend-Light",
-		color: Colors.light.secondary,
-		flexWrap: "wrap",
-		textAlign: "center"
+		color: Colors.light.secondary
 	},
 	serviceButtons: {
-		justifyContent: "space-between",
 		gap: 8,
 		width: "100%",
 		paddingHorizontal: 12
 	},
 	subscriptionsButton: {
-		paddingVertical: 6.5,
-		paddingHorizontal: 4.5,
-		backgroundColor: Colors.light.secondary,
-		borderRadius: 3
+		flexDirection: "row",
+		justifyContent: "center",
+		alignContent: "flex-end",
+		gap: 6,
+		marginBottom: 4
 	},
 	subscriptionsButtonText: {
-		fontSize: 10,
-		color: "#FFF1F1",
+		fontSize: 14,
+		fontFamily: "Lexend-Medium"
+	},
+	subscriptionsButtonSubscriberText: {
+		fontSize: 9,
 		fontFamily: "Lexend-Regular",
-		textAlign: "center"
+		marginTop: 6
 	},
 	subscribeButton: {
-		paddingVertical: 3.5,
+		paddingVertical: 3.2,
 		paddingHorizontal: 4.5,
-		borderRadius: 3,
-		borderWidth: 1,
-		borderColor: "#000"
+		borderRadius: 6,
+		width: "84%",
+		marginHorizontal: "auto"
 	},
 	subscribeButtonGold: {
 		backgroundColor: "#D4AF37",

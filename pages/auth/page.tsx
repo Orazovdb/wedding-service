@@ -106,7 +106,7 @@ export const AuthScreen = () => {
 					onMomentumScrollEnd={handleMomentumScrollEnd}
 					renderItem={({ item, index }) => (
 						<View style={styles.slide}>
-							{index !== 3 && (
+							{index !== 3 ? (
 								<>
 									<View style={styles.imageContainer}>
 										<Image source={item.image} style={styles.image} />
@@ -114,11 +114,11 @@ export const AuthScreen = () => {
 									</View>
 									<View style={styles.content}>
 										<Text style={styles.contentTitle}>{item.contentTitle}</Text>
-										{item.contentImage && item.contentImage}
+										{item.contentImage ? item.contentImage : null}
 									</View>
 								</>
-							)}
-							{index === 3 && (
+							) : null}
+							{index === 3 ? (
 								<View style={styles.loginContainer}>
 									<View style={styles.loginTitleBox}>
 										<View style={styles.loginLogo} />
@@ -144,7 +144,7 @@ export const AuthScreen = () => {
 										/>
 									)}
 								</View>
-							)}
+							) : null}
 						</View>
 					)}
 				/>

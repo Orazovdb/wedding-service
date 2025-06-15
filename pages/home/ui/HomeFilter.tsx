@@ -140,19 +140,19 @@ const HomeFilterModal = (props: HomeFilterModalProps) => {
 			style={{ backgroundColor: colors.bgPage }}
 		>
 			<View style={[styles.modalContainer, { backgroundColor: colors.bgPage }]}>
+				<TouchableOpacity style={styles.closeButton} onPress={closeFilter}>
+					{mode === "light" ? <CloseIcon /> : <CloseIconDark />}
+					<Text style={[styles.closeButtonText, { color: colors.text }]}>
+						{t("filter")}
+					</Text>
+				</TouchableOpacity>
+
 				<ScrollView
 					contentContainerStyle={[
 						styles.modalContent,
 						{ backgroundColor: colors.bgPage }
 					]}
 				>
-					<TouchableOpacity style={styles.closeButton} onPress={closeFilter}>
-						{mode === "light" ? <CloseIcon /> : <CloseIconDark />}
-						<Text style={[styles.closeButtonText, { color: colors.text }]}>
-							{t("filter")}
-						</Text>
-					</TouchableOpacity>
-
 					<View style={styles.categoryItemModal}>
 						<View style={styles.categoryItemModalSection}>
 							<Text
@@ -261,7 +261,7 @@ const HomeFilterModal = (props: HomeFilterModalProps) => {
 									]}
 									onPress={() => toggleCheckboxRegions(String(region.id))}
 								>
-									{selectedCategories.includes(`${region.id}`) ? (
+									{selectedRegions.includes(`${region.id}`) ? (
 										mode === "light" ? (
 											<CheckedIcon />
 										) : (
@@ -313,14 +313,15 @@ export const styles = StyleSheet.create({
 	modalContainer: {
 		flex: 1,
 		justifyContent: "center",
-		alignItems: "center"
+		alignItems: "center",
+		paddingTop: Platform.OS === "ios" ? 60 : 0
 	},
 	modalContent: {
 		width: width,
-		height: height,
 		padding: 20,
-		paddingTop: Platform.OS === "ios" ? 60 : 0,
-		alignItems: "center"
+		paddingVertical: 10,
+		alignItems: "center",
+		paddingBottom: 30
 	},
 	closeButton: {
 		alignSelf: "flex-start",
@@ -328,7 +329,8 @@ export const styles = StyleSheet.create({
 		flexDirection: "row",
 		alignItems: "center",
 		gap: 12,
-		marginBottom: 4
+		marginBottom: 4,
+		marginHorizontal: 20
 	},
 	closeButtonText: {
 		fontSize: 16,
