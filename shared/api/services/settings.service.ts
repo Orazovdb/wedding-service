@@ -1,4 +1,4 @@
-import { axiosWithAuth } from "../interceptors";
+import { axiosWithAuth, axiosWithFile } from "../interceptors";
 import { ProvidedServices, Settings } from "../types";
 
 class SettingsService {
@@ -24,7 +24,11 @@ class SettingsService {
 			"/providing-services",
 			{ params }
 		);
-		return response.data
+		return response.data;
+	};
+	patchProvidedServices = async (id: string, data: any) => {
+		const response = await axiosWithFile.post(`/services/${id}/update`, data);
+		return response.data;
 	};
 }
 

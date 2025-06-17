@@ -26,9 +26,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 	useEffect(() => {
 		const checkAuth = async () => {
 			const token = await getAccessToken();
+			
 			if (token) {
 				setIsLoggedIn(true);
-				console.log(token);
 			} else {
 				setIsLoggedIn(false);
 			}

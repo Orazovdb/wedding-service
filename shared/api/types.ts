@@ -245,3 +245,19 @@ export type ProvidedServices = {
 		}
 	];
 };
+
+export type Languages = {
+	tk?: string;
+	ru?: string;
+	en?: string;
+};
+
+export type ServiceUpdate = {
+	_method: string;
+	name?: Languages;
+	description?: Languages;
+	pricing?: Languages;
+	booking?: Languages;
+	contacts?: Languages;
+	phone: string;
+};

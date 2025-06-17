@@ -33,6 +33,7 @@ import IconNoData from "@/shared/icons/no-data.svg";
 import GoldenIcon from "@/shared/icons/status-golden.svg";
 import NewIcon from "@/shared/icons/status-new.svg";
 import PremiumIcon from "@/shared/icons/status-premium.svg";
+import { useAuth } from "@/shared/store/AuthContext";
 import { useRouter } from "expo-router";
 import { t } from "i18next";
 import { homeService } from "./home.service";
@@ -48,6 +49,7 @@ const gridItemHeight = (height - 280) / 3 + 1;
 export const HomeScreen = () => {
 	const currentLang = i18n.language;
 	const { colors, mode } = useAppTheme();
+	const { logout } = useAuth();
 	const router = useRouter();
 
 	const [search, setSearch] = useState("");
@@ -71,7 +73,16 @@ export const HomeScreen = () => {
 		categoriesService
 			.getCategories({ parent: 1, lang: currentLang })
 			.then(setDataCategories);
-		homeService.getHome().then(setData);
+		homeService
+			.getHome()
+			.then(setData)
+			.catch((error: any) => {
+				if (error?.response?.status === 401) {
+					router.push("/login");
+					logout();
+					console.log(error?.response?.status, "errorstatusss");
+				}
+			});
 	}, []);
 
 	useEffect(() => {
@@ -80,15 +91,24 @@ export const HomeScreen = () => {
 			setPage(1);
 			setHasMore(true);
 			setIsFiltered(true);
-			const result = await servicesService.getServices({
-				category_ids: categories.join(",") || undefined,
-				statuses: statuses.join(",") || undefined,
-				provinces: regions.join(",") || undefined,
-				name: search,
-				page: 1,
-				lang: currentLang
-			});
-			setDataServices(result);
+
+			try {
+				const result = await servicesService.getServices({
+					category_ids: categories.join(",") || undefined,
+					statuses: statuses.join(",") || undefined,
+					provinces: regions.join(",") || undefined,
+					name: search,
+					page: 1,
+					lang: currentLang
+				});
+				setDataServices(result);
+			} catch (error: any) {
+				if (error?.response?.status === 401) {
+					router.push("/login");
+					logout();
+					console.log(error?.response?.status, "errorstatusss");
+				}
+			}
 		};
 		fetchOnSearch();
 	}, [search]);

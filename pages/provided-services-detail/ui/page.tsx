@@ -1,6 +1,7 @@
 import { Colors } from "@/constants/Colors";
 import { profileService } from "@/shared/api/services/profile.service";
 import { servicesService } from "@/shared/api/services/services.service";
+import { settingsService } from "@/shared/api/services/settings.service";
 import { HumanServicesByIdData } from "@/shared/api/types";
 import { useAppTheme } from "@/shared/hooks/use-app-theme";
 import i18n from "@/shared/i18n";
@@ -36,6 +37,7 @@ export const ProvidedServicesDetailScreen = () => {
 	const [description, setDescription] = useState("");
 	const [pricing, setPricing] = useState("");
 	const [booking, setBooking] = useState("");
+	const [contact, setContact] = useState("");
 	const [imageUri, setImageUri] = useState<string | null>(null);
 
 	useEffect(() => {
@@ -47,7 +49,6 @@ export const ProvidedServicesDetailScreen = () => {
 			setData(response);
 		};
 		fetchData();
-		console.log(id);
 	}, []);
 
 	useEffect(() => {
@@ -58,10 +59,13 @@ export const ProvidedServicesDetailScreen = () => {
 			setDescription(data.service.description);
 		}
 		if (data?.service.booking) {
-			setBooking(data.service.booking[0]);
+			setBooking(data.service.booking.join(","));
 		}
 		if (data?.service.pricing) {
-			setPricing(data.service.pricing[0]);
+			setPricing(data.service.pricing.join(","));
+		}
+		if (data?.service.contacts) {
+			setContact(data.service.contacts.join(","));
 		}
 	}, [data]);
 
@@ -129,6 +133,71 @@ export const ProvidedServicesDetailScreen = () => {
 			setData(response);
 		};
 		fetchData();
+	};
+
+	const putService = async () => {
+		try {
+			const existingName = data?.service?.name ?? "";
+			const existingDescription = data?.service?.description ?? "";
+			const existingPricing = data?.service?.pricing.join(",") ?? "";
+			const existingBooking = data?.service?.booking.join(",") ?? "";
+			const existingContact = data?.service?.contacts.join(",") ?? "";
+
+			const namePayload: Record<string, string> = {
+				tk: currentLocale === "tk" ? serviceName : existingName || "",
+				ru: currentLocale === "ru" ? serviceName : existingName || "",
+				en: currentLocale === "en" ? serviceName : existingName || ""
+			};
+
+			const descriptionPayload: Record<string, string> = {
+				tk: currentLocale === "tk" ? description : existingDescription || "",
+				ru: currentLocale === "ru" ? description : existingDescription || "",
+				en: currentLocale === "en" ? description : existingDescription || ""
+			};
+
+			const pricingPayload: Record<string, string> = {
+				tk: currentLocale === "tk" ? pricing : existingPricing || "",
+				ru: currentLocale === "ru" ? pricing : existingPricing || "",
+				en: currentLocale === "en" ? pricing : existingPricing || ""
+			};
+
+			const bookingPayload: Record<string, string> = {
+				tk: currentLocale === "tk" ? booking : existingBooking || "",
+				ru: currentLocale === "ru" ? booking : existingBooking || "",
+				en: currentLocale === "en" ? booking : existingBooking || ""
+			};
+
+			const contactsPayload: Record<string, string> = {
+				tk: currentLocale === "tk" ? contact : existingContact,
+				ru: currentLocale === "ru" ? contact : existingContact,
+				en: currentLocale === "en" ? contact : existingContact
+			};
+
+			const payload = {
+				name: namePayload,
+				phone: data?.service.phone ?? "",
+				description: descriptionPayload,
+				pricing: pricingPayload,
+				booking: bookingPayload,
+				contacts: contactsPayload,
+				_method: "PUT"
+			};
+
+			console.log("PATCH payload", JSON.stringify(payload, null, 2));
+
+			await settingsService.patchProvidedServices(String(id), payload);
+
+			const response = await servicesService.getServicesById(
+				id as string,
+				currentLocale
+			);
+			setData(response);
+			Alert.alert("Success", "Service updated successfully.");
+			router.push("/settings");
+		} catch (error) {
+			console.error("PATCH error", error);
+			Alert.alert("Error", "Failed to update service.");
+		}
 	};
 
 	return (
@@ -257,6 +326,7 @@ export const ProvidedServicesDetailScreen = () => {
 								backgroundColor: colors.text
 							}
 						]}
+						onPress={putService}
 					>
 						<Text
 							style={[styles.buttonSaveText, { color: colors.textReverse }]}
@@ -278,7 +348,8 @@ const styles = StyleSheet.create({
 		alignItems: "center",
 		gap: 6,
 		paddingBottom: 14,
-		paddingHorizontal: 24
+		paddingHorizontal: 24,
+		paddingTop: 20
 	},
 	headerTitle: { fontFamily: "Lexend-Regular", fontSize: 16 },
 	text: { fontSize: 16, fontFamily: "Lexend-Regular", marginTop: 20 },

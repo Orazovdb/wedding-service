@@ -121,8 +121,10 @@ export const AuthScreen = () => {
 							{index === 3 ? (
 								<View style={styles.loginContainer}>
 									<View style={styles.loginTitleBox}>
-										<View style={styles.loginLogo} />
-										<Text style={styles.loginTitle}>TMTOY</Text>
+										<Image
+											source={require("@/assets/logo-tmtoy-text.png")}
+											style={styles.loginLogo}
+										/>
 									</View>
 									<View style={styles.loginDivider} />
 									{!isOtp ? (
@@ -176,7 +178,8 @@ const styles = StyleSheet.create({
 	},
 	container: {
 		flex: 1,
-		alignItems: "center"
+		alignItems: "center",
+		paddingTop: Platform.OS === "android" ? 50 : 0
 	},
 
 	slide: { width },
@@ -242,10 +245,10 @@ const styles = StyleSheet.create({
 		marginBottom: 32
 	},
 	loginLogo: {
-		backgroundColor: "#D9D9D9",
 		borderRadius: 4,
-		width: 70,
-		height: 70
+		width: 210,
+		height: 100,
+		objectFit: "contain"
 	},
 	loginTitle: {
 		fontSize: 30,

@@ -86,21 +86,24 @@ const styles = StyleSheet.create({
 		lineHeight: 40
 	},
 	loginInputs: {
-		marginTop: 64,
-		marginBottom: 88
+		marginTop: 34,
+		marginBottom: 38
 	},
 	inputWrapper: {
 		borderWidth: 1,
 		borderColor: `${Colors.light}`,
 		borderRadius: 4,
-		paddingVertical: 7.5,
 		paddingHorizontal: 6,
 		flexDirection: "row",
 		gap: 4,
-		marginBottom: 12
+		marginBottom: 12,
+		height: 40,
+		alignItems: "center"
 	},
 	input: {
-		width: "100%"
+		width: "100%",
+		height: 40,
+		padding: 0
 	},
 	accText: {
 		fontSize: 12,

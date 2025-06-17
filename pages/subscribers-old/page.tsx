@@ -8,22 +8,15 @@ import {
 } from "@/shared/api/types";
 import { useAppTheme } from "@/shared/hooks/use-app-theme";
 import i18n from "@/shared/i18n";
-import { useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import {
-	Image,
-	ScrollView,
-	StyleSheet,
-	Text,
-	TouchableOpacity,
-	View
-} from "react-native";
+import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { SubscribersFilterModal } from "./ui/subscribers-filter";
-import { SubscribersUnsubscribe } from "./ui/subscribers-unsubscribe";
+import { SubscribersInfo } from "./ui/subscribers-info";
+import { SubscribersRecommendCategories } from "./ui/subscribers-recommend-categories";
+import { SubscribersSubscribeSlider } from "./ui/subscribers-subscribe-slider";
 
 export const SubscribersScreen = () => {
-	const router = useRouter();
 	const { t } = useTranslation();
 	const currentLocale = i18n.language;
 	const { colors, mode } = useAppTheme();
@@ -55,6 +48,20 @@ export const SubscribersScreen = () => {
 			.getCategories({ parent: 1, lang: currentLocale })
 			.then(setDataCategories);
 	}, []);
+
+	useEffect(() => {
+		const fetchData = async () => {
+			const result = await servicesService.getServicesById(
+				selectedSubscribeId,
+				currentLocale
+			);
+			setDataService(result);
+		};
+
+		fetchData();
+
+		console.log(selectedSubscribeId);
+	}, [selectedSubscribeId]);
 
 	useEffect(() => {
 		// if (!isFiltered) return;
@@ -98,9 +105,8 @@ export const SubscribersScreen = () => {
 		fetchData();
 	};
 
-	const handleOpenUnsubscribeModal = (id: string) => {
+	const handleOpenUnsubscribeModal = () => {
 		setIsUnsubscribeModalVisible(true);
-		setSelectedSubscribeId(id);
 	};
 
 	const clearFilter = async () => {
@@ -152,7 +158,7 @@ export const SubscribersScreen = () => {
 	};
 
 	return (
-		<View style={[styles.safeArea, { backgroundColor: colors.bgPage }]}>
+		<ScrollView style={[styles.safeArea, { backgroundColor: colors.bgPage }]}>
 			<View style={styles.page}>
 				<View style={[styles.header, { backgroundColor: colors.bgSubscriber }]}>
 					<View style={styles.subscribersRow}>
@@ -173,55 +179,56 @@ export const SubscribersScreen = () => {
 						onFilterApply={handleFilterApply}
 					/>
 				</View>
-				<ScrollView style={styles.items}>
-					{dataSubscribes?.data.map(item => (
-						<TouchableOpacity
-							key={`${item.id}`}
-							onPress={() => router.push(`/home/${item.id}`)}
-							style={styles.item}
-						>
-							<View style={styles.itemLeft}>
-								<Image source={{ uri: item.logo }} style={styles.itemImage} />
-								<View style={styles.itemContent}>
-									<Text style={[styles.itemTitle, { color: colors.text }]}>
-										{item.name}
-									</Text>
-									<Text style={[styles.itemStatus, { color: colors.text }]}>
-										{item.status}
-									</Text>
-								</View>
-							</View>
-							<View style={styles.itemRight}>
-								<SubscribersUnsubscribe.Button
-									handleOpenModal={() =>
-										handleOpenUnsubscribeModal(String(item.id))
-									}
-									handleCloseModal={() => setIsUnsubscribeModalVisible(false)}
-									isModalVisible={isUnsubscribeModalVisible}
-									handleConfirm={handleConfirmUnsubscribe}
-									data={dataService}
-								/>
-							</View>
-						</TouchableOpacity>
-					))}
-				</ScrollView>
-				<SubscribersFilterModal.Modal
-					isModalVisible={isModalVisible}
-					setIsModalVisible={handleModalOpen}
-					categories={dataCategories}
-					clearTrigger={clearTrigger}
-					isFiltered={isFiltered}
-					setIsFiltered={setIsFiltered}
-					onFilterApply={handleFilterApply}
+				<SubscribersSubscribeSlider
+					subscribe_id={selectedSubscribeId}
+					onSelectSubCategory={setSelectedSubscribeId}
+					dataSubscribers={dataSubscribes}
+					index={indexProfileSlider}
+					setIndex={setIndexProfileSlider}
 				/>
-				<SubscribersUnsubscribe.Modal
+				<SubscribersInfo
+					handleOpenModal={handleOpenUnsubscribeModal}
 					handleCloseModal={() => setIsUnsubscribeModalVisible(false)}
 					isModalVisible={isUnsubscribeModalVisible}
 					handleConfirm={handleConfirmUnsubscribe}
 					data={dataService}
+					dataSubscribersLength={dataSubscribes?.data.length}
+				/>
+
+				<View style={styles.subscribersCount}>
+					<View style={styles.subscribersCountButton}>
+						<Text
+							style={[
+								styles.subscribersCountText,
+								{ color: colors.text },
+								styles.subscribersCountTextActive
+							]}
+						>
+							{indexProfileSlider + 1}
+						</Text>
+						<Text style={styles.subscribersCountText}>
+							/ {dataSubscribes?.data.length} {t("subscriber")}
+						</Text>
+					</View>
+				</View>
+				<View style={styles.subscribersCountDivider} />
+
+				<SubscribersRecommendCategories
+					data={dataService}
+					category_id={selectedCategoryId}
 				/>
 			</View>
-		</View>
+
+			<SubscribersFilterModal.Modal
+				isModalVisible={isModalVisible}
+				setIsModalVisible={handleModalOpen}
+				categories={dataCategories}
+				clearTrigger={clearTrigger}
+				isFiltered={isFiltered}
+				setIsFiltered={setIsFiltered}
+				onFilterApply={handleFilterApply}
+			/>
+		</ScrollView>
 	);
 };
 
@@ -231,7 +238,7 @@ const styles = StyleSheet.create({
 	},
 	page: {
 		paddingVertical: 20,
-		paddingBottom: 130
+		paddingBottom: 100
 	},
 	header: {
 		flexDirection: "row",
@@ -257,25 +264,35 @@ const styles = StyleSheet.create({
 		fontSize: 24,
 		color: Colors.dark.secondary
 	},
-	items: { marginTop: 20, paddingHorizontal: 10 },
-	item: {
+
+	subscribersCount: {
+		marginTop: 20,
+		marginBottom: 16,
+		marginHorizontal: "auto",
+		width: "50%"
+	},
+	subscribersCountButton: {
 		flexDirection: "row",
 		alignItems: "center",
-		justifyContent: "space-between",
-		marginBottom: 20
+		justifyContent: "center",
+		backgroundColor: "#C0FFB9",
+		borderRadius: 6,
+		height: 35,
+		width: "100%"
 	},
-	itemLeft: {
-		flexDirection: "row",
-		alignItems: "center",
-		gap: 10,
-		flex: 1
+	subscribersCountTextActive: {
+		color: "#000000"
 	},
-	itemContent: {},
-	itemImage: { width: 38, height: 38, borderRadius: 38 / 2 },
-	itemTitle: { fontFamily: "Lexend-SemiBold", fontSize: 14, marginBottom: 0 },
-	itemStatus: {
-		fontFamily: "Lexend-Light",
-		fontSize: 12
+	subscribersCountText: {
+		fontFamily: "Lexend-Medium",
+		fontSize: 16,
+		textAlign: "center"
 	},
-	itemRight: {}
+	subscribersCountDivider: {
+		width: "60%",
+		height: 1,
+		backgroundColor: "#0000001A",
+		marginHorizontal: "auto",
+		marginBottom: 21
+	}
 });

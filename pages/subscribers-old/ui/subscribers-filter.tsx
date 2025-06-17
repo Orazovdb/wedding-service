@@ -13,6 +13,7 @@ import { useTranslation } from "react-i18next";
 import {
 	Dimensions,
 	Modal,
+	Platform,
 	ScrollView,
 	StyleSheet,
 	Text,
@@ -132,14 +133,20 @@ const SubscribersDetailFilter = (props: SubscribersFilterProps) => {
 			visible={props.isModalVisible}
 			onRequestClose={closeFilter}
 		>
-			<View style={(styles.modalContainer, { backgroundColor: colors.bgPage })}>
-				<TouchableOpacity style={styles.closeButton} onPress={closeFilter}>
-					{mode === "light" ? <CloseIcon /> : <CloseIconDark />}
-					<Text style={[styles.closeButtonText, { color: colors.text }]}>
-						{t("filter")}
-					</Text>
-				</TouchableOpacity>
-				<ScrollView contentContainerStyle={[styles.modalContent]}>
+			<View style={styles.modalContainer}>
+				<ScrollView
+					contentContainerStyle={[
+						styles.modalContent,
+						{ backgroundColor: colors.bgPage }
+					]}
+				>
+					<TouchableOpacity style={styles.closeButton} onPress={closeFilter}>
+						{mode === "light" ? <CloseIcon /> : <CloseIconDark />}
+						<Text style={[styles.closeButtonText, { color: colors.text }]}>
+							{t("filter")}
+						</Text>
+					</TouchableOpacity>
+
 					<View style={styles.categoryItemModal}>
 						<View style={styles.categoryItemModalSection}>
 							<Text
@@ -295,10 +302,10 @@ export const styles = StyleSheet.create({
 	},
 	modalContent: {
 		width: width,
+		height: height,
 		padding: 20,
-		paddingVertical: 10,
-		alignItems: "center",
-		paddingBottom: 100
+		paddingTop: Platform.OS === "ios" ? 60 : 0,
+		alignItems: "center"
 	},
 	closeButton: {
 		alignSelf: "flex-start",
@@ -306,9 +313,7 @@ export const styles = StyleSheet.create({
 		flexDirection: "row",
 		alignItems: "center",
 		gap: 12,
-		marginBottom: 4,
-		marginHorizontal: 20,
-		paddingTop: 60
+		marginBottom: 4
 	},
 	closeButtonText: {
 		fontSize: 16,

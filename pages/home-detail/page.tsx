@@ -65,7 +65,6 @@ export const HomeDynamicScreen = () => {
 	return (
 		<ScrollView style={[styles.container, { backgroundColor: colors.bgPage }]}>
 			<View style={{ paddingBottom: 40 }}>
-				{" "}
 				{data?.service.videos.length || data?.service.images.length ? (
 					<HomeDetailBanner data={data} />
 				) : null}

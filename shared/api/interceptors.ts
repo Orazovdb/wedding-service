@@ -13,7 +13,10 @@ const options: CreateAxiosDefaults = {
 };
 
 const optionsFile: CreateAxiosDefaults = {
-	baseURL: BASE_URL
+	baseURL: BASE_URL,
+	headers: {
+		"Content-Type": "multipart/form-data"
+	}
 };
 
 const axiosClassic = axios.create(options);
